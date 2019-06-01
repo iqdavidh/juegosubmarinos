@@ -9,7 +9,7 @@ import {gameConfig} from "./gameConfig.js";
 
 
 
-let game = {
+let gameLoader = {
 
     start: function () {
         this.canvas = document.createElement('canvas');
@@ -27,7 +27,8 @@ let game = {
             ]
         ).then(([imgMar]) => {
 
-            this.ctx.drawImage(imgMar, 0, 0)
+            //this.ctx.drawImage(imgMar, 0, 0)
+            console.log('imagen cargada');
 
         });
 
@@ -41,4 +42,4 @@ let game = {
 
 };
 
-game.start();
+gameLoader.start();
