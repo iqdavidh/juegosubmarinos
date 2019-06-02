@@ -1,7 +1,8 @@
-/* @flow */
+/*  */
 
 const gameConfig = {
     size: 800,
+    deltaSep: 30,
     numSubmarinos: 3,
     resources: {
         imgMar: null
@@ -26,6 +27,8 @@ function loadImage(url) {
 function loadBGMar(){
     return loadImage('/img/mar1.png')
 }
+//@flow
+
 let EventoDummy = {
 
     addJugador2:function(){
@@ -41,14 +44,25 @@ class AJugador {
         this.isPosicionConfirmada = false;
 
         this.getIsLocal = () => {
-            return indexCuadrante===0;
+            return indexCuadrante === 0;
         };
 
         this.listaAtaquesRecibidos = [];
         this.listaCohetes = [];
 
     }
+
+
+    setPosicionConfirmada() {
+        this.isPosicionConfirmada = true;
+    }
 }
+function animador(){
+    let ctx=gameLoader.ctx;
+
+    ctx.fillRect(0,0,20,20)
+}
+
 class Cohete {
 
     constructor(posicionIni) {
@@ -68,18 +82,34 @@ class Cohete {
     }
 
 }
+/* @flow */
+
 class GameEngine  {
 
-    constructor(jugadorLocal){
-        this.listaJugadores=[ jugadorLocal] ;
+    constructor(ctx, tokenRoom, jugadorLocal) {
+
+        this.ctx = ctx;
+        this.tokenRoom = tokenRoom;
+        this.jugadorLocal=jugadorLocal;
+
+        this.listaJugadores = [jugadorLocal];
     }
 
-    addJugador(jugador){
+    addJugador(jugador) {
         this.listaJugadores.push(jugador);
     }
 
+    runEtapaSeleccionarPosicion() {
+        const ctx=this.ctx;
+        drawEtapaSeleccionarPosicion.local(this.ctx, this.jugadorLocal);
+
+    }
+
+
+
 
 }
+
 
 class GameEngineDataIni {
     constructor() {
@@ -118,6 +148,7 @@ class GameEngineDataIni {
 
 
 }
+/* @flow */
 class JugadorLocal extends AJugador {
 
     constructor(listaSubmarinos) {
@@ -298,7 +329,7 @@ let gameLoader = {
 
     canvas: null,
     ctx: null,
-    start: function () {
+    start: function (tokenRoom) {
 
         if (this.isTerminado) {
             throw new Error("El loader ha termiando")
@@ -318,21 +349,47 @@ let gameLoader = {
         ).then(([imgMar]) => {
             //guardar los archivos cargados
             gameConfig.resources.imgMar = imgMar;
-            this.reload();
+            this.confirmarPosiciones(tokenRoom);
         });
 
     },
-    reload:function(){
+    confirmarPosiciones:function(tokenRoom){
 
         let jugadorLocal=factoryJugador.local();
 
-        gameEngine=new GameEngine( jugadorLocal);
+        gameEngine=new GameEngine( this.ctx, tokenRoom, jugadorLocal);
+
+        gameEngine.runEtapaSeleccionarPosicion();
+
+    }
+
+};
+/*@flow*/
+
+const drawEtapaSeleccionarPosicion = {
+    local: function (ctx, jugador) {
+        const sizeRegion = gameConfig.size/3;
+        const delta = gameConfig.deltaSep;
+
+        let origen= getOriginFromIndex(jugador.indexCuadrante);
+        ctx.fillRect(origen.x, origen.y, sizeRegion, sizeRegion);
     }
 
 };
 
 
 
-/*FBUILD*/ console.log( 'FBUILD-20190602 00:25');  /*FBUILD*/
+function getOriginFromIndex(index) {
+    const size = gameConfig.size;
+    const delta = gameConfig.deltaSep;
+
+    if (index === 0) {
+        return new Posicion(size *.33 , size*.33,0)
+    }else{
+        throw new Error("No tenemos eseIndex de jugador");
+    }
+
+}
+/*FBUILD*/ console.log( 'FBUILD-20190602 14:41');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

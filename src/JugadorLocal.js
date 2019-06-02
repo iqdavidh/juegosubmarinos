@@ -1,3 +1,4 @@
+/* @flow */
 class JugadorLocal extends AJugador {
 
     constructor(listaSubmarinos) {

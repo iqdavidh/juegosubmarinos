@@ -1,3 +1,5 @@
+//@flow
+
 let EventoDummy = {
 
     addJugador2:function(){

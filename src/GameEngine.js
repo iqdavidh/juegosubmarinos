@@ -1,12 +1,28 @@
+/* @flow */
+
 class GameEngine  {
 
-    constructor(jugadorLocal){
-        this.listaJugadores=[ jugadorLocal] ;
+    constructor(ctx, tokenRoom, jugadorLocal) {
+
+        this.ctx = ctx;
+        this.tokenRoom = tokenRoom;
+        this.jugadorLocal=jugadorLocal;
+
+        this.listaJugadores = [jugadorLocal];
     }
 
-    addJugador(jugador){
+    addJugador(jugador) {
         this.listaJugadores.push(jugador);
     }
 
+    runEtapaSeleccionarPosicion() {
+        const ctx=this.ctx;
+        drawEtapaSeleccionarPosicion.local(this.ctx, this.jugadorLocal);
+
+    }
+
+
+
 
 }
+

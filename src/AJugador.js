@@ -6,11 +6,16 @@ class AJugador {
         this.isPosicionConfirmada = false;
 
         this.getIsLocal = () => {
-            return indexCuadrante===0;
+            return indexCuadrante === 0;
         };
 
         this.listaAtaquesRecibidos = [];
         this.listaCohetes = [];
 
+    }
+
+
+    setPosicionConfirmada() {
+        this.isPosicionConfirmada = true;
     }
 }

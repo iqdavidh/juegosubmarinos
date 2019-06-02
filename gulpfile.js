@@ -11,13 +11,16 @@ function crearScript() {
 
     console.log(`app - creando script ******************* ${code}`);
     return gulp
-        .src("./src/*.js")
+        .src("./src/**/*.js")
         .pipe($.sourcemaps.init())
         .pipe($.concat("app.js"))
-        .pipe($.flowtype({all:false }))
+        .pipe($.flowtype({all: false}))
+        .pipe($.flowRemoveTypes({
+            pretty: true
+        }))
         .pipe($.insert.append(buildTS))
         .pipe($.sourcemaps.write("."))
-        .pipe(gulp.dest("public"))
+        .pipe(gulp.dest("public/src"))
         ;
 }
 

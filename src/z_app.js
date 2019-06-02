@@ -7,7 +7,7 @@ let gameLoader = {
 
     canvas: null,
     ctx: null,
-    start: function () {
+    start: function (tokenRoom) {
 
         if (this.isTerminado) {
             throw new Error("El loader ha termiando")
@@ -27,17 +27,18 @@ let gameLoader = {
         ).then(([imgMar]) => {
             //guardar los archivos cargados
             gameConfig.resources.imgMar = imgMar;
-            this.reload();
+            this.confirmarPosiciones(tokenRoom);
         });
 
     },
-    reload:function(){
+    confirmarPosiciones:function(tokenRoom){
 
         let jugadorLocal=factoryJugador.local();
 
-        gameEngine=new GameEngine( jugadorLocal);
+        gameEngine=new GameEngine( this.ctx, tokenRoom, jugadorLocal);
+
+        gameEngine.runEtapaSeleccionarPosicion();
+
     }
 
 };
-
-
