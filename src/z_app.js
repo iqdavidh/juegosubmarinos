@@ -17,7 +17,8 @@ let gameLoader = {
         ).then(([imgMar]) => {
 
 
-            let jugador = new Jugador( 0, lista);
+
+
             //this.ctx.drawImage(imgMar, 0, 0)
             console.log('imagen cargada');
 
@@ -29,4 +30,3 @@ let gameLoader = {
 };
 
 // esto no debe ejecutarse por
-//gameLoader.start();

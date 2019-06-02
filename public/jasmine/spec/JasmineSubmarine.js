@@ -1,9 +1,9 @@
 describe('gameLoader', function () {
 
 
-    describe('factoryListaSubmarinoRandom', function () {
+    describe('factoryListaSubmarino', function () {
 
-        let lista = factoryListaSubmarinoRandom();
+        let lista = factoryListaSubmarinos.random();
 
         it('La lista no es vacia', function () {
             expect(lista.length > 0).toBe(true);
@@ -37,6 +37,36 @@ describe('gameLoader', function () {
 
 
         });
+
+    });
+
+
+
+    describe('factoryJugador', function () {
+
+        let jugadorLocal = factoryJugador.local();
+
+        it('el jugador no es null', function () {
+            expect(jugadorLocal !== null).toBe(true);
+        });
+
+
+        it('el jugador local cumple estado', function () {
+            expect(jugadorLocal.getIsLocal() ).toBe(true);
+
+            expect( jugadorLocal.indexCuadrante === 0 ).toBe(true);
+
+            expect( typeof jugadorLocal.listaSubmarinos ).toBe('object');
+            expect( jugadorLocal.listaSubmarinos.length > 0 ).toBe(true);
+
+
+            expect( typeof jugadorLocal.listaCohetes ).toBe('object');
+            expect( jugadorLocal.listaCohetes.length ===0 ).toBe(true);
+
+        });
+
+
+
 
     });
 
