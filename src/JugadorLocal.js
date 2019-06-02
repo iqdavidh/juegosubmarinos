@@ -27,6 +27,16 @@ class JugadorLocal extends AJugador {
             }).length;
     }
 
+    getNumCohetesReady() {
+        let numCoheteListo = this.getListaCohetes()
+            .filter(c => {
+                return c.getIsEstadoReady();
+            })
+            .length;
+
+        return numCoheteListo;
+    }
+
 }
 
 

@@ -4,7 +4,7 @@ const gameConfig = {
     size: 800,
     deltaSep: 30,
     numSubmarinos: 3,
-    numDivisiones: 9,
+    numDivisiones: 5,
     wDivision:2,
     resources: {
         imgMar: null
@@ -79,11 +79,11 @@ class Cohete {
     }
 
     getIsEstadoReady() {
-        return this.estado ==='ready ';
+        return this.estado ==='ready';
     }
 
     getIsEstadoLanzado() {
-        return this.estado ==='lanzado ';
+        return this.estado ==='lanzado';
     }
 
     lanzar(posicionFinalRC, posicionFinal) {
@@ -190,6 +190,16 @@ class JugadorLocal extends AJugador {
             .filter(s => {
                 return s.isActivo;
             }).length;
+    }
+
+    getNumCohetesReady() {
+        let numCoheteListo = this.getListaCohetes()
+            .filter(c => {
+                return c.getIsEstadoReady();
+            })
+            .length;
+
+        return numCoheteListo;
     }
 
 }
@@ -392,7 +402,7 @@ const drawEtapaSeleccionarPosicion = {
         cacheRegionConMar.width = sizeRegion;
         cacheRegionConMar.height = sizeRegion;
 
-        const ctxCache= cacheRegionConMar.getContext('2d');
+        const ctxCache = cacheRegionConMar.getContext('2d');
 
         //el decorado de la region
         let origen = getOriginFromIndex(jugador.indexCuadrante);
@@ -410,37 +420,41 @@ const drawEtapaSeleccionarPosicion = {
         let sizeCM = (sizeMar - gameConfig.numDivisiones * gameConfig.wDivision) / gameConfig.numDivisiones;
 
 
-        ctxCache.fillStyle = "rgba(255, 255, 255, 1)";
+        ctxCache.fillStyle = "rgba(255, 255, 255, 0.7)";
 
         for (let i = 1; i < gameConfig.numDivisiones; i++) {
             ctxCache.fillRect(i * (sizeCM + gameConfig.wDivision) + delta, delta, gameConfig.wDivision, rayaSize);
-            ctxCache.fillRect(delta,i * (sizeCM + gameConfig.wDivision) + delta, rayaSize,  gameConfig.wDivision);
+            ctxCache.fillRect(delta, i * (sizeCM + gameConfig.wDivision) + delta, rayaSize, gameConfig.wDivision);
         }
 
         /* el cache de texto */
         ctxCache.font = '20px monospace';
+        ctxCache.fillStyle = "rgba(200, 200, 200, 0.7)";
         ctxCache.fillText('COHETES LISTOS', delta + 24, sizeMar + delta + 18);
+        ctxCache.fillText('SUBMARINOS', delta + 70, 24);
 
 
-        /**/
-
-        ctx.drawImage(cacheRegionConMar, 0, 0, sizeRegion, sizeRegion, origenMar.x, origenMar.y, sizeRegion, sizeRegion);
-
-
-        let numCoheteListo = jugador.getListaCohetes()
-            .filter(c => {
-                return c.getIsEstadoReady();
-            }).length;
+        /* draw el cache  */
+        ctx.drawImage(cacheRegionConMar, 0, 0, sizeRegion, sizeRegion, origen.x, origen.y, sizeRegion, sizeRegion);
 
 
+        /* actualziar dra numero coehtes*/
+        let numCoheteListo = jugador.getNumCohetesReady();
+
+        ctx.font = '20px monospace';
+        ctx.fillStyle = "rgba(0, 255, 0, 1)";
+        ctx.fillText(numCoheteListo.toString(), origenMar.x, origenMar.y + sizeMar + 18);
 
 
+        /* actualziar dra numero sub*/
+        let numSubmarino = jugador.getNumSubmarinos();
+        ctx.fillStyle = "rgba(255, 255, 0, 1)";
+        ctx.fillText(numSubmarino.toString(), origen.x + sizeRegion - delta - 20, origen.y + delta - 6);
 
 
     }
 
 };
-
 
 
 function getOriginFromIndex(index) {
@@ -454,6 +468,6 @@ function getOriginFromIndex(index) {
     }
 
 }
-/*FBUILD*/ console.log( 'FBUILD-20190602 15:53');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190602 16:24');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

@@ -8,11 +8,11 @@ class Cohete {
     }
 
     getIsEstadoReady() {
-        return this.estado ==='ready ';
+        return this.estado ==='ready';
     }
 
     getIsEstadoLanzado() {
-        return this.estado ==='lanzado ';
+        return this.estado ==='lanzado';
     }
 
     lanzar(posicionFinalRC, posicionFinal) {
