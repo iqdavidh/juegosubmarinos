@@ -28,4 +28,5 @@ let gameLoader = {
     ctx: null
 };
 
-gameLoader.start();
+// esto no debe ejecutarse por
+//gameLoader.start();

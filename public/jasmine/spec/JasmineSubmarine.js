@@ -1,4 +1,3 @@
-
 describe('gameLoader', function () {
 
 
@@ -7,7 +6,7 @@ describe('gameLoader', function () {
         let lista = factoryListaSubmarinoRandom();
 
         it('La lista no es vacia', function () {
-            expect(lista.length > 0).toBeTrue();
+            expect(lista.length > 0).toBe(true);
         });
 
 
@@ -15,16 +14,28 @@ describe('gameLoader', function () {
 
             lista.forEach(item => {
                 expect(typeof item).toBe("object");
-                expect(item.isActivo ).toBeTrue();
-
+                expect(item.isActivo).toBe(true);
+                expect(item.isCoheteListo).toBe(false);
+                expect(item.posicionRC.r>=0).toBe(true);
+                expect(item.posicionRC.c>=0).toBe(true);
             });
+
         });
 
         it('los submarinos tienen posiciones diferentes ', function () {
 
-            lista.forEach(item => {
-                expect(typeof item).toBe("Submarino")
-            });
+            let listaPos = lista
+                .map(submarino => {
+                    return submarino.posicionRC.r.toString() + "-" + submarino.posicionRC.c.toString() ;
+                })
+            ;
+
+            //quitar elementos repetidos del array
+            let listaUnicos = Array.from(new Set(listaPos));
+
+            expect(listaPos.length === listaUnicos.length).toBe(true);
+
+
         });
 
     });

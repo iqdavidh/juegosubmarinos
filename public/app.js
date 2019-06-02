@@ -224,7 +224,8 @@ let gameLoader = {
     ctx: null
 };
 
-gameLoader.start();
-/*FBUILD*/ console.log( 'FBUILD-20190601 20:33');  /*FBUILD*/
+// esto no debe ejecutarse por
+//gameLoader.start();
+/*FBUILD*/ console.log( 'FBUILD-20190601 20:39');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
