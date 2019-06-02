@@ -1,10 +1,13 @@
+/* @flow */
+
 const gameConfig = {
-    size :800,
-    numSubmarinos:3,
-    resources:{
-        imgMar:null
+    size: 800,
+    numSubmarinos: 3,
+    resources: {
+        imgMar: null
     }
 };
+
 
 function loadImage(url) {
     return new Promise(resolve => {
@@ -233,6 +236,7 @@ const factoryListaSubmarinos = {
     }
 };
 
+
 'use strict';
 
 let gameEngine=null;
@@ -276,6 +280,6 @@ let gameLoader = {
 
 
 
-/*FBUILD*/ console.log( 'FBUILD-20190601 21:36');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190601 23:58');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

@@ -14,6 +14,7 @@ function crearScript() {
         .src("./src/*.js")
         .pipe($.sourcemaps.init())
         .pipe($.concat("app.js"))
+        .pipe($.flowtype({all:false }))
         .pipe($.insert.append(buildTS))
         .pipe($.sourcemaps.write("."))
         .pipe(gulp.dest("public"))
