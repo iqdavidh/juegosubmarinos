@@ -4,6 +4,7 @@ const gameConfig = {
     size: 800,
     deltaSep: 30,
     numSubmarinos: 3,
+    numDivisiones: 10,
     resources: {
         imgMar: null
     }
@@ -16,7 +17,6 @@ function loadImage(url) {
         image.addEventListener('load', () => {
             resolve(image)
         });
-
 
         image.src = url;
     })
@@ -36,6 +36,7 @@ let EventoDummy = {
         gameEngine.addJugador( j);
     }
 };
+/* @flow*/
 class AJugador {
 
     constructor(indexCuadrante) {
@@ -56,6 +57,10 @@ class AJugador {
     setPosicionConfirmada() {
         this.isPosicionConfirmada = true;
     }
+
+    getListaCohetes() {
+        return this.listaCohetes;
+    }
 }
 function animador(){
     let ctx=gameLoader.ctx;
@@ -67,17 +72,26 @@ class Cohete {
 
     constructor(posicionIni) {
         this.posicionIni = posicionIni;
-        this.velocidad=new Posicion(0,0,0)
-        this.posicion=null;
+        this.estado = 'ready';
+        this.velocidad = new Posicion(0, 0, 0);
+        this.posicion = null;
     }
 
-    lanzar(posicionFinalRC, posicionFinal ) {
+    getIsEstadoReady() {
+        return this.estado ==='ready ';
+    }
+
+    getIsEstadoLanzado() {
+        return this.estado ==='lanzado ';
+    }
+
+    lanzar(posicionFinalRC, posicionFinal) {
+        this.estado='lanzado';
         this.posicionFinal = posicionFinal;
         this.posicionFinalRC = posicionFinalRC;
-
     }
 
-    mover(){
+    mover() {
 
     }
 
@@ -207,9 +221,11 @@ class JugadorRemoto extends AJugador{
         return this.numSubmarinos;
     }
 }
+/* @flow */
+
 class Posicion {
 
-    constructor(x, y, z) {
+    constructor(x, y, z=0) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -368,15 +384,22 @@ let gameLoader = {
 
 const drawEtapaSeleccionarPosicion = {
     local: function (ctx, jugador) {
-        const sizeRegion = gameConfig.size/3;
+        const sizeRegion = gameConfig.size / 3;
         const delta = gameConfig.deltaSep;
 
-        let origen= getOriginFromIndex(jugador.indexCuadrante);
+        let origen = getOriginFromIndex(jugador.indexCuadrante);
         ctx.fillRect(origen.x, origen.y, sizeRegion, sizeRegion);
+        //la seccion de mar
+
+        let sizeMar = sizeRegion - 2 * delta;
+        let origenMar = new Posicion(origen.x + delta, origen.y + delta);
+        ctx.drawImage(gameConfig.resources.imgMar,0,0,sizeMar,sizeMar, origenMar.x, origenMar.y,sizeMar, sizeMar);
+
+        //poner el texto
+        let numCoheteListo=jugador.getListaCohetes()
     }
 
 };
-
 
 
 function getOriginFromIndex(index) {
@@ -384,12 +407,12 @@ function getOriginFromIndex(index) {
     const delta = gameConfig.deltaSep;
 
     if (index === 0) {
-        return new Posicion(size *.33 , size*.33,0)
-    }else{
+        return new Posicion(size * .33, size * .33, 0)
+    } else {
         throw new Error("No tenemos eseIndex de jugador");
     }
 
 }
-/*FBUILD*/ console.log( 'FBUILD-20190602 14:41');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190602 15:04');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

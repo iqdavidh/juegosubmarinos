@@ -1,3 +1,4 @@
+/* @flow*/
 class AJugador {
 
     constructor(indexCuadrante) {
@@ -17,5 +18,9 @@ class AJugador {
 
     setPosicionConfirmada() {
         this.isPosicionConfirmada = true;
+    }
+
+    getListaCohetes(): Array<Cohete> {
+        return this.listaCohetes;
     }
 }

@@ -2,17 +2,26 @@ class Cohete {
 
     constructor(posicionIni) {
         this.posicionIni = posicionIni;
-        this.velocidad=new Posicion(0,0,0)
-        this.posicion=null;
+        this.estado = 'ready';
+        this.velocidad = new Posicion(0, 0, 0);
+        this.posicion = null;
     }
 
-    lanzar(posicionFinalRC, posicionFinal ) {
+    getIsEstadoReady() {
+        return this.estado ==='ready ';
+    }
+
+    getIsEstadoLanzado() {
+        return this.estado ==='lanzado ';
+    }
+
+    lanzar(posicionFinalRC, posicionFinal) {
+        this.estado='lanzado';
         this.posicionFinal = posicionFinal;
         this.posicionFinalRC = posicionFinalRC;
-
     }
 
-    mover(){
+    mover() {
 
     }
 

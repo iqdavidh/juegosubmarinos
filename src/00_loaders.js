@@ -6,7 +6,6 @@ function loadImage(url) {
             resolve(image)
         });
 
-
         image.src = url;
     })
 }
