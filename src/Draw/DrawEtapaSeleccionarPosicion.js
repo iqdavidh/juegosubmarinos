@@ -1,17 +1,37 @@
 /*@flow*/
 
 const drawEtapaSeleccionarPosicion = {
+
+    drawSubmarino: function (ctx,submarino: Submarino) {
+
+        const sizeRegion = gameConfig.size / 3;
+        const origen = getOriginFromIndex(submarino.jugador.indexCuadrante);
+        const delta = gameConfig.deltaSep;
+
+        const sizeMar = sizeRegion - 2 * delta;
+
+        const origenMar = new Posicion(origen.x + delta, origen.y + delta);
+
+        const sizeCM = (sizeMar - gameConfig.numDivisiones * gameConfig.wDivision) / gameConfig.numDivisiones;
+
+        console.log(submarino.getPosicionRC());
+
+        const x = origenMar.x + (submarino.getPosicionRC().r-1) * (sizeCM + gameConfig.wDivision);
+        const y = origenMar.y + (submarino.getPosicionRC().c-1 )* (sizeCM + gameConfig.wDivision);
+
+        ctx.fillRect(x,y, sizeCM/2, sizeCM/2);
+
+
+    },
     local: function (ctx, jugador: JugadorLocal) {
         const sizeRegion = gameConfig.size / 3;
         const delta = gameConfig.deltaSep;
 
 
-
-        let cacheRegionConMar=this.getCacheCanvasRegionConMar( jugador);
+        let cacheRegionConMar = this.getCacheCanvasRegionConMar(jugador);
 
         let origen = getOriginFromIndex(jugador.indexCuadrante);
-        let origenMar = new Posicion(origen.x + delta, origen.y + delta);
-        let sizeMar = sizeRegion - 2 * delta;
+
 
         /* draw el cache  */
         ctx.drawImage(cacheRegionConMar, 0, 0, sizeRegion, sizeRegion, origen.x, origen.y, sizeRegion, sizeRegion);
@@ -33,12 +53,18 @@ const drawEtapaSeleccionarPosicion = {
         ctx.fillText(numSubmarino.toString(), origen.x + sizeRegion - delta - 20, origen.y + delta - 6);
 
 
+        jugador.getListaSubmarinos().forEach(s => {
+            this.drawSubmarino(ctx,s);
+        });
+
+
     },
-    cacheCanvasRegionConMar:null,
 
-    getCacheCanvasRegionConMar:function(jugador:JugadorLocal  ){
+    cacheCanvasRegionConMar: null,
 
-        if(this.cacheCanvasRegionConMar !==null){
+    getCacheCanvasRegionConMar: function (jugador: JugadorLocal) {
+
+        if (this.cacheCanvasRegionConMar !== null) {
             return this.cacheCanvasRegionConMar;
         }
 
@@ -53,18 +79,18 @@ const drawEtapaSeleccionarPosicion = {
         const ctxCache = cacheRegionConMar.getContext('2d');
 
         //el decorado de la region
-        let origen = getOriginFromIndex(jugador.indexCuadrante);
+        const origen = getOriginFromIndex(jugador.indexCuadrante);
         ctxCache.fillRect(0, 0, sizeRegion, sizeRegion);
 
         //la seccion de mar
-        let sizeMar = sizeRegion - 2 * delta;
+        const sizeMar = sizeRegion - 2 * delta;
         ctxCache.drawImage(gameConfig.resources.imgMar, 0, 0, sizeMar, sizeMar, delta, delta, sizeMar, sizeMar);
 
         //las divisiones
-        let sizeDiv = (sizeRegion - (gameConfig.wDivision * gameConfig.numDivisiones)) / gameConfig.numDivisiones;
-        let rayaSize = sizeRegion - 2 * delta;
+        const sizeDiv = (sizeRegion - (gameConfig.wDivision * gameConfig.numDivisiones)) / gameConfig.numDivisiones;
+        const rayaSize = sizeRegion - 2 * delta;
 
-        let sizeCM = (sizeMar - gameConfig.numDivisiones * gameConfig.wDivision) / gameConfig.numDivisiones;
+        const sizeCM = (sizeMar - gameConfig.numDivisiones * gameConfig.wDivision) / gameConfig.numDivisiones;
 
 
         ctxCache.fillStyle = "rgba(255, 255, 255, 0.7)";
@@ -79,7 +105,7 @@ const drawEtapaSeleccionarPosicion = {
         ctxCache.fillStyle = "rgba(200, 200, 200, 0.7)";
         ctxCache.fillText('SUBMARINOS', delta + 70, 24);
 
-        this.cacheCanvasRegionConMar=cacheRegionConMar;
+        this.cacheCanvasRegionConMar = cacheRegionConMar;
 
         return cacheRegionConMar;
 
