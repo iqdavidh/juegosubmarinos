@@ -7,6 +7,7 @@
   },
   "author": "davidh <david@productividadti.com.mx> (productividadti.com.mx)",
   "devDependencies": {
+    "eslint-config-airbnb-base": "^13.1.0",
     "gulp": "^4.0.1",
     "gulp-concat": "^2.6.1",
     "gulp-insert": "^0.5.0",
@@ -19,4 +20,5 @@
   "dependencies": {
     "st": "^1.2.2"
   }
+
 }

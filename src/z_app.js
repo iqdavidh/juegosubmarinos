@@ -1,8 +1,17 @@
 'use strict';
 
+let gameEngine=null;
+
 let gameLoader = {
 
+    canvas: null,
+    ctx: null,
     start: function () {
+
+        if (this.isTerminado) {
+            throw new Error("El loader ha termiando")
+        }
+
         this.canvas = document.createElement('canvas');
         this.canvas.width = gameConfig.size;
         this.canvas.height = gameConfig.size;
@@ -15,18 +24,19 @@ let gameLoader = {
                 loadBGMar()
             ]
         ).then(([imgMar]) => {
-
-
-
-
-            //this.ctx.drawImage(imgMar, 0, 0)
-            console.log('imagen cargada');
-
+            //guardar los archivos cargados
+            gameConfig.resources.imgMar = imgMar;
+            this.reload();
         });
 
     },
-    canvas: null,
-    ctx: null
+    reload:function(){
+
+        let jugadorLocal=factoryJugador.local();
+
+        gameEngine=new GameEngine( jugadorLocal);
+    }
+
 };
 
-// esto no debe ejecutarse por
+

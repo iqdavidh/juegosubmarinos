@@ -1,0 +1,19 @@
+{
+    "parserOptions": {
+        "ecmaVersion": 2015
+    },
+
+    "rules": {
+        "func-names": "off",
+        "no-alert": "off",
+        "no-console": "off",
+        "no-plusplus": "off",
+        "vars-on-top": "off",
+        "no-multi-spaces": "off",
+        "key-spacing": "off",
+        "max-len": "off",
+        "no-undef": "off",
+        "no-unused-vars": "off"
+
+    }
+}

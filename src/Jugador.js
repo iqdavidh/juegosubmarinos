@@ -2,6 +2,7 @@ class Jugador {
 
     constructor(indexCuadrante, listaSubmarinos) {
         this.indexCuadrante = indexCuadrante;
+        this.id = parseInt(Math.random() * 100000);
 
 
         this.getIsLocal = () => {

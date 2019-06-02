@@ -1,6 +1,6 @@
 class GameEngine  {
 
-    constructor(){
+    constructor(jugadorLocal){
 
     }
 }
