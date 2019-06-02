@@ -22,6 +22,11 @@ class GameEngine  {
     }
 
 
+    onClickEtapaSeleccionarPosicion(event){
+
+        console.log(event.clientX + ',' + event.clientY);
+    }
+
 
 
 }

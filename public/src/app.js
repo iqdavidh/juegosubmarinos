@@ -5,9 +5,41 @@ const gameConfig = {
     deltaSep: 30,
     numSubmarinos: 3,
     numDivisiones: 5,
-    wDivision:2,
+    wDivision: 2,
     resources: {
         imgMar: null
+    }
+};
+
+const gameCacheSize = {
+    sizeRegion: null,
+    getSizeRegion: function () {
+        if (this.sizeRegion !== null) {
+            return this.sizeRegion;
+        }
+
+        this.sizeRegion = gameConfig.size / 3;
+        return this.sizeRegion;
+    } ,
+
+    sizeMar: null,
+    getSizeMar: function () {
+        if (this.sizeMar !== null) {
+            return this.sizeMar;
+        }
+        const delta = gameConfig.deltaSep;
+        this.sizeMar = this.getSizeRegion() -  2 * delta;
+        return this.sizeMar;
+    },
+    sizeCM: null,
+    getSizeCM: function () {
+
+        if (this.sizeCM !== null) {
+            return this.sizeCM;
+        }
+
+        this.sizeCM = (this.getSizeMar() - gameConfig.numDivisiones * gameConfig.wDivision) / gameConfig.numDivisiones;
+        return this.sizeCM;
     }
 };
 
@@ -61,6 +93,19 @@ class AJugador {
 
     getListaCohetes() {
         return this.listaCohetes;
+    }
+
+    getOrigenFromIndex() {
+        const size = gameConfig.size;
+        const delta = gameConfig.deltaSep;
+
+
+        if (this.indexCuadrante === 0) {
+            return new Posicion(size * .33, size * .33, 0)
+        } else {
+            throw new Error("No tenemos eseIndex de jugador");
+        }
+
     }
 }
 function animador(){
@@ -120,6 +165,11 @@ class GameEngine  {
 
     }
 
+
+    onClickEtapaSeleccionarPosicion(event){
+
+        console.log(event.clientX + ',' + event.clientY);
+    }
 
 
 
@@ -232,25 +282,6 @@ class JugadorRemoto extends AJugador{
         return this.numSubmarinos;
     }
 }
-/* @flow */
-
-class Posicion {
-
-    constructor(x, y, z=0) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-    }
-
-}
-class PosicionRC {
-
-    constructor(r, c) {
-        this.r = r;
-        this.c = c;
-    }
-
-}
 class ResultadoOpe {
 
     constructor(isOk, msg, dataAdicional) {
@@ -349,10 +380,9 @@ const factoryListaSubmarinos = {
     }
 };
 
-
 'use strict';
 
-let gameEngine=null;
+let gameEngine = null;
 
 let gameLoader = {
 
@@ -368,6 +398,7 @@ let gameLoader = {
         this.canvas.width = gameConfig.size;
         this.canvas.height = gameConfig.size;
 
+
         let container = document.getElementById('container');
         container.append(this.canvas);
         this.ctx = this.canvas.getContext('2d');
@@ -382,11 +413,17 @@ let gameLoader = {
         });
 
     },
-    confirmarPosiciones:function(tokenRoom){
+    confirmarPosiciones: function (tokenRoom) {
 
-        let jugadorLocal=factoryJugador.local();
+        let jugadorLocal = factoryJugador.local();
 
-        gameEngine=new GameEngine( this.ctx, tokenRoom, jugadorLocal);
+        gameEngine = new GameEngine(this.ctx, tokenRoom, jugadorLocal);
+
+        this.canvas.onclick = function (event) {
+            console.log('x');
+            gameEngine.onClickEtapaSeleccionarPosicion(event);
+
+        };
 
         gameEngine.runEtapaSeleccionarPosicion();
 
@@ -397,24 +434,19 @@ let gameLoader = {
 
 const drawEtapaSeleccionarPosicion = {
 
-    drawSubmarino: function (ctx,submarino) {
+    drawSubmarino: function (ctx, submarino) {
 
-        const sizeRegion = gameConfig.size / 3;
-        const origen = getOriginFromIndex(submarino.jugador.indexCuadrante);
+        const sizeRegion = gameCacheSize.getSizeRegion();
+        const origen = submarino.jugador.getOrigenFromIndex();
         const delta = gameConfig.deltaSep;
 
-        const sizeMar = sizeRegion - 2 * delta;
-
         const origenMar = new Posicion(origen.x + delta, origen.y + delta);
+        const sizeCM = gameCacheSize.getSizeCM();
 
-        const sizeCM = (sizeMar - gameConfig.numDivisiones * gameConfig.wDivision) / gameConfig.numDivisiones;
+        const x = origenMar.x + (submarino.getPosicionRC().r - 1) * (sizeCM + gameConfig.wDivision);
+        const y = origenMar.y + (submarino.getPosicionRC().c - 1) * (sizeCM + gameConfig.wDivision);
 
-        console.log(submarino.getPosicionRC());
-
-        const x = origenMar.x + (submarino.getPosicionRC().r-1) * (sizeCM + gameConfig.wDivision);
-        const y = origenMar.y + (submarino.getPosicionRC().c-1 )* (sizeCM + gameConfig.wDivision);
-
-        ctx.fillRect(x,y, sizeCM/2, sizeCM/2);
+        ctx.fillRect(x, y, sizeCM / 2, sizeCM / 2);
 
 
     },
@@ -422,10 +454,9 @@ const drawEtapaSeleccionarPosicion = {
         const sizeRegion = gameConfig.size / 3;
         const delta = gameConfig.deltaSep;
 
-
         let cacheRegionConMar = this.getCacheCanvasRegionConMar(jugador);
 
-        let origen = getOriginFromIndex(jugador.indexCuadrante);
+        let origen = jugador.getOrigenFromIndex();
 
 
         /* draw el cache  */
@@ -449,11 +480,11 @@ const drawEtapaSeleccionarPosicion = {
 
 
         jugador.getListaSubmarinos().forEach(s => {
-            this.drawSubmarino(ctx,s);
+            this.drawSubmarino(ctx, s);
         });
 
-
     },
+
 
     cacheCanvasRegionConMar: null,
 
@@ -474,7 +505,7 @@ const drawEtapaSeleccionarPosicion = {
         const ctxCache = cacheRegionConMar.getContext('2d');
 
         //el decorado de la region
-        const origen = getOriginFromIndex(jugador.indexCuadrante);
+        const origen = jugador.getOrigenFromIndex();
         ctxCache.fillRect(0, 0, sizeRegion, sizeRegion);
 
         //la seccion de mar
@@ -504,21 +535,136 @@ const drawEtapaSeleccionarPosicion = {
 
         return cacheRegionConMar;
 
+    },
+    getPosicionFromCanvasXY(x, y) {
+
     }
 };
 
 
-function getOriginFromIndex(index) {
-    const size = gameConfig.size;
-    const delta = gameConfig.deltaSep;
 
-    if (index === 0) {
-        return new Posicion(size * .33, size * .33, 0)
-    } else {
-        throw new Error("No tenemos eseIndex de jugador");
+/* @flow */
+
+class Posicion {
+
+    constructor(x, y, z=0) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
 
 }
-/*FBUILD*/ console.log( 'FBUILD-20190602 17:37');  /*FBUILD*/
+class PosicionRC {
+
+    constructor(r, c) {
+        this.r = r;
+        this.c = c;
+    }
+
+}
+class PosicionRCCuadrante {
+
+    constructor(indexCuadrante, posicion) {
+        this.indexCuadrante = indexCuadrante;
+        this.posicion = posicion;
+    }
+
+    getIndexCuadrante() {
+        return this.indexCuadrante;
+    }
+
+    getR() {
+        return this.posicion.r;
+    }
+
+    getC() {
+        return this.posicion.c;
+    }
+}
+
+const factoryPosicionRCCuadrante = {
+    fromXY: function (x, y) {
+
+        //paso 1 determinar el cuadrante
+        const sizeRegion = gameConfig.size / 3;
+        const delta = gameConfig.deltaSep;
+
+        function getPosicionCuadrante(valor) {
+            return Math.floor(valor / sizeRegion);
+        }
+
+        let cuadranteX = getPosicionCuadrante(x);
+        let cuadranteY = getPosicionCuadrante(y);
+
+        let code = `${cuadranteX}-${cuadranteY}`;
+        let indexCuadrante = this.dicCuadranteIndex[code];
+
+        let origenCuadrante = this.getOrigenCuadrante(indexCuadrante);
+
+        //obtener rango del mar
+        let xMarIni = origenCuadrante.x + delta;
+        let xMarFin = origenCuadrante.x + sizeRegion - delta;
+        let yMarIni = origenCuadrante.y + delta;
+        let yMarFin = origenCuadrante.y + sizeRegion - delta;
+
+        if (x >= xMarIni && x <= xMarFin && y >= yMarIni && y <= yMarFin) {
+
+            //encontrar la posicion RC
+            let xRel = x - xMarIni;
+            let yRel = y - yMarIni;
+
+            return new PosicionRCCuadrante(indexCuadrante);
+
+        } else {
+            return null;
+        }
+    },
+
+    dicCuadranteIndex: {
+        '00': 5,
+        '01': 1,
+        '02': 6,
+        '10': 2,
+        '11': 0,
+        '12': 3,
+        '20': 7,
+        '21': 4,
+        '22': 8,
+    },
+    getOrigenCuadrante(cuadrante) {
+
+        const sizeRegion = gameConfig.size / 3;
+
+        if (index === 5) {
+            return new Posicion(0, 0);
+        } else if (index === 1) {
+            return new Posicion(sizeRegion, 0);
+        } else if (index === 6) {
+            return new Posicion(sizeRegion * 2, 0);
+        }
+
+        if (index === 2) {
+            return new Posicion(0, sizeRegion);
+        } else if (index === 0) {
+            return new Posicion(sizeRegion, sizeRegion);
+        } else if (index === 3) {
+            return new Posicion(sizeRegion * 2, sizeRegion);
+        }
+
+
+        if (index === 7) {
+            return new Posicion(0, sizeRegion * 2);
+        } else if (index === 4) {
+            return new Posicion(sizeRegion, sizeRegion * 2);
+        } else if (index === 8) {
+            return new Posicion(sizeRegion * 2, sizeRegion * 2);
+        }
+
+        throw new Error("Ese cuadrante no esta soportado " + cuadrante.toString());
+    }
+
+
+};
+/*FBUILD*/ console.log( 'FBUILD-20190602 18:47');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

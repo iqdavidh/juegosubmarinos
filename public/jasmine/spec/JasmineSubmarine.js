@@ -16,8 +16,8 @@ describe('gameLoader', function () {
                 expect(typeof item).toBe("object");
                 expect(item.isActivo).toBe(true);
                 expect(item.isCoheteListo).toBe(false);
-                expect(item.posicionRC.r>=0).toBe(true);
-                expect(item.posicionRC.c>=0).toBe(true);
+                expect(item.posicionRC.r >= 0).toBe(true);
+                expect(item.posicionRC.c >= 0).toBe(true);
             });
 
         });
@@ -26,7 +26,7 @@ describe('gameLoader', function () {
 
             let listaPos = lista
                 .map(submarino => {
-                    return submarino.posicionRC.r.toString() + "-" + submarino.posicionRC.c.toString() ;
+                    return submarino.posicionRC.r.toString() + "-" + submarino.posicionRC.c.toString();
                 })
             ;
 
@@ -41,7 +41,6 @@ describe('gameLoader', function () {
     });
 
 
-
     describe('factoryJugador', function () {
 
         let jugadorLocal = factoryJugador.local();
@@ -52,16 +51,55 @@ describe('gameLoader', function () {
 
 
         it('el jugador local cumple estado', function () {
-            expect(jugadorLocal.getIsLocal() ).toBe(true);
+            expect(jugadorLocal.getIsLocal()).toBe(true);
 
-            expect( jugadorLocal.indexCuadrante === 0 ).toBe(true);
+            expect(jugadorLocal.indexCuadrante === 0).toBe(true);
 
-            expect( typeof jugadorLocal.listaSubmarinos ).toBe('object');
-            expect( jugadorLocal.listaSubmarinos.length > 0 ).toBe(true);
+            expect(typeof jugadorLocal.listaSubmarinos).toBe('object');
+            expect(jugadorLocal.listaSubmarinos.length > 0).toBe(true);
 
 
-            expect( typeof jugadorLocal.listaCohetes ).toBe('object');
-            expect( jugadorLocal.listaCohetes.length ===0 ).toBe(true);
+            expect(typeof jugadorLocal.listaCohetes).toBe('object');
+            expect(jugadorLocal.listaCohetes.length === 0).toBe(true);
+
+        });
+
+
+    });
+
+
+    describe('Evento Click Cavas - Confirmar Posicion en Jugador Local', function () {
+
+
+        const listaPosicion = [
+            [329, 331, 1, 1],
+            [351, 357, 2, 2],
+            [358, 480, 4, 2],
+            [487, 493, 5, 5],
+            [2, 331, null, null],
+        ];
+
+        listaPosicion.forEach(row => {
+            let x = row[0];
+            let y = row[1];
+            let r = row[2];
+            let c = row[3];
+
+            it('Las coordenadas de click se traducen en posicion RC', function () {
+
+                let pCuadrante=factoryPosicionRCCuadrante.fromXY(x,y);
+
+                expect(pCuadrante.getR() === r).toBe(true);
+                expect(pCuadrante.getC() === c).toBe(true);
+
+                if(r===null){
+                    expect(pCuadrante.getIndexCuadrante() === null).toBe(true);
+                }else{
+                    expect(pCuadrante.getIndexCuadrante() === 1).toBe(true);
+                }
+
+
+            });
 
         });
 
@@ -69,7 +107,6 @@ describe('gameLoader', function () {
 
 
     });
-
 
 });
 

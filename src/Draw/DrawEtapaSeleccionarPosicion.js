@@ -2,24 +2,19 @@
 
 const drawEtapaSeleccionarPosicion = {
 
-    drawSubmarino: function (ctx,submarino: Submarino) {
+    drawSubmarino: function (ctx, submarino: Submarino) {
 
-        const sizeRegion = gameConfig.size / 3;
-        const origen = getOriginFromIndex(submarino.jugador.indexCuadrante);
+        const sizeRegion = gameCacheSize.getSizeRegion();
+        const origen = submarino.jugador.getOrigenFromIndex();
         const delta = gameConfig.deltaSep;
 
-        const sizeMar = sizeRegion - 2 * delta;
-
         const origenMar = new Posicion(origen.x + delta, origen.y + delta);
+        const sizeCM = gameCacheSize.getSizeCM();
 
-        const sizeCM = (sizeMar - gameConfig.numDivisiones * gameConfig.wDivision) / gameConfig.numDivisiones;
+        const x = origenMar.x + (submarino.getPosicionRC().r - 1) * (sizeCM + gameConfig.wDivision);
+        const y = origenMar.y + (submarino.getPosicionRC().c - 1) * (sizeCM + gameConfig.wDivision);
 
-        console.log(submarino.getPosicionRC());
-
-        const x = origenMar.x + (submarino.getPosicionRC().r-1) * (sizeCM + gameConfig.wDivision);
-        const y = origenMar.y + (submarino.getPosicionRC().c-1 )* (sizeCM + gameConfig.wDivision);
-
-        ctx.fillRect(x,y, sizeCM/2, sizeCM/2);
+        ctx.fillRect(x, y, sizeCM / 2, sizeCM / 2);
 
 
     },
@@ -27,10 +22,9 @@ const drawEtapaSeleccionarPosicion = {
         const sizeRegion = gameConfig.size / 3;
         const delta = gameConfig.deltaSep;
 
-
         let cacheRegionConMar = this.getCacheCanvasRegionConMar(jugador);
 
-        let origen = getOriginFromIndex(jugador.indexCuadrante);
+        let origen = jugador.getOrigenFromIndex();
 
 
         /* draw el cache  */
@@ -54,11 +48,11 @@ const drawEtapaSeleccionarPosicion = {
 
 
         jugador.getListaSubmarinos().forEach(s => {
-            this.drawSubmarino(ctx,s);
+            this.drawSubmarino(ctx, s);
         });
 
-
     },
+
 
     cacheCanvasRegionConMar: null,
 
@@ -79,7 +73,7 @@ const drawEtapaSeleccionarPosicion = {
         const ctxCache = cacheRegionConMar.getContext('2d');
 
         //el decorado de la region
-        const origen = getOriginFromIndex(jugador.indexCuadrante);
+        const origen = jugador.getOrigenFromIndex();
         ctxCache.fillRect(0, 0, sizeRegion, sizeRegion);
 
         //la seccion de mar
@@ -109,18 +103,10 @@ const drawEtapaSeleccionarPosicion = {
 
         return cacheRegionConMar;
 
+    },
+    getPosicionFromCanvasXY(x:number, y:number) {
+
     }
 };
 
 
-function getOriginFromIndex(index): Posicion {
-    const size = gameConfig.size;
-    const delta = gameConfig.deltaSep;
-
-    if (index === 0) {
-        return new Posicion(size * .33, size * .33, 0)
-    } else {
-        throw new Error("No tenemos eseIndex de jugador");
-    }
-
-}

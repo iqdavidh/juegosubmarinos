@@ -1,7 +1,6 @@
-
 'use strict';
 
-let gameEngine=null;
+let gameEngine = null;
 
 let gameLoader = {
 
@@ -17,6 +16,7 @@ let gameLoader = {
         this.canvas.width = gameConfig.size;
         this.canvas.height = gameConfig.size;
 
+
         let container = document.getElementById('container');
         container.append(this.canvas);
         this.ctx = this.canvas.getContext('2d');
@@ -31,11 +31,17 @@ let gameLoader = {
         });
 
     },
-    confirmarPosiciones:function(tokenRoom){
+    confirmarPosiciones: function (tokenRoom) {
 
-        let jugadorLocal=factoryJugador.local();
+        let jugadorLocal = factoryJugador.local();
 
-        gameEngine=new GameEngine( this.ctx, tokenRoom, jugadorLocal);
+        gameEngine = new GameEngine(this.ctx, tokenRoom, jugadorLocal);
+
+        this.canvas.onclick = function (event) {
+            console.log('x');
+            gameEngine.onClickEtapaSeleccionarPosicion(event);
+
+        };
 
         gameEngine.runEtapaSeleccionarPosicion();
 
