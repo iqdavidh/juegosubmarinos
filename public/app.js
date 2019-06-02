@@ -28,7 +28,27 @@ function loadBGMar(){
 }
 let EventoDummy = {
 
+    addJugador2:function(){
+        let j= factoryJugador.
+        gameEngine.addJugador( j);
+    }
 };
+class AJugador {
+
+    constructor(indexCuadrante) {
+        this.indexCuadrante = indexCuadrante;
+        this.id = parseInt(Math.random() * 100000);
+        this.isPosicionConfirmada = false;
+
+        this.getIsLocal = () => {
+            return indexCuadrante===0;
+        };
+
+        this.listaAtaquesRecibidos = [];
+        this.listaCohetes = [];
+
+    }
+}
 class Cohete {
 
     constructor(posicionIni) {
@@ -51,8 +71,14 @@ class Cohete {
 class GameEngine  {
 
     constructor(jugadorLocal){
-
+        this.listaJugadores=[ jugadorLocal] ;
     }
+
+    addJugador(jugador){
+        this.listaJugadores.push(jugador);
+    }
+
+
 }
 
 class GameEngineDataIni {
@@ -92,19 +118,12 @@ class GameEngineDataIni {
 
 
 }
-class Jugador {
+class JugadorLocal extends AJugador {
 
-    constructor(indexCuadrante, listaSubmarinos) {
-        this.indexCuadrante = indexCuadrante;
-        this.id = parseInt(Math.random() * 100000);
-
-
-        this.getIsLocal = () => {
-            return indexCuadrante === 0;
-        };
+    constructor(listaSubmarinos) {
+        super(0);
 
         this.listaSubmarinos = listaSubmarinos;
-        this.listaCohetes = [];
 
         //asignar los submarinos al jugador actual
         this.listaSubmarinos
@@ -113,16 +132,50 @@ class Jugador {
             })
         ;
 
+
     }
+
+    getListaSubmarinos(){
+        return this.listaSubmarinos;
+    }
+
+    getNumSubmarinos() {
+        return this.listaSubmarinos
+            .filter(s => {
+                return s.isActivo;
+            }).length;
+    }
+
 }
 
 
 const factoryJugador = {
     local: function () {
         let listaSubmarinos = factoryListaSubmarinos.random();
-        return new Jugador(0, listaSubmarinos);
+        return new JugadorLocal( listaSubmarinos);
+    },
+    remoto: function (index) {
+
+        if (index === 0) {
+            throw new Error("No se puede poner index 0 a jugador remoto");
+        }
+        return new JugadorRemoto(index);
     }
 };
+class JugadorRemoto extends AJugador{
+
+    constructor(indexCuadrante) {
+
+        super(indexCuadrante);
+
+        this.numSubmarinos= gameConfig.numSubmarinos;
+
+    }
+
+    getNumSubmarinos(){
+        return this.numSubmarinos;
+    }
+}
 class Posicion {
 
     constructor(x, y, z) {
@@ -280,6 +333,6 @@ let gameLoader = {
 
 
 
-/*FBUILD*/ console.log( 'FBUILD-20190601 23:58');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190602 00:25');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
