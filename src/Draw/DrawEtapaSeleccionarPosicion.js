@@ -34,6 +34,12 @@ const drawEtapaSeleccionarPosicion = {
             ctxCache.fillRect(delta,i * (sizeCM + gameConfig.wDivision) + delta, rayaSize,  gameConfig.wDivision);
         }
 
+        /* el cache de texto */
+        ctxCache.font = '20px monospace';
+        ctxCache.fillText('COHETES LISTOS', delta + 24, sizeMar + delta + 18);
+
+
+        /**/
 
         ctx.drawImage(cacheRegionConMar, 0, 0, sizeRegion, sizeRegion, origenMar.x, origenMar.y, sizeRegion, sizeRegion);
 
@@ -43,7 +49,10 @@ const drawEtapaSeleccionarPosicion = {
                 return c.getIsEstadoReady();
             }).length;
 
-        let texto = `${numCoheteListo} cohetes listos`;
+
+
+
+
 
     }
 
