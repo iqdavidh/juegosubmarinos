@@ -1,7 +1,8 @@
-export class Jugador {
+class Jugador {
 
-    constructor(posicion , listaSubmarinos){
-        this.posicion=posicion;
+    constructor(indexCuadrante , listaSubmarinos){
+        this.indexCuadrante=indexCuadrante;
         this.listaSubmarinos=listaSubmarinos;
     }
+
 }

@@ -1,4 +1,5 @@
-export function loadImage(url) {
+
+function loadImage(url) {
     return new Promise(resolve => {
         const image = new Image();
         image.addEventListener('load', () => {
@@ -12,6 +13,6 @@ export function loadImage(url) {
 
 
 
-export function loadBGMar(){
-    return loadImage('./img/mar1.png')
+function loadBGMar(){
+    return loadImage('/img/mar1.png')
 }

@@ -1,9 +1,10 @@
-export class Submarino {
+class Submarino {
+
     constructor(posicionRC , jugador) {
         this.posicionRC=posicionRC;
         this.isActivo=true;
         this.isCoheteListo=false;
-        this.jugador=jugar;
+        this.jugador=jugador;
     }
 
     getPosicionRC(){
@@ -18,7 +19,5 @@ export class Submarino {
     lanzaCohete(fnCB){
 
     }
-
-
 
 }

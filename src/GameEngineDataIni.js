@@ -1,6 +1,4 @@
-import {FactoryResultadoOpe} from "./ResultadoOpe";
-
-export class GameEngineDataIni {
+class GameEngineDataIni {
     constructor() {
         this.size = null;
         this.listaJugador=[];

@@ -1,12 +1,12 @@
-export class ResultadoOpe{
+class ResultadoOpe {
 
     constructor(isOk, msg, dataAdicional) {
 
-        this.getIsSuccess= function(){
+        this.getIsSuccess = function () {
             return isOk;
         };
 
-        this.getMsg= function(){
+        this.getMsg = function () {
             return msg;
         };
 
@@ -18,12 +18,12 @@ export class ResultadoOpe{
 
 }
 
-export  let FactoryResultadoOpe= {
-    OK : function(data = null){
-        return new ResultadoOpe(true,msg,data);
+let FactoryResultadoOpe = {
+    OK: function (data = null) {
+        return new ResultadoOpe(true, msg, data);
     },
-    Error : function (msg, data=null) {
-        return new ResultadoOpe(false,msg,data);
+    Error: function (msg, data = null) {
+        return new ResultadoOpe(false, msg, data);
     }
 
 };

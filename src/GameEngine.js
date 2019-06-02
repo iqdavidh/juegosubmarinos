@@ -1,4 +1,4 @@
-export class GameEngine  {
+class GameEngine  {
 
     constructor(){
 

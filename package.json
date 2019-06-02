@@ -1,0 +1,22 @@
+{
+  "name": "submarine_battle_royale",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "default": "node server"
+  },
+  "author": "davidh <david@productividadti.com.mx> (productividadti.com.mx)",
+  "devDependencies": {
+    "gulp": "^4.0.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-insert": "^0.5.0",
+    "gulp-jasmine": "^4.0.0",
+    "gulp-livereload": "^4.0.1",
+    "gulp-load-plugins": "^1.5.0",
+    "gulp-sourcemaps": "^2.6.5",
+    "jasmine": "^3.4.0"
+  },
+  "dependencies": {
+    "st": "^1.2.2"
+  }
+}

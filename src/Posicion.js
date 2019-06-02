@@ -1,4 +1,5 @@
-export class Posicion {
+class Posicion {
+
     constructor(x, y, z) {
         this.x = x;
         this.y = y;
