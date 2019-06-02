@@ -4,7 +4,8 @@ const gameConfig = {
     size: 800,
     deltaSep: 30,
     numSubmarinos: 3,
-    numDivisiones: 10,
+    numDivisiones: 9,
+    wDivision:2,
     resources: {
         imgMar: null
     }
@@ -387,19 +388,50 @@ const drawEtapaSeleccionarPosicion = {
         const sizeRegion = gameConfig.size / 3;
         const delta = gameConfig.deltaSep;
 
-        let origen = getOriginFromIndex(jugador.indexCuadrante);
-        ctx.fillRect(origen.x, origen.y, sizeRegion, sizeRegion);
-        //la seccion de mar
+        const cacheRegionConMar = document.createElement('canvas');
+        cacheRegionConMar.width = sizeRegion;
+        cacheRegionConMar.height = sizeRegion;
 
+        const ctxCache= cacheRegionConMar.getContext('2d');
+
+        //el decorado de la region
+        let origen = getOriginFromIndex(jugador.indexCuadrante);
+        ctxCache.fillRect(0, 0, sizeRegion, sizeRegion);
+
+        //la seccion de mar
         let sizeMar = sizeRegion - 2 * delta;
         let origenMar = new Posicion(origen.x + delta, origen.y + delta);
-        ctx.drawImage(gameConfig.resources.imgMar,0,0,sizeMar,sizeMar, origenMar.x, origenMar.y,sizeMar, sizeMar);
+        ctxCache.drawImage(gameConfig.resources.imgMar, 0, 0, sizeMar, sizeMar, delta, delta, sizeMar, sizeMar);
 
-        //poner el texto
-        let numCoheteListo=jugador.getListaCohetes()
+        //las divisiones
+        let sizeDiv = (sizeRegion - (gameConfig.wDivision * gameConfig.numDivisiones)) / gameConfig.numDivisiones;
+        let rayaSize = sizeRegion - 2 * delta;
+
+        let sizeCM = (sizeMar - gameConfig.numDivisiones * gameConfig.wDivision) / gameConfig.numDivisiones;
+
+
+        ctxCache.fillStyle = "rgba(255, 255, 255, 1)";
+
+        for (let i = 1; i < gameConfig.numDivisiones; i++) {
+            ctxCache.fillRect(i * (sizeCM + gameConfig.wDivision) + delta, delta, gameConfig.wDivision, rayaSize);
+            ctxCache.fillRect(delta,i * (sizeCM + gameConfig.wDivision) + delta, rayaSize,  gameConfig.wDivision);
+        }
+
+
+        ctx.drawImage(cacheRegionConMar, 0, 0, sizeRegion, sizeRegion, origenMar.x, origenMar.y, sizeRegion, sizeRegion);
+
+
+        let numCoheteListo = jugador.getListaCohetes()
+            .filter(c => {
+                return c.getIsEstadoReady();
+            }).length;
+
+        let texto = `${numCoheteListo} cohetes listos`;
+
     }
 
 };
+
 
 
 function getOriginFromIndex(index) {
@@ -413,6 +445,6 @@ function getOriginFromIndex(index) {
     }
 
 }
-/*FBUILD*/ console.log( 'FBUILD-20190602 15:04');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190602 15:45');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
