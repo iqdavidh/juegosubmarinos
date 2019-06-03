@@ -5,4 +5,7 @@ class PosicionRC {
         this.c = c;
     }
 
+    toString(){
+        return `c:${this.c},r:${this.r}`;
+    }
 }

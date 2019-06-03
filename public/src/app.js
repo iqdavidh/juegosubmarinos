@@ -3,7 +3,7 @@
 const gameConfig = {
     size: 800,
     deltaSep: 30,
-    numSubmarinos: 3,
+    numSubmarinos: 8,
     numDivisiones: 5,
     wDivision: 2,
     resources: {
@@ -189,7 +189,7 @@ class GameEngine {
             return;
         }
 
-        console.log(`${x},${y}`);
+        console.log(`${posicionRCCuadrante}`);
 
         //estamos en un cuadrante del centro , sigue ver si hay submarino
 
@@ -205,7 +205,7 @@ class GameEngine {
         }
 
         let sub=lista[0];
-        console.log(sub.getPosicionRC().toString());
+        console.log('sub ----' + sub.getPosicionRC().toString());
 
         //drawEtapaSeleccionarPosicion.onMouseHoverCanvas();
     }
@@ -391,8 +391,9 @@ const factoryListaSubmarinos = {
         while (lista.length < gameConfig.numSubmarinos) {
             //agregar submarino
 
-            let r = 1 + Math.floor(Math.random() * gameConfig.numDivisiones);
-            let c = 1 + Math.floor(Math.random() * gameConfig.numDivisiones);
+
+            let r = 1 + Math.floor(Math.random() * (gameConfig.numDivisiones));
+            let c = 1 + Math.floor(Math.random() * (gameConfig.numDivisiones));
 
             //buscar si se repiten
 
@@ -613,6 +614,9 @@ class PosicionRC {
         this.c = c;
     }
 
+    toString(){
+        return `c:${this.c},r:${this.r}`;
+    }
 }
 class PosicionRCCuadrante {
 
@@ -732,6 +736,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190602 20:44');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190602 21:02');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

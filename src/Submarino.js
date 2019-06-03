@@ -41,8 +41,9 @@ const factoryListaSubmarinos = {
         while (lista.length < gameConfig.numSubmarinos) {
             //agregar submarino
 
-            let r = 1 + Math.floor(Math.random() * gameConfig.numDivisiones);
-            let c = 1 + Math.floor(Math.random() * gameConfig.numDivisiones);
+
+            let r = 1 + Math.floor(Math.random() * (gameConfig.numDivisiones));
+            let c = 1 + Math.floor(Math.random() * (gameConfig.numDivisiones));
 
             //buscar si se repiten
 

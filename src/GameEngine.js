@@ -42,7 +42,7 @@ class GameEngine {
             return;
         }
 
-        console.log(`${x},${y}`);
+        console.log(`${posicionRCCuadrante}`);
 
         //estamos en un cuadrante del centro , sigue ver si hay submarino
 
@@ -58,7 +58,7 @@ class GameEngine {
         }
 
         let sub=lista[0];
-        console.log(sub.getPosicionRC().toString());
+        console.log('sub ----' + sub.getPosicionRC().toString());
 
         //drawEtapaSeleccionarPosicion.onMouseHoverCanvas();
     }
