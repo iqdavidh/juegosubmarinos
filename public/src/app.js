@@ -135,12 +135,6 @@ class AJugador {
 
     }
 }
-function animador(){
-    let ctx=gameLoader.ctx;
-
-    ctx.fillRect(0,0,20,20)
-}
-
 class Cohete {
 
     constructor(posicionIni) {
@@ -383,24 +377,29 @@ const factoryListaSubmarinos = {
 
 let engineSelPos = null;
 
+let gameData = {
+    tokenRoom:null,
+    canvas: null,
+    ctx: null,
+    jugadorLocal: [],
+    listaJugadores:[],
+    listaCohetes:[],
+    listaMsgSocket:[]
+};
+
 let gameLoader = {
 
     canvas: null,
     ctx: null,
     start: function (tokenRoom) {
 
-        if (this.isTerminado) {
-            throw new Error("El loader ha termiando")
-        }
-
-        this.canvas = document.createElement('canvas');
-        this.canvas.width = gameConfig.size;
-        this.canvas.height = gameConfig.size;
-
+        gameData.canvas = document.createElement('canvas');
+        gameData.canvas.width = gameConfig.size;
+        gameData.canvas.height = gameConfig.size;
 
         let container = document.getElementById('container');
-        container.append(this.canvas);
-        this.ctx = this.canvas.getContext('2d');
+        container.append(gameData.canvas);
+        gameData.ctx = gameData.canvas.getContext('2d');
 
         Promise.all([
                 loadBGMar()
@@ -415,9 +414,10 @@ let gameLoader = {
     },
     runConfirmarPosiciones: function (tokenRoom) {
 
-        let jugadorLocal = factoryJugador.local();
+        gameData.tokenRoom = tokenRoom;
+        gameData.jugadorLocal = factoryJugador.local();
 
-        engineSelPos = new EngineSelPos(this.canvas, tokenRoom, jugadorLocal);
+        engineSelPos = new EngineSelPos();
         engineSelPos.run();
 
     }
@@ -575,25 +575,22 @@ const drawSelPos = {
 
 class EngineSelPos {
 
-    constructor(canvas, tokenRoom, jugadorLocal) {
+    constructor(fnOnConfirmarPos) {
 
-        this.canvas = canvas;
-        this.ctx = canvas.getContext('2d');
-        this.tokenRoom = tokenRoom;
-        this.jugadorLocal = jugadorLocal;
-        this.listaJugadores = [jugadorLocal];
+        this.canvas = gameData.canvas;
+        this.ctx = gameData.ctx;
+        this.tokenRoom = gameData.tokenRoom;
+        this.jugadorLocal = gameData.jugadorLocal;
 
         this.mouseEstatus = null;
 
         this.posicionOnDrag = null;
         this.submarinoOnDrag = null;
 
-        this.addEventosMouseAndKeyboard(canvas);
+        this.addEventosMouseAndKeyboard();
+        this.fnOnConfirmarPos=fnOnConfirmarPos;
     }
 
-    addJugador(jugador) {
-        this.listaJugadores.push(jugador);
-    }
 
     run() {
         const ctx = this.ctx;
@@ -620,7 +617,9 @@ class EngineSelPos {
     }
 
 
-    addEventosMouseAndKeyboard(canvas) {
+    addEventosMouseAndKeyboard() {
+
+        let canvas= gameData.canvas;
 
         canvas.onmousedown = (event) => {
             this.onMouseDown(event);
@@ -947,6 +946,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190603 18:41');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190603 18:53');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

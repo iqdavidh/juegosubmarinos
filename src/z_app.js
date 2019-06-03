@@ -2,24 +2,29 @@
 
 let engineSelPos = null;
 
+let gameData = {
+    tokenRoom:null,
+    canvas: null,
+    ctx: null,
+    jugadorLocal: [],
+    listaJugadores:[],
+    listaCohetes:[],
+    listaMsgSocket:[]
+};
+
 let gameLoader = {
 
     canvas: null,
     ctx: null,
     start: function (tokenRoom) {
 
-        if (this.isTerminado) {
-            throw new Error("El loader ha termiando")
-        }
-
-        this.canvas = document.createElement('canvas');
-        this.canvas.width = gameConfig.size;
-        this.canvas.height = gameConfig.size;
-
+        gameData.canvas = document.createElement('canvas');
+        gameData.canvas.width = gameConfig.size;
+        gameData.canvas.height = gameConfig.size;
 
         let container = document.getElementById('container');
-        container.append(this.canvas);
-        this.ctx = this.canvas.getContext('2d');
+        container.append(gameData.canvas);
+        gameData.ctx = gameData.canvas.getContext('2d');
 
         Promise.all([
                 loadBGMar()
@@ -34,9 +39,10 @@ let gameLoader = {
     },
     runConfirmarPosiciones: function (tokenRoom) {
 
-        let jugadorLocal = factoryJugador.local();
+        gameData.tokenRoom = tokenRoom;
+        gameData.jugadorLocal = factoryJugador.local();
 
-        engineSelPos = new EngineSelPos(this.canvas, tokenRoom, jugadorLocal);
+        engineSelPos = new EngineSelPos();
         engineSelPos.run();
 
     }

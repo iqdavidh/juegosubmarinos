@@ -2,25 +2,22 @@
 
 class EngineSelPos {
 
-    constructor(canvas, tokenRoom, jugadorLocal) {
+    constructor(fnOnConfirmarPos) {
 
-        this.canvas = canvas;
-        this.ctx = canvas.getContext('2d');
-        this.tokenRoom = tokenRoom;
-        this.jugadorLocal = jugadorLocal;
-        this.listaJugadores = [jugadorLocal];
+        this.canvas = gameData.canvas;
+        this.ctx = gameData.ctx;
+        this.tokenRoom = gameData.tokenRoom;
+        this.jugadorLocal = gameData.jugadorLocal;
 
         this.mouseEstatus = null;
 
         this.posicionOnDrag = null;
         this.submarinoOnDrag = null;
 
-        this.addEventosMouseAndKeyboard(canvas);
+        this.addEventosMouseAndKeyboard();
+        this.fnOnConfirmarPos=fnOnConfirmarPos;
     }
 
-    addJugador(jugador) {
-        this.listaJugadores.push(jugador);
-    }
 
     run() {
         const ctx = this.ctx;
@@ -47,7 +44,9 @@ class EngineSelPos {
     }
 
 
-    addEventosMouseAndKeyboard(canvas) {
+    addEventosMouseAndKeyboard() {
+
+        let canvas= gameData.canvas;
 
         canvas.onmousedown = (event) => {
             this.onMouseDown(event);
