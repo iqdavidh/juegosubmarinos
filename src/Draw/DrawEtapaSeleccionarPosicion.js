@@ -20,7 +20,10 @@ const drawEtapaSeleccionarPosicion = {
             ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
         }
 
-        ctx.fillRect(x, y, sizeCM / 2, sizeCM / 2);
+        let submarinoSize=sizeCM / 2;
+        let dy=sizeCM/4;
+
+        ctx.fillRect(x +dy, y +sizeCM/4,submarinoSize , submarinoSize);
     },
     drawDragSubmarino(ctx,posicionRCC: PosicionRCCuadrante){
 
@@ -35,7 +38,9 @@ const drawEtapaSeleccionarPosicion = {
         const y = origenMar.y + (posicionRCC.getR() - 1) * (sizeCM + gameConfig.wDivision);
 
         ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-        ctx.fillRect(x, y, sizeCM / 2, sizeCM / 2);
+        let submarinoSize=sizeCM / 2;
+        ctx.fillRect(x +sizeCM/4, y +sizeCM/4,submarinoSize , submarinoSize);
+
 
     },
 

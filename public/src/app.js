@@ -201,7 +201,7 @@ class GameEngine {
             drawEtapaSeleccionarPosicion.local(ctx, jugador);
 
 
-            if (this.posicionOnDrag !==null) {
+            if (this.posicionOnDrag !== null) {
                 let p = this.posicionOnDrag;
                 drawEtapaSeleccionarPosicion.drawDragSubmarino(ctx, p);
             }
@@ -246,10 +246,10 @@ class GameEngine {
 
         //actualizar esttado de subarino para ponerlo como drag
 
-        let idSub=sub.id;
+        let idSub = sub.id;
         this.jugadorLocal.getListaSubmarinos()
             .forEach(s => {
-                s.isOnDrag = s.id=== idSub;
+                s.isOnDrag = s.id === idSub;
             });
 
 
@@ -260,21 +260,31 @@ class GameEngine {
 
     onMouseUpEtapaSeleccionarPosicion(event) {
 
+        if( this.mouseEstatus !== 'moviendose'){
+            return ;
+        }
+
+
         let posicionRCCuadrante = this.getPosicionRCCuadranteFromMouse(event);
 
+
+
         if (posicionRCCuadrante === null) {
+            this.mouseEstatus = 'select';
             return;
         }
 
         if (posicionRCCuadrante.getIndexCuadrante() !== 0) {
+            this.mouseEstatus = 'select';
             return;
         }
 
-       this.submarinoOnDrag.getPosicionRC().c=posicionRCCuadrante.getC();
-       this.submarinoOnDrag.getPosicionRC().r=posicionRCCuadrante.getR();
-       this.submarinoOnDrag.isOnDrag=false;
+        this.submarinoOnDrag.getPosicionRC().c = posicionRCCuadrante.getC();
+        this.submarinoOnDrag.getPosicionRC().r = posicionRCCuadrante.getR();
+        this.submarinoOnDrag.isOnDrag = false;
 
-       this.posicionOnDrag=null;
+        this.submarinoOnDrag=null;
+        this.posicionOnDrag = null;
 
         this.mouseEstatus = 'select';
     }
@@ -315,19 +325,17 @@ class GameEngine {
         if (this.mouseEstatus === 'moviendose') {
 
 
-
-
             if (posicionRCCuadrante === null) {
                 this.mouseEstatus = 'select';
-                this.submarinoOnDrag.isOnDrag=false;
-                this.posicionOnDrag=null;
+                this.submarinoOnDrag.isOnDrag = false;
+                this.posicionOnDrag = null;
                 return;
             }
 
             if (posicionRCCuadrante.getIndexCuadrante() !== 0) {
                 this.mouseEstatus = 'select';
-                this.submarinoOnDrag.isOnDrag=false;
-                this.posicionOnDrag=null;
+                this.submarinoOnDrag.isOnDrag = false;
+                this.posicionOnDrag = null;
                 return;
 
             }
@@ -652,7 +660,10 @@ const drawEtapaSeleccionarPosicion = {
             ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
         }
 
-        ctx.fillRect(x, y, sizeCM / 2, sizeCM / 2);
+        let submarinoSize=sizeCM / 2;
+        let dy=sizeCM/4;
+
+        ctx.fillRect(x +dy, y +sizeCM/4,submarinoSize , submarinoSize);
     },
     drawDragSubmarino(ctx,posicionRCC){
 
@@ -667,7 +678,9 @@ const drawEtapaSeleccionarPosicion = {
         const y = origenMar.y + (posicionRCC.getR() - 1) * (sizeCM + gameConfig.wDivision);
 
         ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-        ctx.fillRect(x, y, sizeCM / 2, sizeCM / 2);
+        let submarinoSize=sizeCM / 2;
+        ctx.fillRect(x +sizeCM/4, y +sizeCM/4,submarinoSize , submarinoSize);
+
 
     },
 
@@ -909,6 +922,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190602 22:41');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190602 23:05');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

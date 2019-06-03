@@ -30,7 +30,7 @@ class GameEngine {
             drawEtapaSeleccionarPosicion.local(ctx, jugador);
 
 
-            if (this.posicionOnDrag !==null) {
+            if (this.posicionOnDrag !== null) {
                 let p = this.posicionOnDrag;
                 drawEtapaSeleccionarPosicion.drawDragSubmarino(ctx, p);
             }
@@ -75,10 +75,10 @@ class GameEngine {
 
         //actualizar esttado de subarino para ponerlo como drag
 
-        let idSub=sub.id;
+        let idSub = sub.id;
         this.jugadorLocal.getListaSubmarinos()
             .forEach(s => {
-                s.isOnDrag = s.id=== idSub;
+                s.isOnDrag = s.id === idSub;
             });
 
 
@@ -89,21 +89,31 @@ class GameEngine {
 
     onMouseUpEtapaSeleccionarPosicion(event) {
 
+        if( this.mouseEstatus !== 'moviendose'){
+            return ;
+        }
+
+
         let posicionRCCuadrante = this.getPosicionRCCuadranteFromMouse(event);
 
+
+
         if (posicionRCCuadrante === null) {
+            this.mouseEstatus = 'select';
             return;
         }
 
         if (posicionRCCuadrante.getIndexCuadrante() !== 0) {
+            this.mouseEstatus = 'select';
             return;
         }
 
-       this.submarinoOnDrag.getPosicionRC().c=posicionRCCuadrante.getC();
-       this.submarinoOnDrag.getPosicionRC().r=posicionRCCuadrante.getR();
-       this.submarinoOnDrag.isOnDrag=false;
+        this.submarinoOnDrag.getPosicionRC().c = posicionRCCuadrante.getC();
+        this.submarinoOnDrag.getPosicionRC().r = posicionRCCuadrante.getR();
+        this.submarinoOnDrag.isOnDrag = false;
 
-       this.posicionOnDrag=null;
+        this.submarinoOnDrag=null;
+        this.posicionOnDrag = null;
 
         this.mouseEstatus = 'select';
     }
@@ -144,19 +154,17 @@ class GameEngine {
         if (this.mouseEstatus === 'moviendose') {
 
 
-
-
             if (posicionRCCuadrante === null) {
                 this.mouseEstatus = 'select';
-                this.submarinoOnDrag.isOnDrag=false;
-                this.posicionOnDrag=null;
+                this.submarinoOnDrag.isOnDrag = false;
+                this.posicionOnDrag = null;
                 return;
             }
 
             if (posicionRCCuadrante.getIndexCuadrante() !== 0) {
                 this.mouseEstatus = 'select';
-                this.submarinoOnDrag.isOnDrag=false;
-                this.posicionOnDrag=null;
+                this.submarinoOnDrag.isOnDrag = false;
+                this.posicionOnDrag = null;
                 return;
 
             }
