@@ -72,9 +72,11 @@ describe('gameLoader', function () {
 
 
         const listaPosicion = [
+            [317,502,1,5],
             [329, 331, 1, 1],
             [351, 357, 2, 2],
-            [445, 349,  2,4],
+            [445, 349,  4,2],
+            [487, 493, 5, 5],
             [487, 493, 5, 5],
             [2, 331, null, null],
         ];
@@ -84,8 +86,8 @@ describe('gameLoader', function () {
             listaPosicion.forEach(row => {
                 let x = row[0];
                 let y = row[1];
-                let r = row[2];
-                let c = row[3];
+                let c = row[2];
+                let r = row[3];
 
                 let pCuadrante=factoryPosicionRCCuadrante.fromXY(x,y);
 

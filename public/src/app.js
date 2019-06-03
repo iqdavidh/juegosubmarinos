@@ -20,7 +20,7 @@ const gameCacheSize = {
 
         this.sizeRegion = gameConfig.size / 3;
         return this.sizeRegion;
-    } ,
+    },
 
     sizeMar: null,
     getSizeMar: function () {
@@ -28,7 +28,7 @@ const gameCacheSize = {
             return this.sizeMar;
         }
         const delta = gameConfig.deltaSep;
-        this.sizeMar = this.getSizeRegion() -  2 * delta;
+        this.sizeMar = this.getSizeRegion() - 2 * delta;
         return this.sizeMar;
     },
     sizeCM: null,
@@ -38,7 +38,10 @@ const gameCacheSize = {
             return this.sizeCM;
         }
 
-        this.sizeCM = (this.getSizeMar() - gameConfig.numDivisiones * gameConfig.wDivision) / gameConfig.numDivisiones;
+        const s = this.getSizeMar();
+        const w = gameConfig.wDivision;
+
+        this.sizeCM = (s - (gameConfig.numDivisiones - 1) * w) / gameConfig.numDivisiones;
         return this.sizeCM;
     }
 };
@@ -144,13 +147,13 @@ class Cohete {
 }
 /* @flow */
 
-class GameEngine  {
+class GameEngine {
 
     constructor(ctx, tokenRoom, jugadorLocal) {
 
         this.ctx = ctx;
         this.tokenRoom = tokenRoom;
-        this.jugadorLocal=jugadorLocal;
+        this.jugadorLocal = jugadorLocal;
 
         this.listaJugadores = [jugadorLocal];
     }
@@ -160,19 +163,52 @@ class GameEngine  {
     }
 
     runEtapaSeleccionarPosicion() {
-        const ctx=this.ctx;
+        const ctx = this.ctx;
         drawEtapaSeleccionarPosicion.local(this.ctx, this.jugadorLocal);
-
     }
 
-
-    onClickEtapaSeleccionarPosicion(event){
-
+    onClickEtapaSeleccionarPosicion(event) {
         drawEtapaSeleccionarPosicion.onClickCanvas(event.clientX, event.clientY);
-
     }
 
 
+    onMouseHoverEtapaSeleccionarPosicion(event) {
+        const x = event.clientX;
+        const y = event.clientY;
+
+
+        //paso 1 encontrar si es una celda de region jugador
+        let posicionRCCuadrante = factoryPosicionRCCuadrante.fromXY(x, y);
+
+
+        if (posicionRCCuadrante === null) {
+            return;
+        }
+
+        if (posicionRCCuadrante.getIndexCuadrante() !== 0) {
+            return;
+        }
+
+        console.log(`${x},${y}`);
+
+        //estamos en un cuadrante del centro , sigue ver si hay submarino
+
+        let lista = this.jugadorLocal.getListaSubmarinos()
+            .filter(s => {
+                return s.getPosicionRC().r===posicionRCCuadrante.getR() &&
+                    s.getPosicionRC().c=== posicionRCCuadrante.getC();
+            });
+
+        if(lista.length===0){
+            //no es celda de submarino
+            return;
+        }
+
+        let sub=lista[0];
+        console.log(sub.getPosicionRC().toString());
+
+        //drawEtapaSeleccionarPosicion.onMouseHoverCanvas();
+    }
 
 }
 
@@ -420,11 +456,15 @@ let gameLoader = {
 
         gameEngine = new GameEngine(this.ctx, tokenRoom, jugadorLocal);
 
+        //eventos de mouse **************************************
         this.canvas.onclick = function (event) {
-            console.log('x');
             gameEngine.onClickEtapaSeleccionarPosicion(event);
-
         };
+
+        this.canvas.onmousemove=function(event){
+            gameEngine.onMouseHoverEtapaSeleccionarPosicion(event);
+        };
+
 
         gameEngine.runEtapaSeleccionarPosicion();
 
@@ -485,9 +525,7 @@ const drawEtapaSeleccionarPosicion = {
         });
 
     },
-
     cacheCanvasRegionConMar: null,
-
     getCacheCanvasRegionConMar: function (jugador) {
 
         if (this.cacheCanvasRegionConMar !== null) {
@@ -536,7 +574,6 @@ const drawEtapaSeleccionarPosicion = {
         return cacheRegionConMar;
 
     },
-
     onClickCanvas(x, y) {
 
         let posicionRCCuadrante=factoryPosicionRCCuadrante.fromXY(x,y);
@@ -546,8 +583,9 @@ const drawEtapaSeleccionarPosicion = {
         }else{
             console.log(posicionRCCuadrante.toString());
         }
-
-
+    },
+    onMouseHoverCanvas(x,y){
+        console.log(`${x},${y}`);
     }
 };
 
@@ -604,7 +642,7 @@ const factoryPosicionRCCuadrante = {
     fromXY: function (x, y) {
 
         //paso 1 determinar el cuadrante
-        const sizeRegion = gameConfig.size / 3;
+        const sizeRegion =  gameCacheSize.getSizeRegion();
         const delta = gameConfig.deltaSep;
 
         function getPosicionCuadrante(valor) {
@@ -614,6 +652,10 @@ const factoryPosicionRCCuadrante = {
         let cuadranteX = getPosicionCuadrante(x);
         let cuadranteY = getPosicionCuadrante(y);
 
+        if(cuadranteY===3 || cuadranteX===3){
+            return null;
+        }
+
         let code = `${cuadranteX}-${cuadranteY}`;
 
         let indexCuadrante = this.dicCuadranteIndex[code];
@@ -622,10 +664,10 @@ const factoryPosicionRCCuadrante = {
 
         //obtener rango del mar
         let xMarIni = origenCuadrante.x + delta;
-        let xMarFin = origenCuadrante.x + sizeRegion - delta;
+        let xMarFin = xMarIni+ gameCacheSize.getSizeMar();
 
         let yMarIni = origenCuadrante.y + delta;
-        let yMarFin = origenCuadrante.y + sizeRegion - delta;
+        let yMarFin = yMarIni + gameCacheSize.getSizeMar();
 
 
 
@@ -634,10 +676,10 @@ const factoryPosicionRCCuadrante = {
             //encontrar la posicion RC
             let xRel = x - xMarIni;
             let yRel = y - yMarIni;
-            let sizeCM = gameCacheSize.getSizeCM();
+            let celda = gameCacheSize.getSizeCM() + gameConfig.wDivision;
 
-            let c = 1 + Math.floor(xRel / sizeCM);
-            let r = 1 + Math.floor(yRel / sizeCM);
+            let c = 1 + Math.floor(xRel / celda);
+            let r = 1 + Math.floor(yRel / celda);
             let posicionRC = new PosicionRC(r, c);
             return new PosicionRCCuadrante(indexCuadrante, posicionRC);
 
@@ -689,8 +731,7 @@ const factoryPosicionRCCuadrante = {
         throw new Error("Ese cuadrante no esta soportado " + cuadrante.toString());
     }
 
-
 };
-/*FBUILD*/ console.log( 'FBUILD-20190602 19:56');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190602 20:44');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

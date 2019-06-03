@@ -20,7 +20,7 @@ const gameCacheSize = {
 
         this.sizeRegion = gameConfig.size / 3;
         return this.sizeRegion;
-    } ,
+    },
 
     sizeMar: null,
     getSizeMar: function () {
@@ -28,7 +28,7 @@ const gameCacheSize = {
             return this.sizeMar;
         }
         const delta = gameConfig.deltaSep;
-        this.sizeMar = this.getSizeRegion() -  2 * delta;
+        this.sizeMar = this.getSizeRegion() - 2 * delta;
         return this.sizeMar;
     },
     sizeCM: null,
@@ -38,7 +38,10 @@ const gameCacheSize = {
             return this.sizeCM;
         }
 
-        this.sizeCM = (this.getSizeMar() - gameConfig.numDivisiones * gameConfig.wDivision) / gameConfig.numDivisiones;
+        const s = this.getSizeMar();
+        const w = gameConfig.wDivision;
+
+        this.sizeCM = (s - (gameConfig.numDivisiones - 1) * w) / gameConfig.numDivisiones;
         return this.sizeCM;
     }
 };
