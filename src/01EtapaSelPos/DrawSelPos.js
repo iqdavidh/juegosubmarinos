@@ -1,6 +1,6 @@
 /*@flow*/
 
-const drawEtapaSeleccionarPosicion = {
+const drawSelPos = {
 
     drawSubmarino: function (ctx, submarino: Submarino) {
 

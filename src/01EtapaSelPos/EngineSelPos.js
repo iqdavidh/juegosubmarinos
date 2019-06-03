@@ -30,12 +30,12 @@ class EngineSelPos {
 
         let frames = () => {
 
-            drawEtapaSeleccionarPosicion.local(ctx, jugador);
+            drawSelPos.local(ctx, jugador);
 
 
             if (this.posicionOnDrag !== null) {
                 let p = this.posicionOnDrag;
-                drawEtapaSeleccionarPosicion.drawDragSubmarino(ctx, p);
+                drawSelPos.drawDragSubmarino(ctx, p);
             }
 
             window.requestAnimationFrame(frames);
