@@ -1,8 +1,8 @@
 class PosicionRCCuadrante {
 
-    constructor(indexCuadrante: number, posicion: PosicionRC) {
+    constructor(indexCuadrante: number, posicionRC: PosicionRC) {
         this.indexCuadrante = indexCuadrante;
-        this.posicion = posicion;
+        this.posicionRC = posicionRC;
     }
 
     getIndexCuadrante() {
@@ -10,11 +10,11 @@ class PosicionRCCuadrante {
     }
 
     getR() {
-        return this.posicion.r;
+        return this.posicionRC.r;
     }
 
     getC() {
-        return this.posicion.c;
+        return this.posicionRC.c;
     }
 }
 
@@ -48,8 +48,12 @@ const factoryPosicionRCCuadrante = {
             //encontrar la posicion RC
             let xRel = x - xMarIni;
             let yRel = y - yMarIni;
+            let sizeCM = gameCacheSize.getSizeCM();
 
-            return new PosicionRCCuadrante(indexCuadrante);
+            let r = 1 + Math.floor(xRel / sizeCM);
+            let c = 1 + Math.floor(yRel / sizeCM);
+            let posicionRC = new PosicionRC(r, c);
+            return new PosicionRCCuadrante(indexCuadrante, posicionRC);
 
         } else {
             return null;
@@ -57,42 +61,42 @@ const factoryPosicionRCCuadrante = {
     },
 
     dicCuadranteIndex: {
-        '00': 5,
-        '01': 1,
-        '02': 6,
-        '10': 2,
-        '11': 0,
-        '12': 3,
-        '20': 7,
-        '21': 4,
-        '22': 8,
+        '0-0': 5,
+        '0-1': 1,
+        '0-2': 6,
+        '1-0': 2,
+        '1-1': 0,
+        '1-2': 3,
+        '2-0': 7,
+        '2-1': 4,
+        '2-2': 8,
     },
     getOrigenCuadrante(cuadrante: number) {
 
-        const sizeRegion = gameConfig.size / 3;
+        const sizeRegion =  gameCacheSize.getSizeRegion();
 
-        if (index === 5) {
+        if (cuadrante === 5) {
             return new Posicion(0, 0);
-        } else if (index === 1) {
+        } else if (cuadrante === 1) {
             return new Posicion(sizeRegion, 0);
-        } else if (index === 6) {
+        } else if (cuadrante === 6) {
             return new Posicion(sizeRegion * 2, 0);
         }
 
-        if (index === 2) {
+        if (cuadrante === 2) {
             return new Posicion(0, sizeRegion);
-        } else if (index === 0) {
+        } else if (cuadrante === 0) {
             return new Posicion(sizeRegion, sizeRegion);
-        } else if (index === 3) {
+        } else if (cuadrante === 3) {
             return new Posicion(sizeRegion * 2, sizeRegion);
         }
 
 
-        if (index === 7) {
+        if (cuadrante === 7) {
             return new Posicion(0, sizeRegion * 2);
-        } else if (index === 4) {
+        } else if (cuadrante === 4) {
             return new Posicion(sizeRegion, sizeRegion * 2);
-        } else if (index === 8) {
+        } else if (cuadrante === 8) {
             return new Posicion(sizeRegion * 2, sizeRegion * 2);
         }
 

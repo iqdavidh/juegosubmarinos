@@ -72,9 +72,9 @@ describe('gameLoader', function () {
 
 
         const listaPosicion = [
-            [329, 331, 1, 1],
-            [351, 357, 2, 2],
-            [358, 480, 4, 2],
+            // [329, 331, 1, 1],
+            // [351, 357, 2, 2],
+            [445, 349, 4, 2],
             [487, 493, 5, 5],
             [2, 331, null, null],
         ];
@@ -89,13 +89,17 @@ describe('gameLoader', function () {
 
                 let pCuadrante=factoryPosicionRCCuadrante.fromXY(x,y);
 
-                expect(pCuadrante.getR() === r).toBe(true);
-                expect(pCuadrante.getC() === c).toBe(true);
+                console.log(row);
+                console.log(pCuadrante);
 
                 if(r===null){
-                    expect(pCuadrante.getIndexCuadrante() === null).toBe(true);
+                    expect(pCuadrante === null).toBe(true);
                 }else{
-                    expect(pCuadrante.getIndexCuadrante() === 1).toBe(true);
+                    expect(pCuadrante !== null).toBe(true);
+                    expect(pCuadrante.getR() === r).toBe(true);
+                    expect(pCuadrante.getC() === c).toBe(true);
+
+                    expect(pCuadrante.getIndexCuadrante() === 0).toBe(true);
                 }
 
 
