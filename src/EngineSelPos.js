@@ -61,9 +61,9 @@ class EngineSelPos {
             this.onMouseMove(event);
         };
 
-        canvas.onkeydown = (event) => {
+        document.onkeydown = (event) => {
             this.onKeyDow(event);
-        }
+        };
     }
 
     onMouseDown(event) {
@@ -205,7 +205,7 @@ class EngineSelPos {
 
     onKeyDow(event) {
 
-        if (event.code !== 13) {
+        if (event.code !== "Enter") {
             return;
         }
 

@@ -232,9 +232,9 @@ class EngineSelPos {
             this.onMouseMove(event);
         };
 
-        canvas.onkeydown = (event) => {
+        document.onkeydown = (event) => {
             this.onKeyDow(event);
-        }
+        };
     }
 
     onMouseDown(event) {
@@ -376,7 +376,7 @@ class EngineSelPos {
 
     onKeyDow(event) {
 
-        if (event.code !== 13) {
+        if (event.code !== "Enter") {
             return;
         }
 
@@ -947,6 +947,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190603 16:44');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190603 16:54');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
