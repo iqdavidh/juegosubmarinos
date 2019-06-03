@@ -930,6 +930,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190602 23:23');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190602 23:29');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
