@@ -102,13 +102,7 @@ const drawEtapaSeleccionarPosicion = {
     },
     onClickCanvas(x: number, y: number) :void {
 
-        let posicionRCCuadrante=factoryPosicionRCCuadrante.fromXY(x,y);
 
-        if(posicionRCCuadrante===null){
-            console.log('null');
-        }else{
-            console.log(posicionRCCuadrante.toString());
-        }
     },
     onMouseHoverCanvas(x,y):void{
         console.log(`${x},${y}`);

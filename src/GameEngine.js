@@ -7,8 +7,10 @@ class GameEngine {
         this.ctx = ctx;
         this.tokenRoom = tokenRoom;
         this.jugadorLocal = jugadorLocal;
-
         this.listaJugadores = [jugadorLocal];
+
+        this.mouseEstatus = null;
+
     }
 
     addJugador(jugador) {
@@ -17,22 +19,22 @@ class GameEngine {
 
     runEtapaSeleccionarPosicion() {
         const ctx = this.ctx;
+        this.mouseEstatus = 'select';
         drawEtapaSeleccionarPosicion.local(this.ctx, this.jugadorLocal);
     }
 
-    onClickEtapaSeleccionarPosicion(event) {
-        drawEtapaSeleccionarPosicion.onClickCanvas(event.clientX, event.clientY);
-    }
 
-
-    onMouseHoverEtapaSeleccionarPosicion(event) {
+    getPosicionRCCuadranteFromMouse(event): PosicionRCCuadrante {
         const x = event.clientX;
         const y = event.clientY;
 
+        return factoryPosicionRCCuadrante.fromXY(x, y);
 
-        //paso 1 encontrar si es una celda de region jugador
-        let posicionRCCuadrante = factoryPosicionRCCuadrante.fromXY(x, y);
+    }
 
+    onMouseDownEtapaSeleccionarPosicion(event) {
+
+        let posicionRCCuadrante = this.getPosicionRCCuadranteFromMouse(event);
 
         if (posicionRCCuadrante === null) {
             return;
@@ -42,25 +44,67 @@ class GameEngine {
             return;
         }
 
-        console.log(`${posicionRCCuadrante}`);
+        this.mouseEstatus = 'select';
 
-        //estamos en un cuadrante del centro , sigue ver si hay submarino
+    }
 
-        let lista = this.jugadorLocal.getListaSubmarinos()
-            .filter(s => {
-                return s.getPosicionRC().r===posicionRCCuadrante.getR() &&
-                    s.getPosicionRC().c=== posicionRCCuadrante.getC();
-            });
+    onMouseUpEtapaSeleccionarPosicion(event) {
 
-        if(lista.length===0){
-            //no es celda de submarino
+        let posicionRCCuadrante = this.getPosicionRCCuadranteFromMouse(event);
+
+        if (posicionRCCuadrante === null) {
             return;
         }
 
-        let sub=lista[0];
-        console.log('sub ----' + sub.getPosicionRC().toString());
+        if (posicionRCCuadrante.getIndexCuadrante() !== 0) {
+            return;
+        }
 
-        //drawEtapaSeleccionarPosicion.onMouseHoverCanvas();
+        this.mouseEstatus = 'select';
+    }
+
+
+    onMouseMoveEtapaSeleccionarPosicion(event) {
+
+        let posicionRCCuadrante = this.getPosicionRCCuadranteFromMouse(event);
+
+
+        if (this.mouseEstatus === 'select') {
+
+            gameLoader.canvas.style.cursor = 'default';
+
+            //paso 1 encontrar si es una celda de region jugador
+
+            if (posicionRCCuadrante === null) {
+                return;
+            }
+
+            if (posicionRCCuadrante.getIndexCuadrante() !== 0) {
+                return;
+            }
+
+            //console.log(`${posicionRCCuadrante}`);
+
+            //estamos en un cuadrante del centro , sigue ver si hay submarino
+
+            let sub = this.jugadorLocal.getListaSubmarinos()
+                .find(s => {
+                    return s.getPosicionRC().r === posicionRCCuadrante.getR() &&
+                        s.getPosicionRC().c === posicionRCCuadrante.getC();
+                });
+
+
+            if (!sub ) {
+                //no hay submarino
+                return;
+            }
+
+
+            gameLoader.canvas.style.cursor = 'pointer';
+            console.log('po');
+        }
+
+
     }
 
 }

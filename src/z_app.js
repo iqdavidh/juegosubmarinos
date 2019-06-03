@@ -38,12 +38,16 @@ let gameLoader = {
         gameEngine = new GameEngine(this.ctx, tokenRoom, jugadorLocal);
 
         //eventos de mouse **************************************
-        this.canvas.onclick = function (event) {
-            gameEngine.onClickEtapaSeleccionarPosicion(event);
+        this.canvas.onmousedown = function (event) {
+            gameEngine.onMouseDownEtapaSeleccionarPosicion(event);
+        };
+
+        this.canvas.onmouseup = function(event){
+            gameEngine.onMouseUpEtapaSeleccionarPosicion(event);
         };
 
         this.canvas.onmousemove=function(event){
-            gameEngine.onMouseHoverEtapaSeleccionarPosicion(event);
+            gameEngine.onMouseMoveEtapaSeleccionarPosicion(event);
         };
 
 
