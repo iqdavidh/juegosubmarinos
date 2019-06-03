@@ -478,15 +478,14 @@ const drawEtapaSeleccionarPosicion = {
 
     drawSubmarino: function (ctx, submarino) {
 
-        const sizeRegion = gameCacheSize.getSizeRegion();
         const origen = submarino.jugador.getOrigenFromIndex();
         const delta = gameConfig.deltaSep;
 
         const origenMar = new Posicion(origen.x + delta, origen.y + delta);
         const sizeCM = gameCacheSize.getSizeCM();
 
-        const x = origenMar.x + (submarino.getPosicionRC().r - 1) * (sizeCM + gameConfig.wDivision);
-        const y = origenMar.y + (submarino.getPosicionRC().c - 1) * (sizeCM + gameConfig.wDivision);
+        const x = origenMar.x + (submarino.getPosicionRC().c - 1) * (sizeCM + gameConfig.wDivision);
+        const y = origenMar.y + (submarino.getPosicionRC().r - 1) * (sizeCM + gameConfig.wDivision);
 
         ctx.fillRect(x, y, sizeCM / 2, sizeCM / 2);
 
@@ -736,6 +735,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190602 21:02');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190602 21:09');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
