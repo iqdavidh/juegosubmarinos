@@ -69,8 +69,16 @@ const drawEtapaSeleccionarPosicion = {
         /* actualziar dra numero sub*/
         let numSubmarino = jugador.getNumSubmarinos();
         ctx.fillStyle = "rgba(255, 255, 0, 1)";
-        ctx.font = '20px monospace';
-        ctx.fillText(numSubmarino.toString(), origen.x + sizeRegion - delta - 20, origen.y + delta - 6);
+        ctx.font = '19px monospace';
+        ctx.fillText(numSubmarino.toString(), origen.x + sizeRegion - delta - 20, origen.y + delta - 4);
+
+
+
+        let sizeTexto=470;
+        let dx= ( (sizeRegion *3) - sizeTexto )/2;
+        ctx.fillStyle = "rgba(255, 255, 255, 1)";
+        ctx.fillText('Arrastra los submarinos a la posición deseada', dx, sizeRegion*2+50);
+        ctx.fillText('Presiona Enter para continuar', dx +80, sizeRegion*2+100);
 
 
         jugador.getListaSubmarinos().forEach(s => {
@@ -118,9 +126,9 @@ const drawEtapaSeleccionarPosicion = {
         }
 
         /* el cache de texto */
-        ctxCache.font = '20px monospace';
+        ctxCache.font = '19px monospace';
         ctxCache.fillStyle = "rgba(200, 200, 200, 0.7)";
-        ctxCache.fillText('SUBMARINOS', delta + 70, 24);
+        ctxCache.fillText('SUBMARINOS', sizeMar - 112, 16);
 
         this.cacheCanvasRegionConMar = cacheRegionConMar;
 

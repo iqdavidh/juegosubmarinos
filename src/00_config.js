@@ -1,10 +1,10 @@
 /* @flow */
 
 const gameConfig = {
-    size: 800,
-    deltaSep: 30,
+    size: 900,
+    deltaSep: 20,
     numSubmarinos: 8,
-    numDivisiones: 5,
+    numDivisiones: 6,
     wDivision: 2,
     resources: {
         imgMar: null
