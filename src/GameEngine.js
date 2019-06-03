@@ -24,7 +24,8 @@ class GameEngine  {
 
     onClickEtapaSeleccionarPosicion(event){
 
-        console.log(event.clientX + ',' + event.clientY);
+        drawEtapaSeleccionarPosicion.onClickCanvas(event.clientX, event.clientY);
+
     }
 
 

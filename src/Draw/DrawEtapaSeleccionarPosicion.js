@@ -53,7 +53,6 @@ const drawEtapaSeleccionarPosicion = {
 
     },
 
-
     cacheCanvasRegionConMar: null,
 
     getCacheCanvasRegionConMar: function (jugador: JugadorLocal) {
@@ -104,7 +103,17 @@ const drawEtapaSeleccionarPosicion = {
         return cacheRegionConMar;
 
     },
-    getPosicionFromCanvasXY(x:number, y:number) {
+
+    onClickCanvas(x: number, y: number) :void {
+
+        let posicionRCCuadrante=factoryPosicionRCCuadrante.fromXY(x,y);
+
+        if(posicionRCCuadrante===null){
+            console.log('null');
+        }else{
+            console.log(posicionRCCuadrante.toString());
+        }
+
 
     }
 };

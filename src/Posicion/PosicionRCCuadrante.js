@@ -16,6 +16,10 @@ class PosicionRCCuadrante {
     getC() {
         return this.posicionRC.c;
     }
+
+    toString(){
+        return `cuad:${this.indexCuadrante} c:${this.posicionRC.c} r: ${this.posicionRC.r}`;
+    }
 }
 
 const factoryPosicionRCCuadrante = {
@@ -50,8 +54,8 @@ const factoryPosicionRCCuadrante = {
             let yRel = y - yMarIni;
             let sizeCM = gameCacheSize.getSizeCM();
 
-            let r = 1 + Math.floor(xRel / sizeCM);
-            let c = 1 + Math.floor(yRel / sizeCM);
+            let c = 1 + Math.floor(xRel / sizeCM);
+            let r = 1 + Math.floor(yRel / sizeCM);
             let posicionRC = new PosicionRC(r, c);
             return new PosicionRCCuadrante(indexCuadrante, posicionRC);
 
