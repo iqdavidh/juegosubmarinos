@@ -1,6 +1,6 @@
 'use strict';
 
-let gameEngine = null;
+let engineSelPos = null;
 
 let gameLoader = {
 
@@ -27,31 +27,17 @@ let gameLoader = {
         ).then(([imgMar]) => {
             //guardar los archivos cargados
             gameConfig.resources.imgMar = imgMar;
-            this.confirmarPosiciones(tokenRoom);
+
+            this.runConfirmarPosiciones(tokenRoom);
         });
 
     },
-    confirmarPosiciones: function (tokenRoom) {
+    runConfirmarPosiciones: function (tokenRoom) {
 
         let jugadorLocal = factoryJugador.local();
 
-        gameEngine = new GameEngine(this.ctx, tokenRoom, jugadorLocal);
-
-        //eventos de mouse **************************************
-        this.canvas.onmousedown = function (event) {
-            gameEngine.onMouseDownEtapaSeleccionarPosicion(event);
-        };
-
-        this.canvas.onmouseup = function(event){
-            gameEngine.onMouseUpEtapaSeleccionarPosicion(event);
-        };
-
-        this.canvas.onmousemove=function(event){
-            gameEngine.onMouseMoveEtapaSeleccionarPosicion(event);
-        };
-
-
-        gameEngine.runEtapaSeleccionarPosicion();
+        engineSelPos = new EngineSelPos(this.canvas, tokenRoom, jugadorLocal);
+        engineSelPos.run();
 
     }
 

@@ -171,11 +171,12 @@ class Cohete {
 }
 /* @flow */
 
-class GameEngine {
+class EngineSelPos {
 
-    constructor(ctx, tokenRoom, jugadorLocal) {
+    constructor(canvas, tokenRoom, jugadorLocal) {
 
-        this.ctx = ctx;
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
         this.tokenRoom = tokenRoom;
         this.jugadorLocal = jugadorLocal;
         this.listaJugadores = [jugadorLocal];
@@ -184,13 +185,15 @@ class GameEngine {
 
         this.posicionOnDrag = null;
         this.submarinoOnDrag = null;
+
+        this.addEventosMouseAndKeyboard(canvas);
     }
 
     addJugador(jugador) {
         this.listaJugadores.push(jugador);
     }
 
-    runEtapaSeleccionarPosicion() {
+    run() {
         const ctx = this.ctx;
         const jugador = this.jugadorLocal;
 
@@ -215,17 +218,30 @@ class GameEngine {
     }
 
 
-    getPosicionRCCuadranteFromMouse(event) {
-        const x = event.clientX;
-        const y = event.clientY;
+    addEventosMouseAndKeyboard(canvas) {
 
-        return factoryPosicionRCCuadrante.fromXY(x, y);
+        canvas.onmousedown = (event) => {
+            this.onMouseDown(event);
+        };
 
+        canvas.onmouseup = (event) => {
+            this.onMouseUp(event);
+        };
+
+        canvas.onmousemove = (event) => {
+            this.onMouseMove(event);
+        };
+
+        canvas.onkeydown = (event) => {
+            this.onKeyDow(event);
+        }
     }
 
-    onMouseDownEtapaSeleccionarPosicion(event) {
+    onMouseDown(event) {
 
-        let posicionRCCuadrante = this.getPosicionRCCuadranteFromMouse(event);
+
+
+        let posicionRCCuadrante = factoryPosicionRCCuadrante.fromEventMouse(event);
 
         if (posicionRCCuadrante === null) {
             return;
@@ -241,8 +257,10 @@ class GameEngine {
             return;
         }
 
-        this.mouseEstatus = 'moviendose';
         this.submarinoOnDrag = sub;
+
+        this.mouseEstatus = 'arrastrando';
+       // this.canvas.style.cursor = 'move';
 
         //actualizar esttado de subarino para ponerlo como drag
 
@@ -258,15 +276,14 @@ class GameEngine {
 
     }
 
-    onMouseUpEtapaSeleccionarPosicion(event) {
+    onMouseUp(event) {
 
-        if( this.mouseEstatus !== 'moviendose'){
-            return ;
+        if (this.mouseEstatus !== 'arrastrando') {
+            return;
         }
 
 
-        let posicionRCCuadrante = this.getPosicionRCCuadranteFromMouse(event);
-
+        let posicionRCCuadrante = factoryPosicionRCCuadrante.fromEventMouse(event);
 
 
         if (posicionRCCuadrante === null) {
@@ -283,20 +300,22 @@ class GameEngine {
         this.submarinoOnDrag.getPosicionRC().r = posicionRCCuadrante.getR();
         this.submarinoOnDrag.isOnDrag = false;
 
-        this.submarinoOnDrag=null;
+        this.submarinoOnDrag = null;
         this.posicionOnDrag = null;
 
         this.mouseEstatus = 'select';
+        this.canvas.style.cursor = 'pointer';
     }
 
+    onMouseMove(event) {
 
-    onMouseMoveEtapaSeleccionarPosicion(event) {
+        let posicionRCCuadrante = factoryPosicionRCCuadrante.fromEventMouse(event);
 
-        let posicionRCCuadrante = this.getPosicionRCCuadranteFromMouse(event);
 
-        gameLoader.canvas.style.cursor = 'default';
 
         if (this.mouseEstatus === 'select') {
+
+            this.canvas.style.cursor = 'default';
 
             //paso 1 encontrar si es una celda de region jugador
 
@@ -318,12 +337,13 @@ class GameEngine {
             }
 
 
-            gameLoader.canvas.style.cursor = 'pointer';
+            this.canvas.style.cursor = 'pointer';
 
         }
 
-        if (this.mouseEstatus === 'moviendose') {
+        if (this.mouseEstatus === 'arrastrando') {
 
+           // this.canvas.style.cursor = 'move';
 
             if (posicionRCCuadrante === null) {
                 this.mouseEstatus = 'select';
@@ -339,7 +359,6 @@ class GameEngine {
                 return;
 
             }
-            gameLoader.canvas.style.cursor = 'pointer';
 
             let sub = this.getSubFromPos(posicionRCCuadrante);
 
@@ -349,14 +368,20 @@ class GameEngine {
                 return;
             }
 
-
-            gameLoader.canvas.style.cursor = 'move';
-
             this.posicionOnDrag = posicionRCCuadrante;
-
 
         }
 
+    }
+
+    onKeyDow(event) {
+
+        if (event.code !== 13) {
+            return;
+        }
+
+        //confirmar que ya se termino
+        console.log('confimrado');
     }
 
     getSubFromPos(posicionRCCuadrante) {
@@ -582,7 +607,7 @@ const factoryListaSubmarinos = {
 
 'use strict';
 
-let gameEngine = null;
+let engineSelPos = null;
 
 let gameLoader = {
 
@@ -609,31 +634,17 @@ let gameLoader = {
         ).then(([imgMar]) => {
             //guardar los archivos cargados
             gameConfig.resources.imgMar = imgMar;
-            this.confirmarPosiciones(tokenRoom);
+
+            this.runConfirmarPosiciones(tokenRoom);
         });
 
     },
-    confirmarPosiciones: function (tokenRoom) {
+    runConfirmarPosiciones: function (tokenRoom) {
 
         let jugadorLocal = factoryJugador.local();
 
-        gameEngine = new GameEngine(this.ctx, tokenRoom, jugadorLocal);
-
-        //eventos de mouse **************************************
-        this.canvas.onmousedown = function (event) {
-            gameEngine.onMouseDownEtapaSeleccionarPosicion(event);
-        };
-
-        this.canvas.onmouseup = function(event){
-            gameEngine.onMouseUpEtapaSeleccionarPosicion(event);
-        };
-
-        this.canvas.onmousemove=function(event){
-            gameEngine.onMouseMoveEtapaSeleccionarPosicion(event);
-        };
-
-
-        gameEngine.runEtapaSeleccionarPosicion();
+        engineSelPos = new EngineSelPos(this.canvas, tokenRoom, jugadorLocal);
+        engineSelPos.run();
 
     }
 
@@ -831,16 +842,23 @@ class PosicionRCCuadrante {
         return this.posicionRC.c;
     }
 
-    toString(){
+    toString() {
         return `cuad:${this.indexCuadrante} c:${this.posicionRC.c} r: ${this.posicionRC.r}`;
     }
 }
 
 const factoryPosicionRCCuadrante = {
+
+    fromEventMouse: function (event) {
+        const x = event.clientX;
+        const y = event.clientY;
+
+        return this.fromXY(x, y);
+    },
     fromXY: function (x, y) {
 
         //paso 1 determinar el cuadrante
-        const sizeRegion =  gameCacheSize.getSizeRegion();
+        const sizeRegion = gameCacheSize.getSizeRegion();
         const delta = gameConfig.deltaSep;
 
         function getPosicionCuadrante(valor) {
@@ -850,7 +868,7 @@ const factoryPosicionRCCuadrante = {
         let cuadranteX = getPosicionCuadrante(x);
         let cuadranteY = getPosicionCuadrante(y);
 
-        if(cuadranteY===3 || cuadranteX===3){
+        if (cuadranteY === 3 || cuadranteX === 3) {
             return null;
         }
 
@@ -862,11 +880,10 @@ const factoryPosicionRCCuadrante = {
 
         //obtener rango del mar
         let xMarIni = origenCuadrante.x + delta;
-        let xMarFin = xMarIni+ gameCacheSize.getSizeMar();
+        let xMarFin = xMarIni + gameCacheSize.getSizeMar();
 
         let yMarIni = origenCuadrante.y + delta;
         let yMarFin = yMarIni + gameCacheSize.getSizeMar();
-
 
 
         if (x >= xMarIni && x <= xMarFin && y >= yMarIni && y <= yMarFin) {
@@ -899,7 +916,7 @@ const factoryPosicionRCCuadrante = {
     },
     getOrigenCuadrante(cuadrante) {
 
-        const sizeRegion =  gameCacheSize.getSizeRegion();
+        const sizeRegion = gameCacheSize.getSizeRegion();
 
         if (cuadrante === 5) {
             return new Posicion(0, 0);
@@ -930,6 +947,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190602 23:29');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190603 16:44');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

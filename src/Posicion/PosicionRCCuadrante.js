@@ -17,16 +17,23 @@ class PosicionRCCuadrante {
         return this.posicionRC.c;
     }
 
-    toString(){
+    toString() {
         return `cuad:${this.indexCuadrante} c:${this.posicionRC.c} r: ${this.posicionRC.r}`;
     }
 }
 
 const factoryPosicionRCCuadrante = {
+
+    fromEventMouse: function (event) {
+        const x = event.clientX;
+        const y = event.clientY;
+
+        return this.fromXY(x, y);
+    },
     fromXY: function (x, y) {
 
         //paso 1 determinar el cuadrante
-        const sizeRegion =  gameCacheSize.getSizeRegion();
+        const sizeRegion = gameCacheSize.getSizeRegion();
         const delta = gameConfig.deltaSep;
 
         function getPosicionCuadrante(valor) {
@@ -36,7 +43,7 @@ const factoryPosicionRCCuadrante = {
         let cuadranteX = getPosicionCuadrante(x);
         let cuadranteY = getPosicionCuadrante(y);
 
-        if(cuadranteY===3 || cuadranteX===3){
+        if (cuadranteY === 3 || cuadranteX === 3) {
             return null;
         }
 
@@ -48,11 +55,10 @@ const factoryPosicionRCCuadrante = {
 
         //obtener rango del mar
         let xMarIni = origenCuadrante.x + delta;
-        let xMarFin = xMarIni+ gameCacheSize.getSizeMar();
+        let xMarFin = xMarIni + gameCacheSize.getSizeMar();
 
         let yMarIni = origenCuadrante.y + delta;
         let yMarFin = yMarIni + gameCacheSize.getSizeMar();
-
 
 
         if (x >= xMarIni && x <= xMarFin && y >= yMarIni && y <= yMarFin) {
@@ -85,7 +91,7 @@ const factoryPosicionRCCuadrante = {
     },
     getOrigenCuadrante(cuadrante: number) {
 
-        const sizeRegion =  gameCacheSize.getSizeRegion();
+        const sizeRegion = gameCacheSize.getSizeRegion();
 
         if (cuadrante === 5) {
             return new Posicion(0, 0);

@@ -1,10 +1,11 @@
 /* @flow */
 
-class GameEngine {
+class EngineSelPos {
 
-    constructor(ctx, tokenRoom, jugadorLocal) {
+    constructor(canvas, tokenRoom, jugadorLocal) {
 
-        this.ctx = ctx;
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
         this.tokenRoom = tokenRoom;
         this.jugadorLocal = jugadorLocal;
         this.listaJugadores = [jugadorLocal];
@@ -13,13 +14,15 @@ class GameEngine {
 
         this.posicionOnDrag = null;
         this.submarinoOnDrag = null;
+
+        this.addEventosMouseAndKeyboard(canvas);
     }
 
     addJugador(jugador) {
         this.listaJugadores.push(jugador);
     }
 
-    runEtapaSeleccionarPosicion() {
+    run() {
         const ctx = this.ctx;
         const jugador = this.jugadorLocal;
 
@@ -44,17 +47,30 @@ class GameEngine {
     }
 
 
-    getPosicionRCCuadranteFromMouse(event): PosicionRCCuadrante {
-        const x = event.clientX;
-        const y = event.clientY;
+    addEventosMouseAndKeyboard(canvas) {
 
-        return factoryPosicionRCCuadrante.fromXY(x, y);
+        canvas.onmousedown = (event) => {
+            this.onMouseDown(event);
+        };
 
+        canvas.onmouseup = (event) => {
+            this.onMouseUp(event);
+        };
+
+        canvas.onmousemove = (event) => {
+            this.onMouseMove(event);
+        };
+
+        canvas.onkeydown = (event) => {
+            this.onKeyDow(event);
+        }
     }
 
-    onMouseDownEtapaSeleccionarPosicion(event) {
+    onMouseDown(event) {
 
-        let posicionRCCuadrante = this.getPosicionRCCuadranteFromMouse(event);
+
+
+        let posicionRCCuadrante = factoryPosicionRCCuadrante.fromEventMouse(event);
 
         if (posicionRCCuadrante === null) {
             return;
@@ -70,8 +86,10 @@ class GameEngine {
             return;
         }
 
-        this.mouseEstatus = 'moviendose';
         this.submarinoOnDrag = sub;
+
+        this.mouseEstatus = 'arrastrando';
+       // this.canvas.style.cursor = 'move';
 
         //actualizar esttado de subarino para ponerlo como drag
 
@@ -87,15 +105,14 @@ class GameEngine {
 
     }
 
-    onMouseUpEtapaSeleccionarPosicion(event) {
+    onMouseUp(event) {
 
-        if( this.mouseEstatus !== 'moviendose'){
-            return ;
+        if (this.mouseEstatus !== 'arrastrando') {
+            return;
         }
 
 
-        let posicionRCCuadrante = this.getPosicionRCCuadranteFromMouse(event);
-
+        let posicionRCCuadrante = factoryPosicionRCCuadrante.fromEventMouse(event);
 
 
         if (posicionRCCuadrante === null) {
@@ -112,20 +129,22 @@ class GameEngine {
         this.submarinoOnDrag.getPosicionRC().r = posicionRCCuadrante.getR();
         this.submarinoOnDrag.isOnDrag = false;
 
-        this.submarinoOnDrag=null;
+        this.submarinoOnDrag = null;
         this.posicionOnDrag = null;
 
         this.mouseEstatus = 'select';
+        this.canvas.style.cursor = 'pointer';
     }
 
+    onMouseMove(event) {
 
-    onMouseMoveEtapaSeleccionarPosicion(event) {
+        let posicionRCCuadrante = factoryPosicionRCCuadrante.fromEventMouse(event);
 
-        let posicionRCCuadrante = this.getPosicionRCCuadranteFromMouse(event);
 
-        gameLoader.canvas.style.cursor = 'default';
 
         if (this.mouseEstatus === 'select') {
+
+            this.canvas.style.cursor = 'default';
 
             //paso 1 encontrar si es una celda de region jugador
 
@@ -147,12 +166,13 @@ class GameEngine {
             }
 
 
-            gameLoader.canvas.style.cursor = 'pointer';
+            this.canvas.style.cursor = 'pointer';
 
         }
 
-        if (this.mouseEstatus === 'moviendose') {
+        if (this.mouseEstatus === 'arrastrando') {
 
+           // this.canvas.style.cursor = 'move';
 
             if (posicionRCCuadrante === null) {
                 this.mouseEstatus = 'select';
@@ -168,7 +188,6 @@ class GameEngine {
                 return;
 
             }
-            gameLoader.canvas.style.cursor = 'pointer';
 
             let sub = this.getSubFromPos(posicionRCCuadrante);
 
@@ -178,14 +197,20 @@ class GameEngine {
                 return;
             }
 
-
-            gameLoader.canvas.style.cursor = 'move';
-
             this.posicionOnDrag = posicionRCCuadrante;
-
 
         }
 
+    }
+
+    onKeyDow(event) {
+
+        if (event.code !== 13) {
+            return;
+        }
+
+        //confirmar que ya se termino
+        console.log('confimrado');
     }
 
     getSubFromPos(posicionRCCuadrante) {
