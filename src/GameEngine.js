@@ -11,6 +11,7 @@ class GameEngine {
 
         this.mouseEstatus = null;
 
+        this.posicionOnDrag = null;
         this.submarinoOnDrag = null;
     }
 
@@ -20,8 +21,26 @@ class GameEngine {
 
     runEtapaSeleccionarPosicion() {
         const ctx = this.ctx;
+        const jugador = this.jugadorLocal;
+
         this.mouseEstatus = 'select';
-        drawEtapaSeleccionarPosicion.local(this.ctx, this.jugadorLocal);
+
+        let frames = () => {
+
+            drawEtapaSeleccionarPosicion.local(ctx, jugador);
+
+
+            if (this.posicionOnDrag !==null) {
+                let p = this.posicionOnDrag;
+                drawEtapaSeleccionarPosicion.drawDragSubmarino(ctx, p);
+            }
+
+            window.requestAnimationFrame(frames);
+
+        };
+
+        frames();
+
     }
 
 
@@ -51,9 +70,20 @@ class GameEngine {
             return;
         }
 
-        this.mouseEstatus = 'start_move';
+        this.mouseEstatus = 'moviendose';
         this.submarinoOnDrag = sub;
-        this.posicionOnDrag=null;
+
+        //actualizar esttado de subarino para ponerlo como drag
+
+        let idSub=sub.id;
+        this.jugadorLocal.getListaSubmarinos()
+            .forEach(s => {
+                s.isOnDrag = s.id=== idSub;
+            });
+
+
+        //guardar la posicion
+        this.posicionOnDrag = posicionRCCuadrante;
 
     }
 
@@ -69,6 +99,12 @@ class GameEngine {
             return;
         }
 
+       this.submarinoOnDrag.getPosicionRC().c=posicionRCCuadrante.getC();
+       this.submarinoOnDrag.getPosicionRC().r=posicionRCCuadrante.getR();
+       this.submarinoOnDrag.isOnDrag=false;
+
+       this.posicionOnDrag=null;
+
         this.mouseEstatus = 'select';
     }
 
@@ -77,10 +113,9 @@ class GameEngine {
 
         let posicionRCCuadrante = this.getPosicionRCCuadranteFromMouse(event);
 
+        gameLoader.canvas.style.cursor = 'default';
 
         if (this.mouseEstatus === 'select') {
-
-            gameLoader.canvas.style.cursor = 'default';
 
             //paso 1 encontrar si es una celda de region jugador
 
@@ -106,8 +141,26 @@ class GameEngine {
 
         }
 
-        if (this.mouseEstatus === 'start_move') {
-            gameLoader.canvas.style.cursor = 'move';
+        if (this.mouseEstatus === 'moviendose') {
+
+
+
+
+            if (posicionRCCuadrante === null) {
+                this.mouseEstatus = 'select';
+                this.submarinoOnDrag.isOnDrag=false;
+                this.posicionOnDrag=null;
+                return;
+            }
+
+            if (posicionRCCuadrante.getIndexCuadrante() !== 0) {
+                this.mouseEstatus = 'select';
+                this.submarinoOnDrag.isOnDrag=false;
+                this.posicionOnDrag=null;
+                return;
+
+            }
+            gameLoader.canvas.style.cursor = 'pointer';
 
             let sub = this.getSubFromPos(posicionRCCuadrante);
 
@@ -117,8 +170,11 @@ class GameEngine {
                 return;
             }
 
-            this.posicionOnDrag=posicionRCCuadrante;
-            drawEtapaSeleccionarPosicion.drawDragSubmarino(gameLoader.ctx,posicionRCCuadrante)
+
+            gameLoader.canvas.style.cursor = 'move';
+
+            this.posicionOnDrag = posicionRCCuadrante;
+
 
         }
 

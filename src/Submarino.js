@@ -3,6 +3,9 @@
 class Submarino {
 
     constructor(posicionRC) {
+
+        this.id=IDGenerator();
+        this.isOnDrag=false;
         this.posicionRC = posicionRC;
         this.isActivo = true;
         this.isCoheteListo = false;
@@ -24,9 +27,11 @@ class Submarino {
         this.isCoheteListo = false;
     }
 
+
     lanzaCohete(fnCB) {
 
     }
+
 
 }
 

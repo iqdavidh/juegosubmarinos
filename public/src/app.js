@@ -47,6 +47,30 @@ const gameCacheSize = {
 };
 
 
+function IDGenerator() {
+
+    let length = 8;
+    let timestamp = new Date;
+
+    let _getRandomInt = function( min, max ) {
+        return Math.floor( Math.random() * ( max - min + 1 ) ) + min;
+    };
+
+    let ts = timestamp.toString();
+    let parts = ts.split( "" ).reverse();
+    let id = "";
+
+    for( let i = 0; i < length; ++i ) {
+        let index = _getRandomInt( 0, parts.length - 1 );
+        id += parts[index];
+    }
+
+    return id;
+
+
+}
+
+
 function loadImage(url) {
     return new Promise(resolve => {
         const image = new Image();
@@ -158,6 +182,7 @@ class GameEngine {
 
         this.mouseEstatus = null;
 
+        this.posicionOnDrag = null;
         this.submarinoOnDrag = null;
     }
 
@@ -167,8 +192,26 @@ class GameEngine {
 
     runEtapaSeleccionarPosicion() {
         const ctx = this.ctx;
+        const jugador = this.jugadorLocal;
+
         this.mouseEstatus = 'select';
-        drawEtapaSeleccionarPosicion.local(this.ctx, this.jugadorLocal);
+
+        let frames = () => {
+
+            drawEtapaSeleccionarPosicion.local(ctx, jugador);
+
+
+            if (this.posicionOnDrag !==null) {
+                let p = this.posicionOnDrag;
+                drawEtapaSeleccionarPosicion.drawDragSubmarino(ctx, p);
+            }
+
+            window.requestAnimationFrame(frames);
+
+        };
+
+        frames();
+
     }
 
 
@@ -198,9 +241,20 @@ class GameEngine {
             return;
         }
 
-        this.mouseEstatus = 'start_move';
+        this.mouseEstatus = 'moviendose';
         this.submarinoOnDrag = sub;
-        this.posicionOnDrag=null;
+
+        //actualizar esttado de subarino para ponerlo como drag
+
+        let idSub=sub.id;
+        this.jugadorLocal.getListaSubmarinos()
+            .forEach(s => {
+                s.isOnDrag = s.id=== idSub;
+            });
+
+
+        //guardar la posicion
+        this.posicionOnDrag = posicionRCCuadrante;
 
     }
 
@@ -216,6 +270,12 @@ class GameEngine {
             return;
         }
 
+       this.submarinoOnDrag.getPosicionRC().c=posicionRCCuadrante.getC();
+       this.submarinoOnDrag.getPosicionRC().r=posicionRCCuadrante.getR();
+       this.submarinoOnDrag.isOnDrag=false;
+
+       this.posicionOnDrag=null;
+
         this.mouseEstatus = 'select';
     }
 
@@ -224,10 +284,9 @@ class GameEngine {
 
         let posicionRCCuadrante = this.getPosicionRCCuadranteFromMouse(event);
 
+        gameLoader.canvas.style.cursor = 'default';
 
         if (this.mouseEstatus === 'select') {
-
-            gameLoader.canvas.style.cursor = 'default';
 
             //paso 1 encontrar si es una celda de region jugador
 
@@ -253,8 +312,26 @@ class GameEngine {
 
         }
 
-        if (this.mouseEstatus === 'start_move') {
-            gameLoader.canvas.style.cursor = 'move';
+        if (this.mouseEstatus === 'moviendose') {
+
+
+
+
+            if (posicionRCCuadrante === null) {
+                this.mouseEstatus = 'select';
+                this.submarinoOnDrag.isOnDrag=false;
+                this.posicionOnDrag=null;
+                return;
+            }
+
+            if (posicionRCCuadrante.getIndexCuadrante() !== 0) {
+                this.mouseEstatus = 'select';
+                this.submarinoOnDrag.isOnDrag=false;
+                this.posicionOnDrag=null;
+                return;
+
+            }
+            gameLoader.canvas.style.cursor = 'pointer';
 
             let sub = this.getSubFromPos(posicionRCCuadrante);
 
@@ -264,8 +341,11 @@ class GameEngine {
                 return;
             }
 
-            this.posicionOnDrag=posicionRCCuadrante;
-            drawEtapaSeleccionarPosicion.drawDragSubmarino(gameLoader.ctx,posicionRCCuadrante)
+
+            gameLoader.canvas.style.cursor = 'move';
+
+            this.posicionOnDrag = posicionRCCuadrante;
+
 
         }
 
@@ -422,6 +502,9 @@ let FactoryResultadoOpe = {
 class Submarino {
 
     constructor(posicionRC) {
+
+        this.id=IDGenerator();
+        this.isOnDrag=false;
         this.posicionRC = posicionRC;
         this.isActivo = true;
         this.isCoheteListo = false;
@@ -443,9 +526,11 @@ class Submarino {
         this.isCoheteListo = false;
     }
 
+
     lanzaCohete(fnCB) {
 
     }
+
 
 }
 
@@ -559,6 +644,13 @@ const drawEtapaSeleccionarPosicion = {
 
         const x = origenMar.x + (submarino.getPosicionRC().c - 1) * (sizeCM + gameConfig.wDivision);
         const y = origenMar.y + (submarino.getPosicionRC().r - 1) * (sizeCM + gameConfig.wDivision);
+
+        //se dibuja diferente si esta en drag
+        if( submarino.isOnDrag){
+            ctx.fillStyle = "rgba(100, 100, 100, 0.5)";
+        }else{
+            ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+        }
 
         ctx.fillRect(x, y, sizeCM / 2, sizeCM / 2);
     },
@@ -817,6 +909,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190602 22:03');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190602 22:41');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

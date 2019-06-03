@@ -13,6 +13,13 @@ const drawEtapaSeleccionarPosicion = {
         const x = origenMar.x + (submarino.getPosicionRC().c - 1) * (sizeCM + gameConfig.wDivision);
         const y = origenMar.y + (submarino.getPosicionRC().r - 1) * (sizeCM + gameConfig.wDivision);
 
+        //se dibuja diferente si esta en drag
+        if( submarino.isOnDrag){
+            ctx.fillStyle = "rgba(100, 100, 100, 0.5)";
+        }else{
+            ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+        }
+
         ctx.fillRect(x, y, sizeCM / 2, sizeCM / 2);
     },
     drawDragSubmarino(ctx,posicionRCC: PosicionRCCuadrante){
