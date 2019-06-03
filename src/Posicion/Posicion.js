@@ -8,4 +8,8 @@ class Posicion {
         this.z = z;
     }
 
+    toString(){
+        return `${this.x}, ${this.y}`;
+    }
+
 }

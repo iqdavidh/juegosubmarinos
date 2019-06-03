@@ -563,6 +563,10 @@ class Posicion {
         this.z = z;
     }
 
+    toString(){
+        return `${this.x}, ${this.y}`;
+    }
+
 }
 class PosicionRC {
 
@@ -611,6 +615,7 @@ const factoryPosicionRCCuadrante = {
         let cuadranteY = getPosicionCuadrante(y);
 
         let code = `${cuadranteX}-${cuadranteY}`;
+
         let indexCuadrante = this.dicCuadranteIndex[code];
 
         let origenCuadrante = this.getOrigenCuadrante(indexCuadrante);
@@ -618,8 +623,11 @@ const factoryPosicionRCCuadrante = {
         //obtener rango del mar
         let xMarIni = origenCuadrante.x + delta;
         let xMarFin = origenCuadrante.x + sizeRegion - delta;
+
         let yMarIni = origenCuadrante.y + delta;
         let yMarFin = origenCuadrante.y + sizeRegion - delta;
+
+
 
         if (x >= xMarIni && x <= xMarFin && y >= yMarIni && y <= yMarFin) {
 
@@ -640,13 +648,13 @@ const factoryPosicionRCCuadrante = {
 
     dicCuadranteIndex: {
         '0-0': 5,
-        '0-1': 1,
-        '0-2': 6,
-        '1-0': 2,
+        '0-1': 2,
+        '0-2': 7,
+        '1-0': 1,
         '1-1': 0,
-        '1-2': 3,
-        '2-0': 7,
-        '2-1': 4,
+        '1-2': 4,
+        '2-0': 6,
+        '2-1': 3,
         '2-2': 8,
     },
     getOrigenCuadrante(cuadrante) {
@@ -683,6 +691,6 @@ const factoryPosicionRCCuadrante = {
 
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190602 19:32');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190602 19:56');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
