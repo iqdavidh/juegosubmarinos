@@ -158,6 +158,7 @@ class GameEngine {
 
         this.mouseEstatus = null;
 
+        this.submarinoOnDrag = null;
     }
 
     addJugador(jugador) {
@@ -191,7 +192,15 @@ class GameEngine {
             return;
         }
 
-        this.mouseEstatus = 'select';
+        let sub = this.getSubFromPos(posicionRCCuadrante);
+
+        if (!sub) {
+            return;
+        }
+
+        this.mouseEstatus = 'start_move';
+        this.submarinoOnDrag = sub;
+        this.posicionOnDrag=null;
 
     }
 
@@ -230,30 +239,46 @@ class GameEngine {
                 return;
             }
 
-            //console.log(`${posicionRCCuadrante}`);
 
-            //estamos en un cuadrante del centro , sigue ver si hay submarino
-
-            let sub = this.jugadorLocal.getListaSubmarinos()
-                .find(s => {
-                    return s.getPosicionRC().r === posicionRCCuadrante.getR() &&
-                        s.getPosicionRC().c === posicionRCCuadrante.getC();
-                });
+            let sub = this.getSubFromPos(posicionRCCuadrante);
 
 
-            if (!sub ) {
+            if (!sub) {
                 //no hay submarino
                 return;
             }
 
 
             gameLoader.canvas.style.cursor = 'pointer';
-            console.log('po');
+
         }
 
+        if (this.mouseEstatus === 'start_move') {
+            gameLoader.canvas.style.cursor = 'move';
+
+            let sub = this.getSubFromPos(posicionRCCuadrante);
+
+
+            if (sub) {
+                //si hay un submarino no lo podemos poenr
+                return;
+            }
+
+            this.posicionOnDrag=posicionRCCuadrante;
+            drawEtapaSeleccionarPosicion.drawDragSubmarino(gameLoader.ctx,posicionRCCuadrante)
+
+        }
 
     }
 
+    getSubFromPos(posicionRCCuadrante) {
+        let sub = this.jugadorLocal.getListaSubmarinos()
+            .find(s => {
+                return s.getPosicionRC().r === posicionRCCuadrante.getR() &&
+                    s.getPosicionRC().c === posicionRCCuadrante.getC();
+            });
+        return sub;
+    }
 }
 
 
@@ -536,9 +561,24 @@ const drawEtapaSeleccionarPosicion = {
         const y = origenMar.y + (submarino.getPosicionRC().r - 1) * (sizeCM + gameConfig.wDivision);
 
         ctx.fillRect(x, y, sizeCM / 2, sizeCM / 2);
+    },
+    drawDragSubmarino(ctx,posicionRCC){
 
+        const origen =factoryPosicionRCCuadrante.getOrigenCuadrante( posicionRCC.getIndexCuadrante());
+
+        const delta = gameConfig.deltaSep;
+
+        const origenMar = new Posicion(origen.x + delta, origen.y + delta);
+        const sizeCM = gameCacheSize.getSizeCM();
+
+        const x = origenMar.x + (posicionRCC.getC() - 1) * (sizeCM + gameConfig.wDivision);
+        const y = origenMar.y + (posicionRCC.getR() - 1) * (sizeCM + gameConfig.wDivision);
+
+        ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+        ctx.fillRect(x, y, sizeCM / 2, sizeCM / 2);
 
     },
+
     local: function (ctx, jugador) {
         const sizeRegion = gameConfig.size / 3;
         const delta = gameConfig.deltaSep;
@@ -777,6 +817,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190602 21:46');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190602 22:03');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

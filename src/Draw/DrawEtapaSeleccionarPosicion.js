@@ -14,9 +14,24 @@ const drawEtapaSeleccionarPosicion = {
         const y = origenMar.y + (submarino.getPosicionRC().r - 1) * (sizeCM + gameConfig.wDivision);
 
         ctx.fillRect(x, y, sizeCM / 2, sizeCM / 2);
+    },
+    drawDragSubmarino(ctx,posicionRCC: PosicionRCCuadrante){
 
+        const origen =factoryPosicionRCCuadrante.getOrigenCuadrante( posicionRCC.getIndexCuadrante());
+
+        const delta = gameConfig.deltaSep;
+
+        const origenMar = new Posicion(origen.x + delta, origen.y + delta);
+        const sizeCM = gameCacheSize.getSizeCM();
+
+        const x = origenMar.x + (posicionRCC.getC() - 1) * (sizeCM + gameConfig.wDivision);
+        const y = origenMar.y + (posicionRCC.getR() - 1) * (sizeCM + gameConfig.wDivision);
+
+        ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+        ctx.fillRect(x, y, sizeCM / 2, sizeCM / 2);
 
     },
+
     local: function (ctx, jugador: JugadorLocal) {
         const sizeRegion = gameConfig.size / 3;
         const delta = gameConfig.deltaSep;
