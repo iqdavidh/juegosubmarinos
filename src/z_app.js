@@ -16,7 +16,7 @@ let gameLoader = {
 
     canvas: null,
     ctx: null,
-    start: function (tokenRoom) {
+    start: async function (tokenRoom) {
 
         gameData.canvas = document.createElement('canvas');
         gameData.canvas.width = gameConfig.size;
@@ -37,13 +37,17 @@ let gameLoader = {
         });
 
     },
-    runConfirmarPosiciones: function (tokenRoom) {
+    runConfirmarPosiciones:  function (tokenRoom) {
 
         gameData.tokenRoom = tokenRoom;
         gameData.jugadorLocal = factoryJugador.local();
 
+
+
         engineSelPos = new EngineSelPos();
         engineSelPos.run();
+
+        return true;
 
     }
 

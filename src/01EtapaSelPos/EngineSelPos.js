@@ -25,7 +25,7 @@ class EngineSelPos {
 
         this.mouseEstatus = 'select';
 
-        let frames = () => {
+        const frames = () => {
 
             drawSelPos.local(ctx, jugador);
 

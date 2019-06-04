@@ -391,7 +391,7 @@ let gameLoader = {
 
     canvas: null,
     ctx: null,
-    start: function (tokenRoom) {
+    start: async function (tokenRoom) {
 
         gameData.canvas = document.createElement('canvas');
         gameData.canvas.width = gameConfig.size;
@@ -412,13 +412,17 @@ let gameLoader = {
         });
 
     },
-    runConfirmarPosiciones: function (tokenRoom) {
+    runConfirmarPosiciones:  function (tokenRoom) {
 
         gameData.tokenRoom = tokenRoom;
         gameData.jugadorLocal = factoryJugador.local();
 
+
+
         engineSelPos = new EngineSelPos();
         engineSelPos.run();
+
+        return true;
 
     }
 
@@ -598,7 +602,7 @@ class EngineSelPos {
 
         this.mouseEstatus = 'select';
 
-        let frames = () => {
+        const frames = () => {
 
             drawSelPos.local(ctx, jugador);
 
@@ -946,6 +950,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190603 18:53');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190603 19:02');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
