@@ -25,7 +25,7 @@ const drawSelPos = {
 
         ctx.fillRect(x +dy, y +sizeCM/4,submarinoSize , submarinoSize);
     },
-    drawDragSubmarino(ctx,posicionRCC: PosicionRCCuadrante){
+    drawDragSubmarino:function(ctx,posicionRCC: PosicionRCCuadrante){
 
         const origen =factoryPosicionRCCuadrante.getOrigenCuadrante( posicionRCC.getIndexCuadrante());
 

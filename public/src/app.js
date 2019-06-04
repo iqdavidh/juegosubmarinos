@@ -91,14 +91,47 @@ function loadImage(url) {
 
 
 
-function loadBGMar(){
+function loadImages(){
     return loadImage('/img/mar1.png')
+}
+
+function loadCanvasAndResources(callback){
+
+    /* registrar canvas */
+    if(!gameData.isCanvasLoaded){
+
+        gameData.canvas = document.createElement('canvas');
+        gameData.canvas.width = gameConfig.size;
+        gameData.canvas.height = gameConfig.size;
+
+        let container = document.getElementById('container');
+        container.append(gameData.canvas);
+        gameData.ctx = gameData.canvas.getContext('2d');
+
+        gameData.isCanvasLoaded=true;
+    }
+
+    /* precargar archivos *************************** */
+
+    Promise.all([
+            loadImages()
+        ]
+    ).then(([imgMar]) => {
+        callback(imgMar);
+        gameConfig.isResourcesLoaded = true;
+    });
+
 }
 //@flow
 
 let EventoDummy = {
 
-    addJugador2:function(){
+    iniciar2Jugadores:function(){
+        let token='*token*';
+        gameController.onRegistroSocket(token)
+
+    },
+    confirmaJugador2:function(){
         let j= factoryJugador.
         gameEngine.addJugador( j);
     }
@@ -385,46 +418,55 @@ const factoryListaSubmarinos = {
 
 'use strict';
 
-let gameData = {
+const gameData = {
     tokenRoom: null,
     canvas: null,
     ctx: null,
-    jugadorLocal: [],
+    jugadorLocal: null,
     listaJugadores: [],
     listaCohetes: [],
     listaMsgSocket: [],
-    estado: null
+    estado: null,
+    isResourcesLoaded:false,
+    isCanvasLoaded:false
 };
 
-let gameController = {
 
-    start: async function (tokenRoom) {
 
-        gameData.canvas = document.createElement('canvas');
-        gameData.canvas.width = gameConfig.size;
-        gameData.canvas.height = gameConfig.size;
+loadCanvasAndResources( (imgMar)=>{
+    gameConfig.resources.imgMar = imgMar;
+});
 
-        let container = document.getElementById('container');
-        container.append(gameData.canvas);
-        gameData.ctx = gameData.canvas.getContext('2d');
 
-        Promise.all([
-                loadBGMar()
-            ]
-        ).then(([imgMar]) => {
-            //guardar los archivos cargados
-            gameConfig.resources.imgMar = imgMar;
 
-            this.runConfirmarPosiciones(tokenRoom);
-        });
 
-    },
-    runConfirmarPosiciones: function (tokenRoom) {
 
-        gameData.estado = gameEstado.ConfirmarPosicion;
-        gameData.tokenRoom = tokenRoom;
+
+const gameController = {
+
+    onRegistroSocket: function (token) {
+        gameData.tokenRoom = token;
         gameData.jugadorLocal = factoryJugador.local();
 
+        this.start()
+    },
+    start: function () {
+
+        if (gameData.isResourcesLoaded) {
+            this.runConfirmarPosiciones();
+
+        } else {
+
+            loadCanvasAndResources( (imgMar)=>{
+                gameConfig.resources.imgMar = imgMar;
+                this.runConfirmarPosiciones();
+            });
+
+        }
+    },
+    runConfirmarPosiciones: function () {
+
+        gameData.estado = gameEstado.ConfirmarPosicion;
 
         let fnOnConfirmar = () => {
             gameController.runEsperarParticipantes();
@@ -486,7 +528,7 @@ const drawSelPos = {
 
         ctx.fillRect(x +dy, y +sizeCM/4,submarinoSize , submarinoSize);
     },
-    drawDragSubmarino(ctx,posicionRCC){
+    drawDragSubmarino:function(ctx,posicionRCC){
 
         const origen =factoryPosicionRCCuadrante.getOrigenCuadrante( posicionRCC.getIndexCuadrante());
 
@@ -1065,6 +1107,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190603 21:29');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190603 22:05');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

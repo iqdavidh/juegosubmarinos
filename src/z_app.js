@@ -1,45 +1,54 @@
 'use strict';
 
-let gameData = {
+const gameData = {
     tokenRoom: null,
     canvas: null,
     ctx: null,
-    jugadorLocal: [],
+    jugadorLocal: null,
     listaJugadores: [],
     listaCohetes: [],
     listaMsgSocket: [],
-    estado: null
+    estado: null,
+    isResourcesLoaded:false,
+    isCanvasLoaded:false
 };
 
-let gameController = {
 
-    start: async function (tokenRoom) {
 
-        gameData.canvas = document.createElement('canvas');
-        gameData.canvas.width = gameConfig.size;
-        gameData.canvas.height = gameConfig.size;
+loadCanvasAndResources( (imgMar)=>{
+    gameConfig.resources.imgMar = imgMar;
+});
 
-        let container = document.getElementById('container');
-        container.append(gameData.canvas);
-        gameData.ctx = gameData.canvas.getContext('2d');
 
-        Promise.all([
-                loadBGMar()
-            ]
-        ).then(([imgMar]) => {
-            //guardar los archivos cargados
-            gameConfig.resources.imgMar = imgMar;
 
-            this.runConfirmarPosiciones(tokenRoom);
-        });
 
-    },
-    runConfirmarPosiciones: function (tokenRoom) {
 
-        gameData.estado = gameEstado.ConfirmarPosicion;
-        gameData.tokenRoom = tokenRoom;
+
+const gameController = {
+
+    onRegistroSocket: function (token) {
+        gameData.tokenRoom = token;
         gameData.jugadorLocal = factoryJugador.local();
 
+        this.start()
+    },
+    start: function () {
+
+        if (gameData.isResourcesLoaded) {
+            this.runConfirmarPosiciones();
+
+        } else {
+
+            loadCanvasAndResources( (imgMar)=>{
+                gameConfig.resources.imgMar = imgMar;
+                this.runConfirmarPosiciones();
+            });
+
+        }
+    },
+    runConfirmarPosiciones: function () {
+
+        gameData.estado = gameEstado.ConfirmarPosicion;
 
         let fnOnConfirmar = () => {
             gameController.runEsperarParticipantes();
