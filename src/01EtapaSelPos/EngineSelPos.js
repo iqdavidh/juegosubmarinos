@@ -1,26 +1,23 @@
 /* @flow */
 
-class EngineSelPos {
+class EngineSelPos extends AEngine {
 
-    constructor(fnOnConfirmar) {
+    constructor(fnOnContinuar) {
 
-        this.isRunning = null;
-        this.canvas = gameData.canvas;
-        this.ctx = gameData.ctx;
-        this.tokenRoom = gameData.tokenRoom;
-        this.jugadorLocal = gameData.jugadorLocal;
-
-        this.mouseEstatus = null;
+        super(fnOnContinuar);
 
         this.posicionOnDrag = null;
         this.submarinoOnDrag = null;
+        this.mouseEstatus = null;
 
-        this.addEventosMouseAndKeyboard();
+        this.addEventosMouseAndKeyboard(
+            this.onMouseDown,
+            this.onMouseUp,
+            this.onMouseMove,
+            this.onKeyDow
+        );
 
-
-        this.fnOnConfirmar = fnOnConfirmar;
     }
-
 
     run() {
         const ctx = this.ctx;
@@ -48,26 +45,6 @@ class EngineSelPos {
 
         frames();
 
-    }
-
-    removeEventosMouseAndKeyBoard() {
-        let canvas = gameData.canvas;
-
-        canvas.onmousedown = (event) => {
-            console.log('no listenging');
-        };
-
-        canvas.onmouseup = (event) => {
-            console.log('no listenging');
-        };
-
-        canvas.onmousemove = (event) => {
-            console.log('no listenging');
-        };
-
-        document.onkeydown = (event) => {
-            console.log('no listenging');
-        };
     }
 
     addEventosMouseAndKeyboard() {
@@ -234,7 +211,7 @@ class EngineSelPos {
 
         this.removeEventosMouseAndKeyBoard();
         this.isRunning = false;
-        this.fnOnConfirmar();
+        this.fnOnContinuar();
 
     }
 

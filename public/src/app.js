@@ -96,6 +96,46 @@ let EventoDummy = {
         gameEngine.addJugador( j);
     }
 };
+// @flow
+
+class AEngine {
+
+    constructor(fnOnContinuar){
+
+        this.fnOnContinuar = fnOnContinuar;
+
+        this.isRunning = null;
+        this.canvas = gameData.canvas;
+        this.ctx = gameData.ctx;
+        this.tokenRoom = gameData.tokenRoom;
+        this.jugadorLocal = gameData.jugadorLocal;
+
+        this.mouseEstatus = null;
+    }
+
+    removeEventosMouseAndKeyBoard() {
+        let canvas = gameData.canvas;
+
+        canvas.onmousedown = (event) => {
+            console.log('no listenging');
+        };
+
+        canvas.onmouseup = (event) => {
+            console.log('no listenging');
+        };
+
+        canvas.onmousemove = (event) => {
+            console.log('no listenging');
+        };
+
+        document.onkeydown = (event) => {
+            console.log('no listenging');
+        };
+    }
+
+
+
+}
 /* @flow*/
 class AJugador {
 
@@ -161,43 +201,6 @@ class Cohete {
     mover() {
 
     }
-
-}
-class GameEngineDataIni {
-    constructor() {
-        this.size = null;
-        this.listaJugador=[];
-    }
-
-    setSize(size){
-        this.size=size;
-    }
-
-    addJugador(jugador){
-        this.listaJugador.push(jugador);
-    }
-
-    getResOpeIsValid(){
-        let isValid= true;
-        let listaMsg=[];
-
-        if(this.size===null){
-            isValid=false;
-            listaMsg.push('Size es null');
-        }
-
-        if(this.listaJugador.length<2){
-            isValid=false;
-            listaMsg.push('No hay jugadores suficientes');
-        }
-
-        if (isValid){
-            return FactoryResultadoOpe.OK();
-        }else{
-            return FactoryResultadoOpe.Error('Error de validacion', listaMsg);
-        }
-    }
-
 
 }
 /* @flow */
@@ -579,27 +582,24 @@ const drawSelPos = {
 
 /* @flow */
 
-class EngineSelPos {
+class EngineSelPos extends AEngine {
 
-    constructor(fnOnConfirmar) {
+    constructor(fnOnContinuar) {
 
-        this.isRunning = null;
-        this.canvas = gameData.canvas;
-        this.ctx = gameData.ctx;
-        this.tokenRoom = gameData.tokenRoom;
-        this.jugadorLocal = gameData.jugadorLocal;
-
-        this.mouseEstatus = null;
+        super(fnOnContinuar);
 
         this.posicionOnDrag = null;
         this.submarinoOnDrag = null;
+        this.mouseEstatus = null;
 
-        this.addEventosMouseAndKeyboard();
+        this.addEventosMouseAndKeyboard(
+            this.onMouseDown,
+            this.onMouseUp,
+            this.onMouseMove,
+            this.onKeyDow
+        );
 
-
-        this.fnOnConfirmar = fnOnConfirmar;
     }
-
 
     run() {
         const ctx = this.ctx;
@@ -627,26 +627,6 @@ class EngineSelPos {
 
         frames();
 
-    }
-
-    removeEventosMouseAndKeyBoard() {
-        let canvas = gameData.canvas;
-
-        canvas.onmousedown = (event) => {
-            console.log('no listenging');
-        };
-
-        canvas.onmouseup = (event) => {
-            console.log('no listenging');
-        };
-
-        canvas.onmousemove = (event) => {
-            console.log('no listenging');
-        };
-
-        document.onkeydown = (event) => {
-            console.log('no listenging');
-        };
     }
 
     addEventosMouseAndKeyboard() {
@@ -813,7 +793,7 @@ class EngineSelPos {
 
         this.removeEventosMouseAndKeyBoard();
         this.isRunning = false;
-        this.fnOnConfirmar();
+        this.fnOnContinuar();
 
     }
 
@@ -978,6 +958,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190603 19:12');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190603 19:28');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
