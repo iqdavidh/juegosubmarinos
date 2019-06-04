@@ -2,8 +2,9 @@
 
 class EngineSelPos {
 
-    constructor(fnOnConfirmarPos) {
+    constructor(fnOnConfirmar) {
 
+        this.isRunning = null;
         this.canvas = gameData.canvas;
         this.ctx = gameData.ctx;
         this.tokenRoom = gameData.tokenRoom;
@@ -15,7 +16,9 @@ class EngineSelPos {
         this.submarinoOnDrag = null;
 
         this.addEventosMouseAndKeyboard();
-        this.fnOnConfirmarPos=fnOnConfirmarPos;
+
+
+        this.fnOnConfirmar = fnOnConfirmar;
     }
 
 
@@ -24,6 +27,7 @@ class EngineSelPos {
         const jugador = this.jugadorLocal;
 
         this.mouseEstatus = 'select';
+        this.isRunning = true;
 
         const frames = () => {
 
@@ -35,7 +39,10 @@ class EngineSelPos {
                 drawSelPos.drawDragSubmarino(ctx, p);
             }
 
-            window.requestAnimationFrame(frames);
+            if (this.isRunning) {
+                window.requestAnimationFrame(frames);
+            }
+
 
         };
 
@@ -43,10 +50,29 @@ class EngineSelPos {
 
     }
 
+    removeEventosMouseAndKeyBoard() {
+        let canvas = gameData.canvas;
+
+        canvas.onmousedown = (event) => {
+            console.log('no listenging');
+        };
+
+        canvas.onmouseup = (event) => {
+            console.log('no listenging');
+        };
+
+        canvas.onmousemove = (event) => {
+            console.log('no listenging');
+        };
+
+        document.onkeydown = (event) => {
+            console.log('no listenging');
+        };
+    }
 
     addEventosMouseAndKeyboard() {
 
-        let canvas= gameData.canvas;
+        let canvas = gameData.canvas;
 
         canvas.onmousedown = (event) => {
             this.onMouseDown(event);
@@ -68,7 +94,6 @@ class EngineSelPos {
     onMouseDown(event) {
 
 
-
         let posicionRCCuadrante = factoryPosicionRCCuadrante.fromEventMouse(event);
 
         if (posicionRCCuadrante === null) {
@@ -88,7 +113,7 @@ class EngineSelPos {
         this.submarinoOnDrag = sub;
 
         this.mouseEstatus = 'arrastrando';
-       // this.canvas.style.cursor = 'move';
+        // this.canvas.style.cursor = 'move';
 
         //actualizar esttado de subarino para ponerlo como drag
 
@@ -140,7 +165,6 @@ class EngineSelPos {
         let posicionRCCuadrante = factoryPosicionRCCuadrante.fromEventMouse(event);
 
 
-
         if (this.mouseEstatus === 'select') {
 
             this.canvas.style.cursor = 'default';
@@ -171,7 +195,7 @@ class EngineSelPos {
 
         if (this.mouseEstatus === 'arrastrando') {
 
-           // this.canvas.style.cursor = 'move';
+            // this.canvas.style.cursor = 'move';
 
             if (posicionRCCuadrante === null) {
                 this.mouseEstatus = 'select';
@@ -208,8 +232,10 @@ class EngineSelPos {
             return;
         }
 
-        //confirmar que ya se termino
-        console.log('confimrado');
+        this.removeEventosMouseAndKeyBoard();
+        this.isRunning = false;
+        this.fnOnConfirmar();
+
     }
 
     getSubFromPos(posicionRCCuadrante) {

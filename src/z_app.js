@@ -12,10 +12,8 @@ let gameData = {
     listaMsgSocket:[]
 };
 
-let gameLoader = {
+let gameController = {
 
-    canvas: null,
-    ctx: null,
     start: async function (tokenRoom) {
 
         gameData.canvas = document.createElement('canvas');
@@ -43,12 +41,16 @@ let gameLoader = {
         gameData.jugadorLocal = factoryJugador.local();
 
 
+        let fnOnConfirmar= ()=>{
+            gameController.runEsperarParticipantes();
+        };
 
-        engineSelPos = new EngineSelPos();
+        engineSelPos = new EngineSelPos(fnOnConfirmar);
         engineSelPos.run();
 
-        return true;
-
+    },
+    runEsperarParticipantes:function(){
+        console.log('esperando');
     }
 
 };

@@ -1,4 +1,4 @@
-describe('gameLoader', function () {
+describe('submarines', function () {
 
 
     describe('factoryListaSubmarino', function () {
