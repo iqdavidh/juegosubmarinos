@@ -3,13 +3,13 @@
 let engineSelPos = null;
 
 let gameData = {
-    tokenRoom:null,
+    tokenRoom: null,
     canvas: null,
     ctx: null,
     jugadorLocal: [],
-    listaJugadores:[],
-    listaCohetes:[],
-    listaMsgSocket:[]
+    listaJugadores: [],
+    listaCohetes: [],
+    listaMsgSocket: []
 };
 
 let gameController = {
@@ -35,22 +35,31 @@ let gameController = {
         });
 
     },
-    runConfirmarPosiciones:  function (tokenRoom) {
+    runConfirmarPosiciones: function (tokenRoom) {
 
         gameData.tokenRoom = tokenRoom;
         gameData.jugadorLocal = factoryJugador.local();
 
 
-        let fnOnConfirmar= ()=>{
+        let fnOnConfirmar = () => {
             gameController.runEsperarParticipantes();
         };
 
-        engineSelPos = new EngineSelPos(fnOnConfirmar);
-        engineSelPos.run();
+        const engine = new EngineSelPos(fnOnConfirmar);
+        engine.run();
 
     },
-    runEsperarParticipantes:function(){
-        console.log('esperando');
+    runEsperarParticipantes: function () {
+
+        let fnOnContinuar = () => {
+            gameController.runBatalla();
+        };
+
+        const engine = new EngineEsperar(fnOnContinuar);
+        engine.run();
+    },
+    runBatalla: function () {
+        console.log('ya esta inicaida la batalla');
     }
 
 };
