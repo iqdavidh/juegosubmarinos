@@ -126,14 +126,22 @@ function loadCanvasAndResources(callback){
 
 let EventoDummy = {
 
-    iniciar2Jugadores:function(){
-        let token='*token*';
-        gameController.onRegistroSocket(token)
+    iniciar2Jugadores: function () {
+        let token = '*token*';
+        gameController.onRegistroSocket(token);
+
+        let msg = {
+            id_jugador: 2000,
+            token: token
+        };
+
+        let jugador2 = factoryJugadorRemoto.fromMsgJugadorIngresa(msg);
+        gameData.listaJugadores.push(jugador2);
+        gameController.onRegistroSocket(token);
 
     },
-    confirmaJugador2:function(){
-        let j= factoryJugador.
-        gameEngine.addJugador( j);
+    confirmaJugador2: function () {
+        let j = factoryJugador.gameEngine.addJugador(j);
     }
 };
 // @flow
@@ -298,20 +306,30 @@ const factoryJugador = {
         return new JugadorRemoto(index);
     }
 };
-class JugadorRemoto extends AJugador{
+class JugadorRemoto extends AJugador {
 
     constructor(indexCuadrante) {
 
         super(indexCuadrante);
 
-        this.numSubmarinos= gameConfig.numSubmarinos;
+        this.numSubmarinos = gameConfig.numSubmarinos;
 
     }
 
-    getNumSubmarinos(){
+    getNumSubmarinos() {
         return this.numSubmarinos;
     }
 }
+
+
+const factoryJugadorRemoto = {
+    fromMsgJugadorIngresa: function (mensaje) {
+
+        let numJugador=gameData.listaJugadores.length +1 ;
+
+        return new JugadorRemoto(numJugador)
+    }
+};
 class ResultadoOpe {
 
     constructor(isOk, msg, dataAdicional) {
@@ -548,8 +566,9 @@ const drawSelPos = {
     },
 
     local: function (ctx, jugador) {
-        const sizeRegion = gameConfig.size / 3;
+
         const delta = gameConfig.deltaSep;
+        const sizeRegion = gameCacheSize.getSizeRegion();
 
         let cacheRegionConMar = this.getCacheCanvasRegionConMar(jugador);
 
@@ -668,7 +687,13 @@ class EngineSelPos extends AEngine {
         this.mouseEstatus = 'select';
         this.isRunning = true;
 
+        let idFrame = null;
         const frames = () => {
+
+            if (!this.isRunning) {
+                window.cancelAnimationFrame(idFrame);
+                return;
+            }
 
             drawSelPos.local(ctx, jugador);
 
@@ -678,14 +703,10 @@ class EngineSelPos extends AEngine {
                 drawSelPos.drawDragSubmarino(ctx, p);
             }
 
-            if (this.isRunning) {
-                window.requestAnimationFrame(frames);
-            }
-
-
         };
 
-        frames();
+        idFrame = window.requestAnimationFrame(frames);
+
 
     }
 
@@ -851,8 +872,8 @@ class EngineSelPos extends AEngine {
             return;
         }
 
-        this.removeEventosMouseAndKeyBoard();
         this.isRunning = false;
+        this.removeEventosMouseAndKeyBoard();
         this.fnOnContinuar();
 
     }
@@ -909,8 +930,6 @@ class EngineEsperar extends AEngine {
                 indexBlack = 1;
             }
 
-
-
             ctx.fillStyle = `rgba(0,0,0,${indexBlack})`;
             ctx.fillRect(0, 0, gameConfig.size, gameConfig.size);
 
@@ -920,19 +939,6 @@ class EngineEsperar extends AEngine {
                 ctx.fillStyle = "rgb(0,0,0)";
                 ctx.fillRect(0, 0, gameConfig.size, gameConfig.size);
             }
-            // drawSelPos.local(ctx, jugador);
-            //
-            //
-            // if (this.posicionOnDrag !== null) {
-            //     let p = this.posicionOnDrag;
-            //     drawSelPos.drawDragSubmarino(ctx, p);
-            // }
-            //
-            // if (this.isRunning) {
-            //     window.requestAnimationFrame(frames);
-            // }
-
-
         };
 
         framesOscurecer();
@@ -949,11 +955,24 @@ const configTipoMensaje = {
     TerminoBatalla:'TerminoBatalla'
 };
 /* @flow */
+
+
+
+
+
+
+
+
+
+
+
+
+
 const factoryMensajeSocket = {
-    JugadorIngresa : function (token,id){
+    JugadorIngresa: function (token, id_jugador) {
         return {
-            token:token,
-            id_jugador:id,
+            id_jugador: id_jugador,
+            token: token
         };
     }
 };
@@ -1107,6 +1126,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190603 22:05');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190603 22:43');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

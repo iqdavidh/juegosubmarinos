@@ -45,8 +45,9 @@ const drawSelPos = {
     },
 
     local: function (ctx, jugador: JugadorLocal) {
-        const sizeRegion = gameConfig.size / 3;
+
         const delta = gameConfig.deltaSep;
+        const sizeRegion = gameCacheSize.getSizeRegion();
 
         let cacheRegionConMar = this.getCacheCanvasRegionConMar(jugador);
 

@@ -30,8 +30,6 @@ class EngineEsperar extends AEngine {
                 indexBlack = 1;
             }
 
-
-
             ctx.fillStyle = `rgba(0,0,0,${indexBlack})`;
             ctx.fillRect(0, 0, gameConfig.size, gameConfig.size);
 
@@ -41,19 +39,6 @@ class EngineEsperar extends AEngine {
                 ctx.fillStyle = "rgb(0,0,0)";
                 ctx.fillRect(0, 0, gameConfig.size, gameConfig.size);
             }
-            // drawSelPos.local(ctx, jugador);
-            //
-            //
-            // if (this.posicionOnDrag !== null) {
-            //     let p = this.posicionOnDrag;
-            //     drawSelPos.drawDragSubmarino(ctx, p);
-            // }
-            //
-            // if (this.isRunning) {
-            //     window.requestAnimationFrame(frames);
-            // }
-
-
         };
 
         framesOscurecer();

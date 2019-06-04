@@ -26,24 +26,26 @@ class EngineSelPos extends AEngine {
         this.mouseEstatus = 'select';
         this.isRunning = true;
 
+        let idFrame = null;
+
         const frames = () => {
 
-            drawSelPos.local(ctx, jugador);
+            if (!this.isRunning) {
+                window.cancelAnimationFrame(idFrame);
+                return;
+            }
 
+            drawSelPos.local(ctx, jugador);
 
             if (this.posicionOnDrag !== null) {
                 let p = this.posicionOnDrag;
                 drawSelPos.drawDragSubmarino(ctx, p);
             }
 
-            if (this.isRunning) {
-                window.requestAnimationFrame(frames);
-            }
-
-
         };
 
-        frames();
+        idFrame = window.requestAnimationFrame(frames);
+
 
     }
 
@@ -209,8 +211,8 @@ class EngineSelPos extends AEngine {
             return;
         }
 
-        this.removeEventosMouseAndKeyBoard();
         this.isRunning = false;
+        this.removeEventosMouseAndKeyBoard();
         this.fnOnContinuar();
 
     }

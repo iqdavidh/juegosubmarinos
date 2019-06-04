@@ -21,9 +21,6 @@ loadCanvasAndResources( (imgMar)=>{
 
 
 
-
-
-
 const gameController = {
 
     onRegistroSocket: function (token) {
