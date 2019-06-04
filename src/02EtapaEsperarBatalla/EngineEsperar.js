@@ -1,23 +1,46 @@
 /* @flow */
 
-class EngineEsperar extends AEngine{
+class EngineEsperar extends AEngine {
 
-    constructor(fnOnContinuar){
+    constructor(fnOnContinuar) {
 
         super(fnOnContinuar);
 
 
     }
 
-    run(){
+    run() {
         const ctx = this.ctx;
         const jugador = this.jugadorLocal;
+        const listaJugadores = gameData.listaJugadores;
 
-        this.mouseEstatus = 'select';
         this.isRunning = true;
 
-        const frames = () => {
+        //Fase 1 oscurecer la ultima vista
 
+
+        let indexFrame = 0;
+        const framesOscurecer = () => {
+
+
+            let indexBlack = 0;
+            indexFrame++;
+            indexBlack += 0.02;
+            if (indexBlack > 1) {
+                indexBlack = 1;
+            }
+
+
+
+            ctx.fillStyle = `rgba(0,0,0,${indexBlack})`;
+            ctx.fillRect(0, 0, gameConfig.size, gameConfig.size);
+
+            if(indexBlack<1){
+                window.requestAnimationFrame(framesOscurecer);
+            }else{
+                ctx.fillStyle = "rgb(0,0,0)";
+                ctx.fillRect(0, 0, gameConfig.size, gameConfig.size);
+            }
             // drawSelPos.local(ctx, jugador);
             //
             //
@@ -33,7 +56,7 @@ class EngineEsperar extends AEngine{
 
         };
 
-        frames();
+        framesOscurecer();
 
     }
 }

@@ -499,15 +499,6 @@ const drawSelPos = {
         /* draw el cache  */
         ctx.drawImage(cacheRegionConMar, 0, 0, sizeRegion, sizeRegion, origen.x, origen.y, sizeRegion, sizeRegion);
 
-        //ctxCache.fillText('COHETES LISTOS', delta + 24, sizeMar + delta + 18);
-
-        /* actualziar dra numero coehtes*/
-        // let numCoheteListo = jugador.getNumCohetesReady();
-        //
-        // ctx.font = '20px monospace';
-        // ctx.fillStyle = "rgba(0, 255, 0, 1)";
-        // ctx.fillText(numCoheteListo.toString(), origenMar.x, origenMar.y + sizeMar + 18);
-
 
         /* actualziar dra numero sub*/
         let numSubmarino = jugador.getNumSubmarinos();
@@ -817,27 +808,58 @@ class EngineSelPos extends AEngine {
 }
 
 
+/*@flow*/
 
+const drawEsperar = {
+
+
+    local: function (ctx, jugadorLocal, listaJugadores) {
+
+    }
+};
 /* @flow */
 
-class EngineEsperar extends AEngine{
+class EngineEsperar extends AEngine {
 
-    constructor(fnOnContinuar){
+    constructor(fnOnContinuar) {
 
         super(fnOnContinuar);
 
 
     }
 
-    run(){
+    run() {
         const ctx = this.ctx;
         const jugador = this.jugadorLocal;
+        const listaJugadores = gameData.listaJugadores;
 
-        this.mouseEstatus = 'select';
         this.isRunning = true;
 
-        const frames = () => {
+        //Fase 1 oscurecer la ultima vista
 
+
+        let indexFrame = 0;
+        const framesOscurecer = () => {
+
+
+            let indexBlack = 0;
+            indexFrame++;
+            indexBlack += 0.02;
+            if (indexBlack > 1) {
+                indexBlack = 1;
+            }
+
+
+
+            ctx.fillStyle = `rgba(0,0,0,${indexBlack})`;
+            ctx.fillRect(0, 0, gameConfig.size, gameConfig.size);
+
+            if(indexBlack<1){
+                window.requestAnimationFrame(framesOscurecer);
+            }else{
+                ctx.fillStyle = "rgb(0,0,0)";
+                ctx.fillRect(0, 0, gameConfig.size, gameConfig.size);
+            }
             // drawSelPos.local(ctx, jugador);
             //
             //
@@ -853,7 +875,7 @@ class EngineEsperar extends AEngine{
 
         };
 
-        frames();
+        framesOscurecer();
 
     }
 }
@@ -1007,6 +1029,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190603 19:36');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190603 19:54');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
