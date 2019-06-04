@@ -1,7 +1,7 @@
 /*  */
 
 const gameConfig = {
-    size: 900,
+    size: 700,
     deltaSep: 20,
     numSubmarinos: 8,
     numDivisiones: 6,
@@ -9,6 +9,13 @@ const gameConfig = {
     resources: {
         imgMar: null
     }
+};
+
+const gameEstado = {
+    ConfirmarPosicion: 'ConfirmarPosicion',
+    EsperarParticipantes: 'EsperarParticipantes',
+    Batalla: 'Batalla',
+    TerminoBatalla: 'TerminoBatalla'
 };
 
 const gameCacheSize = {
@@ -52,23 +59,23 @@ function IDGenerator() {
     let length = 8;
     let timestamp = new Date;
 
-    let _getRandomInt = function( min, max ) {
-        return Math.floor( Math.random() * ( max - min + 1 ) ) + min;
+    let _getRandomInt = function (min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
     };
 
     let ts = timestamp.toString();
-    let parts = ts.split( "" ).reverse();
+    let parts = ts.split("").reverse();
     let id = "";
 
-    for( let i = 0; i < length; ++i ) {
-        let index = _getRandomInt( 0, parts.length - 1 );
+    for (let i = 0; i < length; ++i) {
+        let index = _getRandomInt(0, parts.length - 1);
         id += parts[index];
     }
 
     return id;
-
-
 }
+
+
 
 
 function loadImage(url) {
@@ -378,8 +385,6 @@ const factoryListaSubmarinos = {
 
 'use strict';
 
-let engineSelPos = null;
-
 let gameData = {
     tokenRoom: null,
     canvas: null,
@@ -387,7 +392,8 @@ let gameData = {
     jugadorLocal: [],
     listaJugadores: [],
     listaCohetes: [],
-    listaMsgSocket: []
+    listaMsgSocket: [],
+    estado: null
 };
 
 let gameController = {
@@ -415,6 +421,7 @@ let gameController = {
     },
     runConfirmarPosiciones: function (tokenRoom) {
 
+        gameData.estado = gameEstado.ConfirmarPosicion;
         gameData.tokenRoom = tokenRoom;
         gameData.jugadorLocal = factoryJugador.local();
 
@@ -429,6 +436,8 @@ let gameController = {
     },
     runEsperarParticipantes: function () {
 
+        gameData.estado = gameEstado.EsperarParticipantes;
+
         let fnOnContinuar = () => {
             gameController.runBatalla();
         };
@@ -437,8 +446,17 @@ let gameController = {
         engine.run();
     },
     runBatalla: function () {
+        gameData.estado = gameEstado.Batalla;
         console.log('ya esta inicaida la batalla');
+    },
+    onRecibirMensajeSocket: function (tipo, data) {
+
+
+    },
+    onEnviarMensajeSocket: function (tipo, data) {
+
     }
+
 
 };
 /*@flow*/
@@ -879,6 +897,24 @@ class EngineEsperar extends AEngine {
 
     }
 }
+const configTipoMensaje = {
+    JugadorIngresa:'JugadorIngresa',
+    JugadorSale:'JugadorSale',
+    IniciarBatalla: 'IniciarBatalla',
+    LanzarCohete:'LanzarCohete',
+    ResultadoAtaque:'ResultadoAtaque',
+    Rendicion:'Rendicion',
+    TerminoBatalla:'TerminoBatalla'
+};
+/* @flow */
+const factoryMensajeSocket = {
+    JugadorIngresa : function (token,id){
+        return {
+            token:token,
+            id_jugador:id,
+        };
+    }
+};
 /* @flow */
 
 class Posicion {
@@ -1029,6 +1065,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190603 19:54');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190603 21:29');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

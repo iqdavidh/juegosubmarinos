@@ -1,7 +1,5 @@
 'use strict';
 
-let engineSelPos = null;
-
 let gameData = {
     tokenRoom: null,
     canvas: null,
@@ -9,7 +7,8 @@ let gameData = {
     jugadorLocal: [],
     listaJugadores: [],
     listaCohetes: [],
-    listaMsgSocket: []
+    listaMsgSocket: [],
+    estado: null
 };
 
 let gameController = {
@@ -37,6 +36,7 @@ let gameController = {
     },
     runConfirmarPosiciones: function (tokenRoom) {
 
+        gameData.estado = gameEstado.ConfirmarPosicion;
         gameData.tokenRoom = tokenRoom;
         gameData.jugadorLocal = factoryJugador.local();
 
@@ -51,6 +51,8 @@ let gameController = {
     },
     runEsperarParticipantes: function () {
 
+        gameData.estado = gameEstado.EsperarParticipantes;
+
         let fnOnContinuar = () => {
             gameController.runBatalla();
         };
@@ -59,7 +61,16 @@ let gameController = {
         engine.run();
     },
     runBatalla: function () {
+        gameData.estado = gameEstado.Batalla;
         console.log('ya esta inicaida la batalla');
+    },
+    onRecibirMensajeSocket: function (tipo, data) {
+
+
+    },
+    onEnviarMensajeSocket: function (tipo, data) {
+
     }
+
 
 };
