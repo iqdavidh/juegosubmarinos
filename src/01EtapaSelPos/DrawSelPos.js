@@ -56,15 +56,6 @@ const drawSelPos = {
         /* draw el cache  */
         ctx.drawImage(cacheRegionConMar, 0, 0, sizeRegion, sizeRegion, origen.x, origen.y, sizeRegion, sizeRegion);
 
-        //ctxCache.fillText('COHETES LISTOS', delta + 24, sizeMar + delta + 18);
-
-        /* actualziar dra numero coehtes*/
-        // let numCoheteListo = jugador.getNumCohetesReady();
-        //
-        // ctx.font = '20px monospace';
-        // ctx.fillStyle = "rgba(0, 255, 0, 1)";
-        // ctx.fillText(numCoheteListo.toString(), origenMar.x, origenMar.y + sizeMar + 18);
-
 
         /* actualziar dra numero sub*/
         let numSubmarino = jugador.getNumSubmarinos();
