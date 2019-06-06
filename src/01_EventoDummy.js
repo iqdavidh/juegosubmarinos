@@ -13,7 +13,7 @@ let EventoDummy = {
 
         let jugador2 = factoryJugadorRemoto.fromMsgJugadorIngresa(msg);
         gameData.listaJugadores.push(jugador2);
-        gameController.onRegistroSocket(token);
+
 
     },
     confirmaJugador2: function () {

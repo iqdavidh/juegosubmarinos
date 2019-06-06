@@ -137,7 +137,7 @@ let EventoDummy = {
 
         let jugador2 = factoryJugadorRemoto.fromMsgJugadorIngresa(msg);
         gameData.listaJugadores.push(jugador2);
-        gameController.onRegistroSocket(token);
+
 
     },
     confirmaJugador2: function () {
@@ -457,9 +457,6 @@ loadCanvasAndResources( (imgMar)=>{
 
 
 
-
-
-
 const gameController = {
 
     onRegistroSocket: function (token) {
@@ -688,6 +685,7 @@ class EngineSelPos extends AEngine {
         this.isRunning = true;
 
         let idFrame = null;
+
         const frames = () => {
 
             if (!this.isRunning) {
@@ -697,11 +695,14 @@ class EngineSelPos extends AEngine {
 
             drawSelPos.local(ctx, jugador);
 
-
+            console.log(this.posicionOnDrag);
             if (this.posicionOnDrag !== null) {
                 let p = this.posicionOnDrag;
                 drawSelPos.drawDragSubmarino(ctx, p);
             }
+
+
+            idFrame = window.requestAnimationFrame(frames);
 
         };
 
@@ -1126,6 +1127,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190603 22:43');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190605 22:54');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
