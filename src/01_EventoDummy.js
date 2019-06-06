@@ -2,7 +2,7 @@
 
 let EventoDummy = {
 
-    token:'*token*',
+    token: '*token*',
 
     iniciar2Jugadores: function () {
 
@@ -28,33 +28,26 @@ let EventoDummy = {
             )
         ;
 
-        let msg=factoryMensajeSocket.JugadorConfirma( this.token, j.id);
+        let msg = factoryMensajeSocket.JugadorConfirma(this.token, j.id);
 
 
         gameController.onRecibirMensajeSocket(msg);
     }
     ,
-    iniciar2JugadoresyConfirmar:function(){
-
-
+    iniciar2JugadoresyConfirmar: function () {
 
         this.iniciar2Jugadores();
         this.confirmaJugadorRemoto();
         //confirma jugador local
-        let fn=()=>{
-            gameController.engine.selpos.onKeyDow({code:"Enter"});
+        let fn = () => {
+            gameController.engine.selpos.onKeyDow({code: "Enter"});
         };
-        setTimeout(fn,1000);
-
-
-
-
+        setTimeout(fn, 1000);
 
     },
 
-    iniciar3Jugadores:function() {
+    iniciar3Jugadores: function () {
         this.iniciar2Jugadores();
-
 
 
         let msg = {
