@@ -126,11 +126,10 @@ function loadCanvasAndResources(callback){
 
 let EventoDummy = {
 
-    token:'*token*',
+    token: '*token*',
 
     iniciar2Jugadores: function () {
 
-        gameController.onRegistroSocket(this.token);
 
         let msg = {
             id_jugador: 2000,
@@ -139,6 +138,8 @@ let EventoDummy = {
 
         let jugador2 = factoryJugadorRemoto.fromMsgJugadorIngresa(msg);
         gameData.listaJugadores.push(jugador2);
+
+        gameController.onRegistroSocket(this.token);
 
     },
     confirmaJugadorRemoto: function () {
@@ -152,33 +153,26 @@ let EventoDummy = {
             )
         ;
 
-        let msg=factoryMensajeSocket.JugadorConfirma( this.token, j.id);
+        let msg = factoryMensajeSocket.JugadorConfirma(this.token, j.id);
 
 
         gameController.onRecibirMensajeSocket(msg);
     }
     ,
-    iniciar2JugadoresyConfirmar:function(){
-
-
+    iniciar2JugadoresyConfirmar: function () {
 
         this.iniciar2Jugadores();
         this.confirmaJugadorRemoto();
-        //confirma jugador local
-        let fn=()=>{
-            gameController.engine.selpos.onKeyDow({code:"Enter"});
-        };
-        setTimeout(fn,1000);
-
-
-
-
+        // //confirma jugador local
+         let fn = () => {
+             gameController.engine.selpos.onKeyDow({code: "Enter"});
+         };
+         setTimeout(fn, 1000);
 
     },
 
-    iniciar3Jugadores:function() {
+    iniciar3Jugadores: function () {
         this.iniciar2Jugadores();
-
 
 
         let msg = {
@@ -508,7 +502,8 @@ const gameController = {
 
     engine: {
         selpos: null,
-        esperarParticipantes: null
+        esperarParticipantes: null,
+        batalla:null
     },
     onRegistroSocket: function (token) {
         gameData.tokenRoom = token;
@@ -532,6 +527,7 @@ const gameController = {
     },
     runConfirmarPosiciones: function () {
 
+        console.log('runConfirmarPosiciones');
         gameData.estado = gameEstado.ConfirmarPosicion;
 
         let fnOnConfirmar = () => {
@@ -546,31 +542,46 @@ const gameController = {
     },
     runEsperarParticipantes: function ( ) {
 
-
+        console.log('runEsperarParticipantes');
         gameData.estado = gameEstado.EsperarParticipantes;
 
         let fnOnContinuar = () => {
-            function frame(){
-                gameData.ctx.fillStyle = `rgb(0, 0, 0)`;
-                gameData.ctx.fillRect(0, 0, gameConfig.size, gameConfig.size);
-            }
-            window.requestAnimationFrame(frame);
-
-
-            gameController.runBatalla();
 
             this.engine.esperarParticipantes = null;
+            gameData.ctx.fillStyle = `rgb(0, 0, 0)`;
+            gameData.ctx.fillRect(0, 0, gameConfig.size, gameConfig.size);
+            gameController.runBatalla();
         };
-
 
         this.engine.esperarParticipantes = new EngineEsperar(fnOnContinuar);
         this.engine.esperarParticipantes.run();
 
     },
     runBatalla: function () {
+        console.log('runBatalla');
         gameData.estado = gameEstado.Batalla;
-        console.log('ya esta inicaida la batalla');
 
+        let fnOnContinuar = () => {
+
+
+            this.engine.esperarParticipantes = null;
+
+            gameData.ctx.fillStyle = `rgb(0, 0, 0)`;
+            gameData.ctx.fillRect(0, 0, gameConfig.size, gameConfig.size);
+
+            gameController.runTerminoBatalla();
+
+
+        };
+
+        this.engine.batalla = new EngineBatalla(fnOnContinuar);
+        this.engine.batalla.run();
+
+
+    },
+    runTerminoBatalla:function(){
+        gameData.estado = gameEstado.TerminoBatalla;
+        console.log('batalla terminada');
     },
     onRecibirMensajeSocket: function (msg) {
         proRecibirMsgSocket.exe(msg);
@@ -734,12 +745,7 @@ class EngineSelPos extends AEngine {
         this.submarinoOnDrag = null;
         this.mouseEstatus = null;
 
-        this.addEventosMouseAndKeyboard(
-            this.onMouseDown,
-            this.onMouseUp,
-            this.onMouseMove,
-            this.onKeyDow
-        );
+        this.addEventosMouseAndKeyboard();
 
     }
 
@@ -1029,7 +1035,6 @@ const drawEsperar = {
             ctx.fillText(textoTop, (gameConfig.size - 476) / 2, 150);
             ctx.fillText(texto, (gameConfig.size - 465) / 2, gameConfig.size / 2);
 
-            //window.cancelAnimationFrame(idFrame);
         }
 
         frame();
@@ -1046,6 +1051,7 @@ class EngineEsperar extends AEngine {
         super(fnOnContinuar);
 
 
+        this.estado = '';
     }
 
     run() {
@@ -1062,6 +1068,8 @@ class EngineEsperar extends AEngine {
             this.onJugadorRemotoConfirma();
         };
 
+        this.estado = 'oscurecer';
+
         drawEsperar.oscurecer(ctx, fnCallback);
     }
 
@@ -1069,24 +1077,141 @@ class EngineEsperar extends AEngine {
         const ctx = this.ctx;
         let numJugadores = gameData.listaJugadores.length;
 
-
         let numConfirmados = gameData.listaJugadores
             .filter(j => {
                 return j.isPosicionConfirmada;
             }).length;
 
-
-        //poner el texto caundots jugadores estan confirmados
-        drawEsperar.actualizarTextoEspera(ctx, numJugadores, numConfirmados);
-
+        if (this.estado !== 'saliendo') {
+            //poner el texto caundots jugadores estan confirmados
+            drawEsperar.actualizarTextoEspera(ctx, numJugadores, numConfirmados);
+        }
 
         if (numJugadores === numConfirmados) {
-            setTimeout( this.fnOnContinuar, 2000);
+            this.estado = 'saliendo';
+            setTimeout(this.fnOnContinuar, 2000);
         }
+
+
+
 
     }
 
 }
+
+//@flow
+
+class EngineBatalla extends AEngine{
+
+    constructor(fnOnContinuar){
+        super(fnOnContinuar);
+
+        this.addEventosMouseAndKeyboard();
+
+    }
+
+
+    run() {
+        const ctx = this.ctx;
+        const jugador = this.jugadorLocal;
+
+        this.isRunning = true;
+        //
+        // let idFrame = null;
+        //
+        // const frames = () => {
+        //
+        //     if (!this.isRunning) {
+        //         window.cancelAnimationFrame(idFrame);
+        //         return;
+        //     }
+        //
+        //     drawSelPos.local(ctx, jugador);
+        //
+        //     idFrame = window.requestAnimationFrame(frames);
+        //
+        // };
+        //
+        // idFrame = window.requestAnimationFrame(frames);
+
+
+    }
+
+    addEventosMouseAndKeyboard() {
+
+        let canvas = gameData.canvas;
+
+        canvas.onmouseclick = (event) => {
+            this.onMouseClick(event);
+        };
+
+        canvas.onmousemove = (event) => {
+            this.onMouseMove(event);
+        };
+
+
+    }
+
+    onMouseClick(event) {
+
+
+        let posicionRCCuadrante = factoryPosicionRCCuadrante.fromEventMouse(event);
+
+        if (posicionRCCuadrante === null) {
+            return;
+        }
+
+        if (posicionRCCuadrante.getIndexCuadrante() === 0) {
+            //salimos si nos apuntamos a nosotros mismos
+            return;
+        }
+
+
+        //buscar la posicion en la lista de posiciones atacadas y salir sio ya fue atacada
+
+
+
+        let idSub = sub.id;
+        this.jugadorLocal.getListaSubmarinos()
+            .forEach(s => {
+                s.isOnDrag = s.id === idSub;
+            });
+
+
+        //guardar la posicion
+        this.posicionOnDrag = posicionRCCuadrante;
+
+    }
+
+    onMouseMove(event) {
+
+        let posicionRCCuadrante = factoryPosicionRCCuadrante.fromEventMouse(event);
+
+        if (posicionRCCuadrante.getIndexCuadrante() === 0) {
+            //salimos porque nos apuntamos a nosotros mismos
+            this.canvas.style.cursor = 'default';
+            return;
+
+        }
+
+        //solo cambiar el cu
+
+
+
+    }
+
+
+    getSubFromPos(posicionRCCuadrante) {
+        let sub = this.jugadorLocal.getListaSubmarinos()
+            .find(s => {
+                return s.getPosicionRC().r === posicionRCCuadrante.getR() &&
+                    s.getPosicionRC().c === posicionRCCuadrante.getC();
+            });
+        return sub;
+    }
+
+}
+
 //@flow
 
 const configTipoMensaje = {
@@ -1131,7 +1256,7 @@ const factoryMensajeSocket = {
 const proRecibirMsgSocket = {
     exe: function (msg) {
 
-        const jugador=this.getJugadorFromId( parseInt( msg.id_jugador ));
+        const jugador = this.getJugadorFromId(parseInt(msg.id_jugador));
 
         if (msg.tipo === tipoMsgSocket.ingresa) {
             this.jugador_ingresa(jugador);
@@ -1146,15 +1271,15 @@ const proRecibirMsgSocket = {
 
 
     },
-    jugador_ingresa: function ( jugador) {
+    jugador_ingresa: function (jugador) {
 
     },
-    jugador_confirma_posicion: function ( jugador) {
+    jugador_confirma_posicion: function (jugador) {
         jugador.setPosicionConfirmada();
 
         //notificar al controller - si no esta en la etapa de espera
-        //no se actualzia nada
-        if(gameController.engine.esperarParticipantes){
+
+        if (gameController.engine.esperarParticipantes) {
             gameController.engine.esperarParticipantes.onJugadorRemotoConfirma();
         }
 
@@ -1168,7 +1293,7 @@ const proRecibirMsgSocket = {
                     return jugador.id === id_jugador;
                 }
             )
-        ;
+            ;
 
 
     }
@@ -1324,6 +1449,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190606 12:07');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190606 16:59');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

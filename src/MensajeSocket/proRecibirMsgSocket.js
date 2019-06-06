@@ -3,7 +3,7 @@
 const proRecibirMsgSocket = {
     exe: function (msg) {
 
-        const jugador=this.getJugadorFromId( parseInt( msg.id_jugador ));
+        const jugador = this.getJugadorFromId(parseInt(msg.id_jugador));
 
         if (msg.tipo === tipoMsgSocket.ingresa) {
             this.jugador_ingresa(jugador);
@@ -18,20 +18,20 @@ const proRecibirMsgSocket = {
 
 
     },
-    jugador_ingresa: function ( jugador: JugadorRemoto) {
+    jugador_ingresa: function (jugador: JugadorRemoto) {
 
     },
-    jugador_confirma_posicion: function ( jugador: JugadorRemoto) {
+    jugador_confirma_posicion: function (jugador: JugadorRemoto) {
         jugador.setPosicionConfirmada();
 
         //notificar al controller - si no esta en la etapa de espera
-        //no se actualzia nada
-        if(gameController.engine.esperarParticipantes){
+
+        if (gameController.engine.esperarParticipantes) {
             gameController.engine.esperarParticipantes.onJugadorRemotoConfirma();
         }
 
     },
-    getJugadorFromId: function (id_jugador : number) : JugadorRemoto {
+    getJugadorFromId: function (id_jugador: number): JugadorRemoto {
 
 
         return gameData.listaJugadores
@@ -40,7 +40,7 @@ const proRecibirMsgSocket = {
                     return jugador.id === id_jugador;
                 }
             )
-        ;
+            ;
 
 
     }

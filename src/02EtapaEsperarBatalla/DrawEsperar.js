@@ -54,7 +54,6 @@ const drawEsperar = {
             ctx.fillText(textoTop, (gameConfig.size - 476) / 2, 150);
             ctx.fillText(texto, (gameConfig.size - 465) / 2, gameConfig.size / 2);
 
-            //window.cancelAnimationFrame(idFrame);
         }
 
         frame();

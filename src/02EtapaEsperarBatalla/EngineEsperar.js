@@ -7,6 +7,7 @@ class EngineEsperar extends AEngine {
         super(fnOnContinuar);
 
 
+        this.estado = '';
     }
 
     run() {
@@ -23,6 +24,8 @@ class EngineEsperar extends AEngine {
             this.onJugadorRemotoConfirma();
         };
 
+        this.estado = 'oscurecer';
+
         drawEsperar.oscurecer(ctx, fnCallback);
     }
 
@@ -30,20 +33,23 @@ class EngineEsperar extends AEngine {
         const ctx = this.ctx;
         let numJugadores = gameData.listaJugadores.length;
 
-
         let numConfirmados = gameData.listaJugadores
             .filter(j => {
                 return j.isPosicionConfirmada;
             }).length;
 
-
-        //poner el texto caundots jugadores estan confirmados
-        drawEsperar.actualizarTextoEspera(ctx, numJugadores, numConfirmados);
-
+        if (this.estado !== 'saliendo') {
+            //poner el texto caundots jugadores estan confirmados
+            drawEsperar.actualizarTextoEspera(ctx, numJugadores, numConfirmados);
+        }
 
         if (numJugadores === numConfirmados) {
-            setTimeout( this.fnOnContinuar, 2000);
+            this.estado = 'saliendo';
+            setTimeout(this.fnOnContinuar, 2000);
         }
+
+
+
 
     }
 

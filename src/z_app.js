@@ -24,7 +24,8 @@ const gameController = {
 
     engine: {
         selpos: null,
-        esperarParticipantes: null
+        esperarParticipantes: null,
+        batalla:null
     },
     onRegistroSocket: function (token) {
         gameData.tokenRoom = token;
@@ -48,6 +49,7 @@ const gameController = {
     },
     runConfirmarPosiciones: function () {
 
+        console.log('runConfirmarPosiciones');
         gameData.estado = gameEstado.ConfirmarPosicion;
 
         let fnOnConfirmar = () => {
@@ -62,31 +64,46 @@ const gameController = {
     },
     runEsperarParticipantes: function ( ) {
 
-
+        console.log('runEsperarParticipantes');
         gameData.estado = gameEstado.EsperarParticipantes;
 
         let fnOnContinuar = () => {
-            function frame(){
-                gameData.ctx.fillStyle = `rgb(0, 0, 0)`;
-                gameData.ctx.fillRect(0, 0, gameConfig.size, gameConfig.size);
-            }
-            window.requestAnimationFrame(frame);
-
-
-            gameController.runBatalla();
 
             this.engine.esperarParticipantes = null;
+            gameData.ctx.fillStyle = `rgb(0, 0, 0)`;
+            gameData.ctx.fillRect(0, 0, gameConfig.size, gameConfig.size);
+            gameController.runBatalla();
         };
-
 
         this.engine.esperarParticipantes = new EngineEsperar(fnOnContinuar);
         this.engine.esperarParticipantes.run();
 
     },
     runBatalla: function () {
+        console.log('runBatalla');
         gameData.estado = gameEstado.Batalla;
-        console.log('ya esta inicaida la batalla');
 
+        let fnOnContinuar = () => {
+
+
+            this.engine.esperarParticipantes = null;
+
+            gameData.ctx.fillStyle = `rgb(0, 0, 0)`;
+            gameData.ctx.fillRect(0, 0, gameConfig.size, gameConfig.size);
+
+            gameController.runTerminoBatalla();
+
+
+        };
+
+        this.engine.batalla = new EngineBatalla(fnOnContinuar);
+        this.engine.batalla.run();
+
+
+    },
+    runTerminoBatalla:function(){
+        gameData.estado = gameEstado.TerminoBatalla;
+        console.log('batalla terminada');
     },
     onRecibirMensajeSocket: function (msg) {
         proRecibirMsgSocket.exe(msg);

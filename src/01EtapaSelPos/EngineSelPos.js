@@ -10,12 +10,7 @@ class EngineSelPos extends AEngine {
         this.submarinoOnDrag = null;
         this.mouseEstatus = null;
 
-        this.addEventosMouseAndKeyboard(
-            this.onMouseDown,
-            this.onMouseUp,
-            this.onMouseMove,
-            this.onKeyDow
-        );
+        this.addEventosMouseAndKeyboard();
 
     }
 

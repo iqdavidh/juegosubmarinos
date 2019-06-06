@@ -6,7 +6,6 @@ let EventoDummy = {
 
     iniciar2Jugadores: function () {
 
-        gameController.onRegistroSocket(this.token);
 
         let msg = {
             id_jugador: 2000,
@@ -15,6 +14,8 @@ let EventoDummy = {
 
         let jugador2 = factoryJugadorRemoto.fromMsgJugadorIngresa(msg);
         gameData.listaJugadores.push(jugador2);
+
+        gameController.onRegistroSocket(this.token);
 
     },
     confirmaJugadorRemoto: function () {
@@ -38,11 +39,11 @@ let EventoDummy = {
 
         this.iniciar2Jugadores();
         this.confirmaJugadorRemoto();
-        //confirma jugador local
-        let fn = () => {
-            gameController.engine.selpos.onKeyDow({code: "Enter"});
-        };
-        setTimeout(fn, 1000);
+        // //confirma jugador local
+         let fn = () => {
+             gameController.engine.selpos.onKeyDow({code: "Enter"});
+         };
+         setTimeout(fn, 1000);
 
     },
 
