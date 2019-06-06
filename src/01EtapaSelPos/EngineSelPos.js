@@ -37,10 +37,14 @@ class EngineSelPos extends AEngine {
 
             drawSelPos.local(ctx, jugador);
 
+            console.log(this.posicionOnDrag);
             if (this.posicionOnDrag !== null) {
                 let p = this.posicionOnDrag;
                 drawSelPos.drawDragSubmarino(ctx, p);
             }
+
+
+            idFrame = window.requestAnimationFrame(frames);
 
         };
 
