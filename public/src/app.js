@@ -156,6 +156,19 @@ let EventoDummy = {
 
 
         gameController.onRecibirMensajeSocket(msg);
+    },
+    iniciar3Jugadores:function () {
+        this.iniciar2Jugadores();
+
+
+
+        let msg = {
+            id_jugador: 3000,
+            token: this.token
+        };
+
+        let jugador3 = factoryJugadorRemoto.fromMsgJugadorIngresa(msg);
+        gameData.listaJugadores.push(jugador3);
     }
 };
 // @flow
@@ -1053,6 +1066,103 @@ class EngineEsperar extends AEngine {
     }
 
 }
+//@flow
+
+const configTipoMensaje = {
+    JugadorIngresa:'JugadorIngresa',
+    JugadorSale:'JugadorSale',
+    IniciarBatalla: 'IniciarBatalla',
+    LanzarCohete:'LanzarCohete',
+    ResultadoAtaque:'ResultadoAtaque',
+    Rendicion:'Rendicion',
+    TerminoBatalla:'TerminoBatalla'
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* @flow */
+const tipoMsgSocket = {
+    ingresa: 'ingresa',
+    sale:'sale',
+    confirma_posiciones:'confirma_posiciones',
+    inicia_batalla:'inicia_batalla',
+    lanza_cohete:'lanza_cohete',
+    resultado_ataque:'resultado_ataque',
+};
+
+
+const factoryMensajeSocket = {
+    JugadorIngresa: function (token, id_jugador) {
+        return {
+            id_jugador,
+            token,
+            tipo: tipoMsgSocket.ingresa
+        };
+    },
+    JugadorConfirma: function (token, id_jugador) {
+        return {
+            id_jugador,
+            token,
+            tipo: tipoMsgSocket.confirma_posiciones
+        }
+    }
+};
+/* @flow */
+
+const proRecibirMsgSocket = {
+    exe: function (data) {
+
+        const jugador=this.getJugadorFromId( parseInt( data.id_jugador ));
+
+        if (data.tipo === tipoMsgSocket.ingresa) {
+            this.jugador_ingresa(jugador);
+
+
+        } else if (data.tipo === tipoMsgSocket.confirma_posiciones) {
+            this.jugador_confirma_posicion(jugador)
+
+        } else {
+            alert("no esperamos este tipo de mensaje " + data.tipo)
+        }
+
+
+    },
+    jugador_ingresa: function ( jugador) {
+
+    },
+    jugador_confirma_posicion: function ( jugador) {
+        jugador.setPosicionConfirmada();
+
+        //notificar al controller
+        gameController.engine.esperarParticipantes.onJugadorRemotoConfirma();
+    },
+    getJugadorFromId: function (id_jugador) {
+
+
+        return gameData.listaJugadores
+            .find(
+                jugador => {
+                    return jugador.id === id_jugador;
+                }
+            )
+        ;
+
+
+    }
+
+};
 /* @flow */
 
 class Posicion {
@@ -1203,103 +1313,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-//@flow
-
-const configTipoMensaje = {
-    JugadorIngresa:'JugadorIngresa',
-    JugadorSale:'JugadorSale',
-    IniciarBatalla: 'IniciarBatalla',
-    LanzarCohete:'LanzarCohete',
-    ResultadoAtaque:'ResultadoAtaque',
-    Rendicion:'Rendicion',
-    TerminoBatalla:'TerminoBatalla'
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* @flow */
-const tipoMsgSocket = {
-    ingresa: 'ingresa',
-    sale:'sale',
-    confirma_posiciones:'confirma_posiciones',
-    inicia_batalla:'inicia_batalla',
-    lanza_cohete:'lanza_cohete',
-    resultado_ataque:'resultado_ataque',
-};
-
-
-const factoryMensajeSocket = {
-    JugadorIngresa: function (token, id_jugador) {
-        return {
-            id_jugador,
-            token,
-            tipo: tipoMsgSocket.ingresa
-        };
-    },
-    JugadorConfirma: function (token, id_jugador) {
-        return {
-            id_jugador,
-            token,
-            tipo: tipoMsgSocket.confirma_posiciones
-        }
-    }
-};
-/* @flow */
-
-const proRecibirMsgSocket = {
-    exe: function (data) {
-
-        const jugador=this.getJugadorFromId( parseInt( data.id_jugador ));
-
-        if (data.tipo === tipoMsgSocket.ingresa) {
-            this.jugador_ingresa(jugador);
-
-
-        } else if (data.tipo === tipoMsgSocket.confirma_posiciones) {
-            this.jugador_confirma_posicion(jugador)
-
-        } else {
-            alert("no esperamos este tipo de mensaje " + data.tipo)
-        }
-
-
-    },
-    jugador_ingresa: function ( jugador) {
-
-    },
-    jugador_confirma_posicion: function ( jugador) {
-        jugador.setPosicionConfirmada();
-
-        //notificar al controller
-        gameController.engine.esperarParticipantes.onJugadorRemotoConfirma();
-    },
-    getJugadorFromId: function (id_jugador) {
-
-
-        return gameData.listaJugadores
-            .find(
-                jugador => {
-                    return jugador.id === id_jugador;
-                }
-            )
-        ;
-
-
-    }
-
-};
-/*FBUILD*/ console.log( 'FBUILD-20190606 11:12');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190606 11:25');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

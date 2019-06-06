@@ -32,5 +32,18 @@ let EventoDummy = {
 
 
         gameController.onRecibirMensajeSocket(msg);
+    },
+    iniciar3Jugadores:function () {
+        this.iniciar2Jugadores();
+
+
+
+        let msg = {
+            id_jugador: 3000,
+            token: this.token
+        };
+
+        let jugador3 = factoryJugadorRemoto.fromMsgJugadorIngresa(msg);
+        gameData.listaJugadores.push(jugador3);
     }
 };
