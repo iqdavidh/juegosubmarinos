@@ -37,7 +37,7 @@ class EngineSelPos extends AEngine {
 
             drawSelPos.local(ctx, jugador);
 
-            console.log(this.posicionOnDrag);
+
             if (this.posicionOnDrag !== null) {
                 let p = this.posicionOnDrag;
                 drawSelPos.drawDragSubmarino(ctx, p);
@@ -132,6 +132,22 @@ class EngineSelPos extends AEngine {
             return;
         }
 
+        //ver si en la posicion hay un submariuono - no se puede encimar
+        let sub = this.getSubFromPos(posicionRCCuadrante);
+
+
+        if (sub) {
+            //hay submarino
+            this.submarinoOnDrag.isOnDrag = false;
+            this.submarinoOnDrag = null;
+            this.posicionOnDrag = null;
+            this.mouseEstatus = 'select';
+            this.canvas.style.cursor = 'pointer';
+            return;
+        }
+
+
+
         this.submarinoOnDrag.getPosicionRC().c = posicionRCCuadrante.getC();
         this.submarinoOnDrag.getPosicionRC().r = posicionRCCuadrante.getR();
         this.submarinoOnDrag.isOnDrag = false;
@@ -178,6 +194,7 @@ class EngineSelPos extends AEngine {
 
         if (this.mouseEstatus === 'arrastrando') {
 
+            this.canvas.style.cursor = 'pointer';
             // this.canvas.style.cursor = 'move';
 
             if (posicionRCCuadrante === null) {

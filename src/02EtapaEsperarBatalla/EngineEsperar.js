@@ -18,30 +18,35 @@ class EngineEsperar extends AEngine {
 
         //Fase 1 oscurecer la ultima vista
 
-
-        let indexFrame = 0;
-        const framesOscurecer = () => {
-
-
-            let indexBlack = 0;
-            indexFrame++;
-            indexBlack += 0.02;
-            if (indexBlack > 1) {
-                indexBlack = 1;
-            }
-
-            ctx.fillStyle = `rgba(0,0,0,${indexBlack})`;
-            ctx.fillRect(0, 0, gameConfig.size, gameConfig.size);
-
-            if(indexBlack<1){
-                window.requestAnimationFrame(framesOscurecer);
-            }else{
-                ctx.fillStyle = "rgb(0,0,0)";
-                ctx.fillRect(0, 0, gameConfig.size, gameConfig.size);
-            }
+        let fnCallback = () => {
+            //actulizar texto de jugadores confirmados
+            this.onJugadorRemotoConfirma();
         };
 
-        framesOscurecer();
+        drawEsperar.oscurecer(ctx, fnCallback);
+    }
+
+    onJugadorRemotoConfirma() {
+        const ctx = this.ctx;
+        let numJugadores = gameData.listaJugadores.length;
+
+
+        let numConfirmados = gameData.listaJugadores
+            .filter(j => {
+                return j.isPosicionConfirmada;
+            }).length;
+
+
+        //poner el texto caundots jugadores estan confirmados
+        drawEsperar.actualizarTextoEspera(ctx, numJugadores, numConfirmados);
+
+
+        if (numJugadores === numConfirmados) {
+
+
+            setTimeout( this.fnOnContinuar, 2000);
+        }
 
     }
+
 }

@@ -9,20 +9,22 @@ const gameData = {
     listaCohetes: [],
     listaMsgSocket: [],
     estado: null,
-    isResourcesLoaded:false,
-    isCanvasLoaded:false
+    isResourcesLoaded: false,
+    isCanvasLoaded: false
 };
 
 
-
-loadCanvasAndResources( (imgMar)=>{
+loadCanvasAndResources((imgMar) => {
     gameConfig.resources.imgMar = imgMar;
 });
 
 
-
 const gameController = {
 
+    engine: {
+        selpos: null,
+        esperarParticipantes: null
+    },
     onRegistroSocket: function (token) {
         gameData.tokenRoom = token;
         gameData.jugadorLocal = factoryJugador.local();
@@ -36,7 +38,7 @@ const gameController = {
 
         } else {
 
-            loadCanvasAndResources( (imgMar)=>{
+            loadCanvasAndResources((imgMar) => {
                 gameConfig.resources.imgMar = imgMar;
                 this.runConfirmarPosiciones();
             });
@@ -49,33 +51,45 @@ const gameController = {
 
         let fnOnConfirmar = () => {
             gameController.runEsperarParticipantes();
+
+            this.engine.selpos = null;
         };
 
-        const engine = new EngineSelPos(fnOnConfirmar);
-        engine.run();
+        this.engine.selpos = new EngineSelPos(fnOnConfirmar);
+        this.engine.selpos.run();
 
     },
     runEsperarParticipantes: function () {
 
+
         gameData.estado = gameEstado.EsperarParticipantes;
 
         let fnOnContinuar = () => {
+            function frame(){
+                gameData.ctx.fillStyle = `rgb(0, 0, 0)`;
+                gameData.ctx.fillRect(0, 0, gameConfig.size, gameConfig.size);
+            }
+            window.requestAnimationFrame(frame);
+
+
             gameController.runBatalla();
+
+            this.engine.esperarParticipantes = null;
         };
 
-        const engine = new EngineEsperar(fnOnContinuar);
-        engine.run();
+        this.engine.esperarParticipantes = new EngineEsperar(fnOnContinuar);
+        this.engine.esperarParticipantes.run();
     },
     runBatalla: function () {
         gameData.estado = gameEstado.Batalla;
         console.log('ya esta inicaida la batalla');
     },
-    onRecibirMensajeSocket: function (tipo, data) {
-
-
+    onRecibirMensajeSocket: function (msg) {
+        proRecibirMsgSocket.exe(msg);
     },
-    onEnviarMensajeSocket: function (tipo, data) {
+    onEnviarMensajeSocket: function (msg) {
 
+        //TODO enviar mensaje de confirmar
     }
 
 

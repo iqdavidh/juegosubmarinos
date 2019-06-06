@@ -1,54 +1,27 @@
 /* @flow */
-
-type MsgJugadorIngresa = {
-    id_jugador: string,
-    token: string
+const tipoMsgSocket = {
+    ingresa: 'ingresa',
+    sale:'sale',
+    confirma_posiciones:'confirma_posiciones',
+    inicia_batalla:'inicia_batalla',
+    lanza_cohete:'lanza_cohete',
+    resultado_ataque:'resultado_ataque',
 };
 
-type MsgJugadorSale = {
-    id_jugador: string,
-    token: string
-};
-
-type MsgJugadorConfirma = {
-    id_jugador: string,
-    token: string
-};
-
-
-type MsgIniciarBatalla = {
-    id_jugador: string,
-    token: string
-};
-
-
-type MsgLanzarCohete = {
-    id_jugador: string,
-    token: string
-};
-
-
-type MsgResultadoAtaque = {
-    id_jugador: string,
-    token: string
-};
-
-
-type MsgRendicion = {
-    id_jugador: string,
-    token: string
-};
-
-type MsgTerminoBatalla = {
-    id_jugador: string,
-    token: string
-};
 
 const factoryMensajeSocket = {
-    JugadorIngresa: function (token, id_jugador) : MensajeJugadorIngresa {
+    JugadorIngresa: function (token, id_jugador): MsgJugadorIngresa {
         return {
-            id_jugador: id_jugador,
-            token: token
+            id_jugador,
+            token,
+            tipo: tipoMsgSocket.ingresa
         };
+    },
+    JugadorConfirma: function (token, id_jugador): MsgJugadorConfirma {
+        return {
+            id_jugador,
+            token,
+            tipo: tipoMsgSocket.confirma_posiciones
+        }
     }
 };

@@ -11,6 +11,8 @@ class JugadorRemoto extends AJugador {
     getNumSubmarinos() {
         return this.numSubmarinos;
     }
+
+
 }
 
 

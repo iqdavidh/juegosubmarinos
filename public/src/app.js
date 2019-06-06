@@ -126,22 +126,36 @@ function loadCanvasAndResources(callback){
 
 let EventoDummy = {
 
+    token:'*token*',
+
     iniciar2Jugadores: function () {
-        let token = '*token*';
-        gameController.onRegistroSocket(token);
+
+        gameController.onRegistroSocket(this.token);
 
         let msg = {
             id_jugador: 2000,
-            token: token
+            token: this.token
         };
 
         let jugador2 = factoryJugadorRemoto.fromMsgJugadorIngresa(msg);
         gameData.listaJugadores.push(jugador2);
 
-
     },
-    confirmaJugador2: function () {
-        let j = factoryJugador.gameEngine.addJugador(j);
+    confirmaJugador: function () {
+
+        //el jugador que tenemos envia mensjae de confirmarciopn
+        let j = gameData.listaJugadores
+            .find(
+                item => {
+                    return !item.isPosicionConfirmada
+                }
+            )
+        ;
+
+        let msg=factoryMensajeSocket.JugadorConfirma( this.token, j.id);
+
+
+        gameController.onRecibirMensajeSocket(msg);
     }
 };
 // @flow
@@ -319,6 +333,8 @@ class JugadorRemoto extends AJugador {
     getNumSubmarinos() {
         return this.numSubmarinos;
     }
+
+
 }
 
 
@@ -445,20 +461,22 @@ const gameData = {
     listaCohetes: [],
     listaMsgSocket: [],
     estado: null,
-    isResourcesLoaded:false,
-    isCanvasLoaded:false
+    isResourcesLoaded: false,
+    isCanvasLoaded: false
 };
 
 
-
-loadCanvasAndResources( (imgMar)=>{
+loadCanvasAndResources((imgMar) => {
     gameConfig.resources.imgMar = imgMar;
 });
 
 
-
 const gameController = {
 
+    engine: {
+        selpos: null,
+        esperarParticipantes: null
+    },
     onRegistroSocket: function (token) {
         gameData.tokenRoom = token;
         gameData.jugadorLocal = factoryJugador.local();
@@ -472,7 +490,7 @@ const gameController = {
 
         } else {
 
-            loadCanvasAndResources( (imgMar)=>{
+            loadCanvasAndResources((imgMar) => {
                 gameConfig.resources.imgMar = imgMar;
                 this.runConfirmarPosiciones();
             });
@@ -485,33 +503,45 @@ const gameController = {
 
         let fnOnConfirmar = () => {
             gameController.runEsperarParticipantes();
+
+            this.engine.selpos = null;
         };
 
-        const engine = new EngineSelPos(fnOnConfirmar);
-        engine.run();
+        this.engine.selpos = new EngineSelPos(fnOnConfirmar);
+        this.engine.selpos.run();
 
     },
     runEsperarParticipantes: function () {
 
+
         gameData.estado = gameEstado.EsperarParticipantes;
 
         let fnOnContinuar = () => {
+            function frame(){
+                gameData.ctx.fillStyle = `rgb(0, 0, 0)`;
+                gameData.ctx.fillRect(0, 0, gameConfig.size, gameConfig.size);
+            }
+            window.requestAnimationFrame(frame);
+
+
             gameController.runBatalla();
+
+            this.engine.esperarParticipantes = null;
         };
 
-        const engine = new EngineEsperar(fnOnContinuar);
-        engine.run();
+        this.engine.esperarParticipantes = new EngineEsperar(fnOnContinuar);
+        this.engine.esperarParticipantes.run();
     },
     runBatalla: function () {
         gameData.estado = gameEstado.Batalla;
         console.log('ya esta inicaida la batalla');
     },
-    onRecibirMensajeSocket: function (tipo, data) {
-
-
+    onRecibirMensajeSocket: function (msg) {
+        proRecibirMsgSocket.exe(msg);
     },
-    onEnviarMensajeSocket: function (tipo, data) {
+    onEnviarMensajeSocket: function (msg) {
 
+        //TODO enviar mensaje de confirmar
     }
 
 
@@ -695,7 +725,7 @@ class EngineSelPos extends AEngine {
 
             drawSelPos.local(ctx, jugador);
 
-            console.log(this.posicionOnDrag);
+
             if (this.posicionOnDrag !== null) {
                 let p = this.posicionOnDrag;
                 drawSelPos.drawDragSubmarino(ctx, p);
@@ -790,6 +820,22 @@ class EngineSelPos extends AEngine {
             return;
         }
 
+        //ver si en la posicion hay un submariuono - no se puede encimar
+        let sub = this.getSubFromPos(posicionRCCuadrante);
+
+
+        if (sub) {
+            //hay submarino
+            this.submarinoOnDrag.isOnDrag = false;
+            this.submarinoOnDrag = null;
+            this.posicionOnDrag = null;
+            this.mouseEstatus = 'select';
+            this.canvas.style.cursor = 'pointer';
+            return;
+        }
+
+
+
         this.submarinoOnDrag.getPosicionRC().c = posicionRCCuadrante.getC();
         this.submarinoOnDrag.getPosicionRC().r = posicionRCCuadrante.getR();
         this.submarinoOnDrag.isOnDrag = false;
@@ -836,6 +882,7 @@ class EngineSelPos extends AEngine {
 
         if (this.mouseEstatus === 'arrastrando') {
 
+            this.canvas.style.cursor = 'pointer';
             // this.canvas.style.cursor = 'move';
 
             if (posicionRCCuadrante === null) {
@@ -895,9 +942,64 @@ class EngineSelPos extends AEngine {
 const drawEsperar = {
 
 
-    local: function (ctx, jugadorLocal, listaJugadores) {
+    oscurecer: (ctx, fnCallback) => {
+
+        let numPasos = 100;
+        let indexFrame = 0;
+
+        let key = null;
+        const framesOscurecer = () => {
+
+            indexFrame++;
+
+            ctx.fillStyle = `rgba(0, 0, 0, 0.02)`;
+            ctx.fillRect(0, 0, gameConfig.size, gameConfig.size);
+
+            if (indexFrame < numPasos) {
+                key = window.requestAnimationFrame(framesOscurecer);
+            } else {
+                ctx.fillStyle = "rgb(0,0,0)";
+                ctx.fillRect(0, 0, gameConfig.size, gameConfig.size);
+                window.cancelAnimationFrame(key);
+                fnCallback();
+            }
+
+        };
+
+        framesOscurecer();
+
+    },
+
+
+    actualizarTextoEspera: (ctx, numJugadores, numConfirmados) => {
+
+        /* no es una animación solo se pintan los textos despues de poner pondo negro*/
+
+        let idFrame=null;
+        /*Fondo negro*/
+        function frame(){
+
+            console.log( `jugadore-confirmados ${numJugadores},${numConfirmados}`);
+            ctx.fillStyle = `rgb(0, 0, 0)`;
+            ctx.fillRect(0, 0, gameConfig.size, gameConfig.size);
+
+
+            let textoTop = 'Esperando a los demás jugadores';
+            //textos
+            let texto = `${numConfirmados} de ${numJugadores} han confirmado posiciones`;
+
+            ctx.fillStyle = "rgb(255, 255, 0)";
+            ctx.font = '28px monospace';
+            ctx.fillText(textoTop, (gameConfig.size - 476) / 2, 150);
+            ctx.fillText(texto, (gameConfig.size - 465) / 2, gameConfig.size / 2);
+
+            //window.cancelAnimationFrame(idFrame);
+        }
+
+        frame();
 
     }
+
 };
 /* @flow */
 
@@ -919,64 +1021,38 @@ class EngineEsperar extends AEngine {
 
         //Fase 1 oscurecer la ultima vista
 
-
-        let indexFrame = 0;
-        const framesOscurecer = () => {
-
-
-            let indexBlack = 0;
-            indexFrame++;
-            indexBlack += 0.02;
-            if (indexBlack > 1) {
-                indexBlack = 1;
-            }
-
-            ctx.fillStyle = `rgba(0,0,0,${indexBlack})`;
-            ctx.fillRect(0, 0, gameConfig.size, gameConfig.size);
-
-            if(indexBlack<1){
-                window.requestAnimationFrame(framesOscurecer);
-            }else{
-                ctx.fillStyle = "rgb(0,0,0)";
-                ctx.fillRect(0, 0, gameConfig.size, gameConfig.size);
-            }
+        let fnCallback = () => {
+            //actulizar texto de jugadores confirmados
+            this.onJugadorRemotoConfirma();
         };
 
-        framesOscurecer();
+        drawEsperar.oscurecer(ctx, fnCallback);
+    }
+
+    onJugadorRemotoConfirma() {
+        const ctx = this.ctx;
+        let numJugadores = gameData.listaJugadores.length;
+
+
+        let numConfirmados = gameData.listaJugadores
+            .filter(j => {
+                return j.isPosicionConfirmada;
+            }).length;
+
+
+        //poner el texto caundots jugadores estan confirmados
+        drawEsperar.actualizarTextoEspera(ctx, numJugadores, numConfirmados);
+
+
+        if (numJugadores === numConfirmados) {
+
+
+            setTimeout( this.fnOnContinuar, 2000);
+        }
 
     }
+
 }
-const configTipoMensaje = {
-    JugadorIngresa:'JugadorIngresa',
-    JugadorSale:'JugadorSale',
-    IniciarBatalla: 'IniciarBatalla',
-    LanzarCohete:'LanzarCohete',
-    ResultadoAtaque:'ResultadoAtaque',
-    Rendicion:'Rendicion',
-    TerminoBatalla:'TerminoBatalla'
-};
-/* @flow */
-
-
-
-
-
-
-
-
-
-
-
-
-
-const factoryMensajeSocket = {
-    JugadorIngresa: function (token, id_jugador) {
-        return {
-            id_jugador: id_jugador,
-            token: token
-        };
-    }
-};
 /* @flow */
 
 class Posicion {
@@ -1127,6 +1203,103 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190605 22:54');  /*FBUILD*/
+//@flow
+
+const configTipoMensaje = {
+    JugadorIngresa:'JugadorIngresa',
+    JugadorSale:'JugadorSale',
+    IniciarBatalla: 'IniciarBatalla',
+    LanzarCohete:'LanzarCohete',
+    ResultadoAtaque:'ResultadoAtaque',
+    Rendicion:'Rendicion',
+    TerminoBatalla:'TerminoBatalla'
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* @flow */
+const tipoMsgSocket = {
+    ingresa: 'ingresa',
+    sale:'sale',
+    confirma_posiciones:'confirma_posiciones',
+    inicia_batalla:'inicia_batalla',
+    lanza_cohete:'lanza_cohete',
+    resultado_ataque:'resultado_ataque',
+};
+
+
+const factoryMensajeSocket = {
+    JugadorIngresa: function (token, id_jugador) {
+        return {
+            id_jugador,
+            token,
+            tipo: tipoMsgSocket.ingresa
+        };
+    },
+    JugadorConfirma: function (token, id_jugador) {
+        return {
+            id_jugador,
+            token,
+            tipo: tipoMsgSocket.confirma_posiciones
+        }
+    }
+};
+/* @flow */
+
+const proRecibirMsgSocket = {
+    exe: function (data) {
+
+        const jugador=this.getJugadorFromId( parseInt( data.id_jugador ));
+
+        if (data.tipo === tipoMsgSocket.ingresa) {
+            this.jugador_ingresa(jugador);
+
+
+        } else if (data.tipo === tipoMsgSocket.confirma_posiciones) {
+            this.jugador_confirma_posicion(jugador)
+
+        } else {
+            alert("no esperamos este tipo de mensaje " + data.tipo)
+        }
+
+
+    },
+    jugador_ingresa: function ( jugador) {
+
+    },
+    jugador_confirma_posicion: function ( jugador) {
+        jugador.setPosicionConfirmada();
+
+        //notificar al controller
+        gameController.engine.esperarParticipantes.onJugadorRemotoConfirma();
+    },
+    getJugadorFromId: function (id_jugador) {
+
+
+        return gameData.listaJugadores
+            .find(
+                jugador => {
+                    return jugador.id === id_jugador;
+                }
+            )
+        ;
+
+
+    }
+
+};
+/*FBUILD*/ console.log( 'FBUILD-20190606 11:12');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
