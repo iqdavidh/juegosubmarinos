@@ -1,4 +1,5 @@
 'use strict';
+//@flow
 
 const gameData = {
     tokenRoom: null,
@@ -59,7 +60,7 @@ const gameController = {
         this.engine.selpos.run();
 
     },
-    runEsperarParticipantes: function () {
+    runEsperarParticipantes: function ( ) {
 
 
         gameData.estado = gameEstado.EsperarParticipantes;
@@ -77,12 +78,15 @@ const gameController = {
             this.engine.esperarParticipantes = null;
         };
 
+
         this.engine.esperarParticipantes = new EngineEsperar(fnOnContinuar);
         this.engine.esperarParticipantes.run();
+
     },
     runBatalla: function () {
         gameData.estado = gameEstado.Batalla;
         console.log('ya esta inicaida la batalla');
+
     },
     onRecibirMensajeSocket: function (msg) {
         proRecibirMsgSocket.exe(msg);

@@ -1,19 +1,19 @@
 /* @flow */
 
 const proRecibirMsgSocket = {
-    exe: function (data) {
+    exe: function (msg) {
 
-        const jugador=this.getJugadorFromId( parseInt( data.id_jugador ));
+        const jugador=this.getJugadorFromId( parseInt( msg.id_jugador ));
 
-        if (data.tipo === tipoMsgSocket.ingresa) {
+        if (msg.tipo === tipoMsgSocket.ingresa) {
             this.jugador_ingresa(jugador);
 
 
-        } else if (data.tipo === tipoMsgSocket.confirma_posiciones) {
+        } else if (msg.tipo === tipoMsgSocket.confirma_posiciones) {
             this.jugador_confirma_posicion(jugador)
 
         } else {
-            alert("no esperamos este tipo de mensaje " + data.tipo)
+            alert("no esperamos este tipo de mensaje " + msg.tipo)
         }
 
 
@@ -24,8 +24,12 @@ const proRecibirMsgSocket = {
     jugador_confirma_posicion: function ( jugador: JugadorRemoto) {
         jugador.setPosicionConfirmada();
 
-        //notificar al controller
-        gameController.engine.esperarParticipantes.onJugadorRemotoConfirma();
+        //notificar al controller - si no esta en la etapa de espera
+        //no se actualzia nada
+        if(gameController.engine.esperarParticipantes){
+            gameController.engine.esperarParticipantes.onJugadorRemotoConfirma();
+        }
+
     },
     getJugadorFromId: function (id_jugador : number) : JugadorRemoto {
 

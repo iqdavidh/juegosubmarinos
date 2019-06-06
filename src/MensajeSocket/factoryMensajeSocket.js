@@ -10,14 +10,14 @@ const tipoMsgSocket = {
 
 
 const factoryMensajeSocket = {
-    JugadorIngresa: function (token, id_jugador): MsgJugadorIngresa {
+    JugadorIngresa: function (token :string, id_jugador :int ) {
         return {
             id_jugador,
             token,
             tipo: tipoMsgSocket.ingresa
         };
     },
-    JugadorConfirma: function (token, id_jugador): MsgJugadorConfirma {
+    JugadorConfirma: function (token :string, id_jugador : int) {
         return {
             id_jugador,
             token,

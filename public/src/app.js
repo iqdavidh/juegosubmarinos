@@ -141,7 +141,7 @@ let EventoDummy = {
         gameData.listaJugadores.push(jugador2);
 
     },
-    confirmaJugador: function () {
+    confirmaJugadorRemoto: function () {
 
         //el jugador que tenemos envia mensjae de confirmarciopn
         let j = gameData.listaJugadores
@@ -156,8 +156,27 @@ let EventoDummy = {
 
 
         gameController.onRecibirMensajeSocket(msg);
+    }
+    ,
+    iniciar2JugadoresyConfirmar:function(){
+
+
+
+        this.iniciar2Jugadores();
+        this.confirmaJugadorRemoto();
+        //confirma jugador local
+        let fn=()=>{
+            gameController.engine.selpos.onKeyDow({code:"Enter"});
+        };
+        setTimeout(fn,1000);
+
+
+
+
+
     },
-    iniciar3Jugadores:function () {
+
+    iniciar3Jugadores:function() {
         this.iniciar2Jugadores();
 
 
@@ -464,6 +483,7 @@ const factoryListaSubmarinos = {
 };
 
 'use strict';
+//@flow
 
 const gameData = {
     tokenRoom: null,
@@ -524,7 +544,7 @@ const gameController = {
         this.engine.selpos.run();
 
     },
-    runEsperarParticipantes: function () {
+    runEsperarParticipantes: function ( ) {
 
 
         gameData.estado = gameEstado.EsperarParticipantes;
@@ -542,12 +562,15 @@ const gameController = {
             this.engine.esperarParticipantes = null;
         };
 
+
         this.engine.esperarParticipantes = new EngineEsperar(fnOnContinuar);
         this.engine.esperarParticipantes.run();
+
     },
     runBatalla: function () {
         gameData.estado = gameEstado.Batalla;
         console.log('ya esta inicaida la batalla');
+
     },
     onRecibirMensajeSocket: function (msg) {
         proRecibirMsgSocket.exe(msg);
@@ -1058,8 +1081,6 @@ class EngineEsperar extends AEngine {
 
 
         if (numJugadores === numConfirmados) {
-
-
             setTimeout( this.fnOnContinuar, 2000);
         }
 
@@ -1078,20 +1099,6 @@ const configTipoMensaje = {
     TerminoBatalla:'TerminoBatalla'
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /* @flow */
 const tipoMsgSocket = {
     ingresa: 'ingresa',
@@ -1104,7 +1111,7 @@ const tipoMsgSocket = {
 
 
 const factoryMensajeSocket = {
-    JugadorIngresa: function (token, id_jugador) {
+    JugadorIngresa: function (token, id_jugador ) {
         return {
             id_jugador,
             token,
@@ -1122,19 +1129,19 @@ const factoryMensajeSocket = {
 /* @flow */
 
 const proRecibirMsgSocket = {
-    exe: function (data) {
+    exe: function (msg) {
 
-        const jugador=this.getJugadorFromId( parseInt( data.id_jugador ));
+        const jugador=this.getJugadorFromId( parseInt( msg.id_jugador ));
 
-        if (data.tipo === tipoMsgSocket.ingresa) {
+        if (msg.tipo === tipoMsgSocket.ingresa) {
             this.jugador_ingresa(jugador);
 
 
-        } else if (data.tipo === tipoMsgSocket.confirma_posiciones) {
+        } else if (msg.tipo === tipoMsgSocket.confirma_posiciones) {
             this.jugador_confirma_posicion(jugador)
 
         } else {
-            alert("no esperamos este tipo de mensaje " + data.tipo)
+            alert("no esperamos este tipo de mensaje " + msg.tipo)
         }
 
 
@@ -1145,8 +1152,12 @@ const proRecibirMsgSocket = {
     jugador_confirma_posicion: function ( jugador) {
         jugador.setPosicionConfirmada();
 
-        //notificar al controller
-        gameController.engine.esperarParticipantes.onJugadorRemotoConfirma();
+        //notificar al controller - si no esta en la etapa de espera
+        //no se actualzia nada
+        if(gameController.engine.esperarParticipantes){
+            gameController.engine.esperarParticipantes.onJugadorRemotoConfirma();
+        }
+
     },
     getJugadorFromId: function (id_jugador) {
 
@@ -1313,6 +1324,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190606 11:25');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190606 12:07');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

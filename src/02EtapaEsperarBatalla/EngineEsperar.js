@@ -42,8 +42,6 @@ class EngineEsperar extends AEngine {
 
 
         if (numJugadores === numConfirmados) {
-
-
             setTimeout( this.fnOnContinuar, 2000);
         }
 
