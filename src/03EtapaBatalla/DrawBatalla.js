@@ -31,31 +31,44 @@ const drawBatalla = {
         ctx.fillRect(0, 0, gameConfig.size, gameConfig.size);
 
         //dibujar el sector de jugador local con sus submarinos -----------------
-        const origenLocal = gameData.jugadorLocal.getOrigenFromIndex();
-        ctx.fillStyle = '#000000';
-        ctx.fillRect(origenLocal.x, origenLocal.y, sizeRegion, sizeRegion);
-        //la seccion de mar
-        const sizeMar = sizeRegion - 2 * delta;
-        ctx.drawImage(gameConfig.resources.imgMar, 0, 0, sizeMar, sizeMar, delta + origenLocal.x, delta + origenLocal.y, sizeMar, sizeMar);
 
-        //las divisiones
+        const sizeMar = sizeRegion - 2 * delta;
         const sizeDiv = (sizeRegion - (gameConfig.wDivision * gameConfig.numDivisiones)) / gameConfig.numDivisiones;
         const rayaSize = sizeRegion - 2 * delta;
-
         const sizeCM = (sizeMar - gameConfig.numDivisiones * gameConfig.wDivision) / gameConfig.numDivisiones;
 
 
-        ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+        function drawSeccionFromOrigen(origen) {
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(origen.x, origen.y, sizeRegion, sizeRegion);
 
-        for (let i = 1; i < gameConfig.numDivisiones; i++) {
-            let xCuadro = origenLocal.x + i * (sizeCM + gameConfig.wDivision) + delta;
-            let yCuadro = origenLocal.y + delta;
-            ctx.fillRect(xCuadro, yCuadro, gameConfig.wDivision, rayaSize);
+            //la seccion de mar
+            ctx.drawImage(gameConfig.resources.imgMar, 0, 0, sizeMar, sizeMar, delta + origen.x, delta + origen.y, sizeMar, sizeMar);
 
-            xCuadro = origenLocal.x + delta;
-            yCuadro = origenLocal.y + i * (sizeCM + gameConfig.wDivision) + delta;
-            ctx.fillRect(xCuadro, yCuadro, rayaSize, gameConfig.wDivision);
+            ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+
+            for (let i = 1; i < gameConfig.numDivisiones; i++) {
+                let xCuadro = origen.x + i * (sizeCM + gameConfig.wDivision) + delta;
+                let yCuadro = origen.y + delta;
+                ctx.fillRect(xCuadro, yCuadro, gameConfig.wDivision, rayaSize);
+
+                xCuadro = origen.x + delta;
+                yCuadro = origen.y + i * (sizeCM + gameConfig.wDivision) + delta;
+                ctx.fillRect(xCuadro, yCuadro, rayaSize, gameConfig.wDivision);
+            }
+
         }
+
+
+        let listaOrigen = gameData.listaJugadores.map(j => {
+            return j.getOrigenFromIndex();
+        });
+
+        listaOrigen.unshift(gameData.jugadorLocal.getOrigenFromIndex());
+
+        listaOrigen.map(origen => {
+            drawSeccionFromOrigen(origen);
+        });
 
 
         this.cacheRegionAll = cacheCanvas;
