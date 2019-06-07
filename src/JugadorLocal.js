@@ -47,17 +47,20 @@ class JugadorLocal extends AJugador {
         return numCoheteListo;
     }
 
-    lanzaCohete(posicionEnLaMira:PosicionRCCuadrante){
-        //buscar el primer cohete que se agrego a la lista
-        if( this.getNumCohetesReady() ===0){
-            return;
+    lanzaCohete(posicionEnLaMira: PosicionRCCuadrante) {
+
+        //buscar un cohete que este en estado ready
+        const cohete = this.getListaCohetes()
+            .find(s => {
+                return s.getIsEstadoReady();
+            });
+
+        if (cohete) {
+            let posicionAbs = posicionEnLaMira.getPosAbs();
+
+            cohete.lanzar(posicionAbs);
+
         }
-
-        const cohete=this.getListaCohetes()[0];
-
-        let posicionAbs = posicionEnLaMira.getPosAbs();
-
-        cohete.lanzar(posicionAbs);
 
     }
 }

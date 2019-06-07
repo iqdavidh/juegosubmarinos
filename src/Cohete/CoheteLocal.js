@@ -10,6 +10,8 @@ class CoheteLocal extends ACohete {
 
         this.callbackAlLanzar = () => {
 
+            console.log('lanzado');
+
             // al lanzar vamos a buscar al submarino que es dueño de  este cohete poara volverlo a mandar
             let submarino = gameData.jugadorLocal.getListaSubmarinos()
                 .find(s => {
@@ -17,9 +19,13 @@ class CoheteLocal extends ACohete {
                 })
             ;
 
+
+
             if(submarino){
+                console.log('preparar');
                 submarino.prepararCohete();
             }
+
 
         }
 

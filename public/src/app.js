@@ -6,7 +6,7 @@ const gameConfig = {
     numSubmarinos: 8,
     numDivisiones: 6,
     wDivision: 2,
-    msPrepararCohete:6000,
+    msPrepararCohete:4000,
     velocidadCohete:10,
     resources: {
         imgMar: null,
@@ -335,17 +335,20 @@ class JugadorLocal extends AJugador {
         return numCoheteListo;
     }
 
-    lanzaCohete(posicionEnLaMira){
-        //buscar el primer cohete que se agrego a la lista
-        if( this.getNumCohetesReady() ===0){
-            return;
+    lanzaCohete(posicionEnLaMira) {
+
+        //buscar un cohete que este en estado ready
+        const cohete = this.getListaCohetes()
+            .find(s => {
+                return s.getIsEstadoReady();
+            });
+
+        if (cohete) {
+            let posicionAbs = posicionEnLaMira.getPosAbs();
+
+            cohete.lanzar(posicionAbs);
+
         }
-
-        const cohete=this.getListaCohetes()[0];
-
-        let posicionAbs = posicionEnLaMira.getPosAbs();
-
-        cohete.lanzar(posicionAbs);
 
     }
 }
@@ -1611,6 +1614,8 @@ class CoheteLocal extends ACohete {
 
         this.callbackAlLanzar = () => {
 
+            console.log('lanzado');
+
             // al lanzar vamos a buscar al submarino que es dueño de  este cohete poara volverlo a mandar
             let submarino = gameData.jugadorLocal.getListaSubmarinos()
                 .find(s => {
@@ -1618,9 +1623,13 @@ class CoheteLocal extends ACohete {
                 })
             ;
 
+
+
             if(submarino){
+                console.log('preparar');
                 submarino.prepararCohete();
             }
+
 
         }
 
@@ -1907,6 +1916,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190607 18:26');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190607 18:44');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
