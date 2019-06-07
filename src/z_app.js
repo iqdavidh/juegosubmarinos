@@ -79,7 +79,7 @@ const gameController = {
         this.engine.esperarParticipantes.run();
 
     },
-    runBatalla: function () {
+    runBatalla: async function () {
         console.log('runBatalla');
         gameData.estado = gameEstado.Batalla;
 
@@ -96,10 +96,14 @@ const gameController = {
 
         };
 
-        this.engine.batalla = new EngineBatalla(fnOnContinuar);
+        let pausa = await setTimeout(()=>{
+            return true;
+        },2000);
 
-        setTimeout(this.engine.batalla.run, 2000);
+        let engine=new EngineBatalla(fnOnContinuar);
+        this.engine.batalla=engine;
 
+        engine.run();
 
     },
     runTerminoBatalla: function () {

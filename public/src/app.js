@@ -557,7 +557,7 @@ const gameController = {
         this.engine.esperarParticipantes.run();
 
     },
-    runBatalla: function () {
+    runBatalla: async function () {
         console.log('runBatalla');
         gameData.estado = gameEstado.Batalla;
 
@@ -574,10 +574,14 @@ const gameController = {
 
         };
 
-        this.engine.batalla = new EngineBatalla(fnOnContinuar);
+        let pausa = await setTimeout(()=>{
+            return true;
+        },2000);
 
-        setTimeout(this.engine.batalla.run, 2000);
+        let engine=new EngineBatalla(fnOnContinuar);
+        this.engine.batalla=engine;
 
+        engine.run();
 
     },
     runTerminoBatalla: function () {
@@ -1099,7 +1103,44 @@ class EngineEsperar extends AEngine {
     }
 
 }
+//@flow
 
+const drawBatalla={
+    drawAllRegions:function(ctx){
+
+        let cacheMar=this.getCacheCanvasAll();
+        ctx.drawImage( cacheMar,0,0, gameConfig.size,gameConfig.size);
+
+    },
+    cacheRegionAll:null,
+    getCacheCanvasAll:function(){
+        //vamos a dibujar todos los jugadores
+        if (this.cacheRegionAll !== null) {
+            return this.cacheRegionAll;
+        }
+
+        const sizeRegion = gameConfig.size / 3;
+        const delta = gameConfig.deltaSep;
+
+        //este canvas tendra todo el mapa
+        const cacheCanvas = document.createElement('canvas');
+        cacheCanvas.width = gameConfig.size ;
+        cacheCanvas.height = gameConfig.size ;
+
+        const ctx = cacheCanvas.getContext('2d');
+
+        //demo
+        ctx.fillStyle='#ffffff';
+        ctx.fillRect(0,0,100,100);
+
+        this.cacheRegionAll=cacheCanvas;
+
+        return this.cacheRegionAll;
+    },
+    resetCacheCanvasAll:function(){
+        this.cacheRegionAll=null;
+    }
+}
 //@flow
 
 class EngineBatalla extends AEngine{
@@ -1117,28 +1158,30 @@ class EngineBatalla extends AEngine{
         const jugador = this.jugadorLocal;
 
         this.isRunning = true;
-        //
-        // let idFrame = null;
-        //
-        // const frames = () => {
-        //
-        //     if (!this.isRunning) {
-        //         window.cancelAnimationFrame(idFrame);
-        //         return;
-        //     }
-        //
-        //     drawSelPos.local(ctx, jugador);
-        //
-        //     idFrame = window.requestAnimationFrame(frames);
-        //
-        // };
-        //
-        // idFrame = window.requestAnimationFrame(frames);
+
+        let idFrame = null;
+
+        const frames = () => {
+
+            if (!this.isRunning) {
+                window.cancelAnimationFrame(idFrame);
+                return;
+            }
+
+            drawBatalla.drawAllRegions(ctx);
+
+            idFrame = window.requestAnimationFrame(frames);
+
+        };
+
+        idFrame = window.requestAnimationFrame(frames);
 
 
     }
 
     addEventosMouseAndKeyboard() {
+
+        return;
 
         let canvas = gameData.canvas;
 
@@ -1155,6 +1198,8 @@ class EngineBatalla extends AEngine{
 
     onMouseClick(event) {
 
+
+        return ;
 
         let posicionRCCuadrante = factoryPosicionRCCuadrante.fromEventMouse(event);
 
@@ -1450,6 +1495,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190606 17:01');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190606 19:59');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

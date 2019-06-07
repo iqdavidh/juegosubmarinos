@@ -15,28 +15,30 @@ class EngineBatalla extends AEngine{
         const jugador = this.jugadorLocal;
 
         this.isRunning = true;
-        //
-        // let idFrame = null;
-        //
-        // const frames = () => {
-        //
-        //     if (!this.isRunning) {
-        //         window.cancelAnimationFrame(idFrame);
-        //         return;
-        //     }
-        //
-        //     drawSelPos.local(ctx, jugador);
-        //
-        //     idFrame = window.requestAnimationFrame(frames);
-        //
-        // };
-        //
-        // idFrame = window.requestAnimationFrame(frames);
+
+        let idFrame = null;
+
+        const frames = () => {
+
+            if (!this.isRunning) {
+                window.cancelAnimationFrame(idFrame);
+                return;
+            }
+
+            drawBatalla.drawAllRegions(ctx);
+
+            idFrame = window.requestAnimationFrame(frames);
+
+        };
+
+        idFrame = window.requestAnimationFrame(frames);
 
 
     }
 
     addEventosMouseAndKeyboard() {
+
+        return;
 
         let canvas = gameData.canvas;
 
@@ -53,6 +55,8 @@ class EngineBatalla extends AEngine{
 
     onMouseClick(event) {
 
+
+        return ;
 
         let posicionRCCuadrante = factoryPosicionRCCuadrante.fromEventMouse(event);
 
