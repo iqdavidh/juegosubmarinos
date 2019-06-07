@@ -1123,7 +1123,7 @@ const drawBatalla = {
         const ctx = cacheCanvas.getContext('2d');
 
         //blanco para reslatar el cambio ----------------------------------------
-        ctx.fillStyle = 'yellow';
+        ctx.fillStyle = 'darkslategray';
         ctx.fillRect(0, 0, gameConfig.size, gameConfig.size);
 
         //dibujar el sector de jugador local con sus submarinos -----------------
@@ -1152,6 +1152,11 @@ const drawBatalla = {
                 yCuadro = origen.y + i * (sizeCM + gameConfig.wDivision) + delta;
                 ctx.fillRect(xCuadro, yCuadro, rayaSize, gameConfig.wDivision);
             }
+
+            ctx.font = '19px monospace';
+            ctx.fillStyle = "rgba(200, 200, 200, 0.7)";
+            ctx.fillText('SUBMARINOS', origen.x + sizeMar - 112, origen.y + 16);
+
 
         }
 
@@ -1531,6 +1536,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190606 21:02');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190606 21:07');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
