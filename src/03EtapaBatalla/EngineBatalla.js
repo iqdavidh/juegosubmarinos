@@ -18,6 +18,10 @@ class EngineBatalla extends AEngine{
 
         let idFrame = null;
 
+        //al estar en modo batalla los submarinos comienzan a cargar cohetes
+
+        jugador.prepararCohetes();
+
         const frames = () => {
 
             if (!this.isRunning) {

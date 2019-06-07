@@ -1,10 +1,11 @@
 class Cohete {
 
-    constructor(posicionIni) {
+    constructor(posicionIni, jugador:AJugador) {
         this.posicionIni = posicionIni;
         this.estado = 'ready';
         this.velocidad = new Posicion(0, 0, 0);
         this.posicion = null;
+        this.jugador=jugador;
     }
 
     getIsEstadoReady() {
@@ -26,3 +27,12 @@ class Cohete {
     }
 
 }
+
+const factoryCohete= {
+    local:function(submarino:Submarino){
+
+        //let posicion= submarino.
+        //return new Cohete()
+    }
+};
+

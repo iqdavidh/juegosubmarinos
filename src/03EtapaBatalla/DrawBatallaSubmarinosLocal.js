@@ -20,20 +20,14 @@ const drawBatallaSubmarinosLocal = {
 
         const delta = gameConfig.deltaSep;
 
-
         const sizeCM = gameCacheSize.getSizeCM();
+        const posRel= submarino.getPosicionXYRel();
 
-        const v1 = (submarino.getPosicionRC().c - 1) * (sizeCM + gameConfig.wDivision);
-        const x = delta + v1;
 
-        const v2 = (submarino.getPosicionRC().r - 1) * (sizeCM + gameConfig.wDivision);
-        const y = delta + v2;
 
         let imgSubmarino= submarino.isActivo? gameConfig.resources.imgTanque : gameConfig.resources.imgTanqueDest;
 
-        ctxRegion.drawImage(imgSubmarino, 0, 0, 100, 100, x, y, sizeCM, sizeCM);
-
-
+        ctxRegion.drawImage(imgSubmarino, 0, 0, 100, 100, posRel.x , posRel.y, sizeCM, sizeCM);
 
     },
 

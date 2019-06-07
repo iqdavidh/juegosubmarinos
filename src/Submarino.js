@@ -4,22 +4,42 @@ class Submarino {
 
     constructor(posicionRC) {
 
-        this.id=IDGenerator();
-        this.isOnDrag=false;
+        this.id = IDGenerator();
+        this.isOnDrag = false;
         this.posicionRC = posicionRC;
         this.isActivo = true;
-        this.isCoheteListo = false;
+
         this.jugador = null;
-        this.isSetJugador = false;
+
+        this.cohete = null;
+        this.avancePrepararCohete = 0;
     }
 
     setJugador(jugador) {
         this.jugador = jugador;
-        this.isSetJugador = true;
+
+    }
+
+    getIsCoheteListo(): boolean {
+        return this.cohete !== null;
     }
 
     getPosicionRC(): PosicionRC {
         return this.posicionRC;
+    }
+
+    /**Posicion relativa a la region/cuadrante*/
+    getPosicionXYRel(): Posicion {
+        const delta = gameConfig.deltaSep;
+        const sizeCM = gameCacheSize.getSizeCM();
+
+        const x = (this.getPosicionRC().c - 1) * (sizeCM + gameConfig.wDivision) + delta;
+
+        const y = (this.getPosicionRC().r - 1) * (sizeCM + gameConfig.wDivision) + delta;
+
+        return new Posicion(x, y);
+
+
     }
 
     recibeImpacto() {
@@ -28,8 +48,27 @@ class Submarino {
     }
 
 
-    lanzaCohete(fnCB) {
+    lanzaCohete(fnCB): void {
 
+    }
+
+
+    prepararCohete(): void {
+
+        if (this.cohete === null) {
+            const intervalo = gameConfig.msPrepararCohete / 6;
+            this.avancePrepararCohete = 0;
+
+            let fn = () => {
+                this.avancePrepararCohete += 10;
+
+                if (this.avancePrepararCohete >= 100) {
+                    // this.cohete = fact
+                }
+            }
+
+
+        }
     }
 
 

@@ -10,8 +10,10 @@ const drawSelPos = {
         const origenMar = new Posicion(origen.x + delta, origen.y + delta);
         const sizeCM = gameCacheSize.getSizeCM();
 
-        const x = origenMar.x + (submarino.getPosicionRC().c - 1) * (sizeCM + gameConfig.wDivision);
-        const y = origenMar.y + (submarino.getPosicionRC().r - 1) * (sizeCM + gameConfig.wDivision);
+        const posRel=submarino.getPosicionXYRel();
+
+        const x = origen.x + posRel.x;
+        const y = origen.y + posRel.y;
 
         //se dibuja diferente si esta en drag
         if( submarino.isOnDrag){

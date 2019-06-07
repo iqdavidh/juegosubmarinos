@@ -16,9 +16,20 @@ class JugadorLocal extends AJugador {
 
     }
 
-    getListaSubmarinos(){
+    getListaSubmarinos() {
         return this.listaSubmarinos;
     }
+
+    prepararCohetes(): void {
+        this.listaSubmarinos
+            .forEach(s => {
+                s.prepararCohete();
+            })
+        ;
+
+
+    }
+
 
     getNumSubmarinos() {
         return this.listaSubmarinos
@@ -43,7 +54,7 @@ class JugadorLocal extends AJugador {
 const factoryJugador = {
     local: function () {
         let listaSubmarinos = factoryListaSubmarinos.random();
-        return new JugadorLocal( listaSubmarinos);
+        return new JugadorLocal(listaSubmarinos);
     },
     remoto: function (index) {
 

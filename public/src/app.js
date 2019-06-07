@@ -6,6 +6,7 @@ const gameConfig = {
     numSubmarinos: 8,
     numDivisiones: 6,
     wDivision: 2,
+    msPrepararCohete:6000,
     resources: {
         imgMar: null,
         imgBullet:null ,
@@ -286,11 +287,12 @@ class AJugador {
 }
 class Cohete {
 
-    constructor(posicionIni) {
+    constructor(posicionIni, jugador) {
         this.posicionIni = posicionIni;
         this.estado = 'ready';
         this.velocidad = new Posicion(0, 0, 0);
         this.posicion = null;
+        this.jugador=jugador;
     }
 
     getIsEstadoReady() {
@@ -312,6 +314,16 @@ class Cohete {
     }
 
 }
+
+const factoryCohete= {
+    local:function(submarino){
+
+        //let posicion= submarino.
+        //return new Cohete()
+    }
+};
+
+
 /* @flow */
 class JugadorLocal extends AJugador {
 
@@ -330,9 +342,20 @@ class JugadorLocal extends AJugador {
 
     }
 
-    getListaSubmarinos(){
+    getListaSubmarinos() {
         return this.listaSubmarinos;
     }
+
+    prepararCohetes() {
+        this.listaSubmarinos
+            .forEach(s => {
+                s.prepararCohete();
+            })
+        ;
+
+
+    }
+
 
     getNumSubmarinos() {
         return this.listaSubmarinos
@@ -357,7 +380,7 @@ class JugadorLocal extends AJugador {
 const factoryJugador = {
     local: function () {
         let listaSubmarinos = factoryListaSubmarinos.random();
-        return new JugadorLocal( listaSubmarinos);
+        return new JugadorLocal(listaSubmarinos);
     },
     remoto: function (index) {
 
@@ -428,22 +451,42 @@ class Submarino {
 
     constructor(posicionRC) {
 
-        this.id=IDGenerator();
-        this.isOnDrag=false;
+        this.id = IDGenerator();
+        this.isOnDrag = false;
         this.posicionRC = posicionRC;
         this.isActivo = true;
-        this.isCoheteListo = false;
+
         this.jugador = null;
-        this.isSetJugador = false;
+
+        this.cohete = null;
+        this.avancePrepararCohete = 0;
     }
 
     setJugador(jugador) {
         this.jugador = jugador;
-        this.isSetJugador = true;
+
+    }
+
+    getIsCoheteListo() {
+        return this.cohete !== null;
     }
 
     getPosicionRC() {
         return this.posicionRC;
+    }
+
+    /**Posicion relativa a la region/cuadrante*/
+    getPosicionXYRel() {
+        const delta = gameConfig.deltaSep;
+        const sizeCM = gameCacheSize.getSizeCM();
+
+        const x = (this.getPosicionRC().c - 1) * (sizeCM + gameConfig.wDivision) + delta;
+
+        const y = (this.getPosicionRC().r - 1) * (sizeCM + gameConfig.wDivision) + delta;
+
+        return new Posicion(x, y);
+
+
     }
 
     recibeImpacto() {
@@ -454,6 +497,25 @@ class Submarino {
 
     lanzaCohete(fnCB) {
 
+    }
+
+
+    prepararCohete() {
+
+        if (this.cohete === null) {
+            const intervalo = gameConfig.msPrepararCohete / 6;
+            this.avancePrepararCohete = 0;
+
+            let fn = () => {
+                this.avancePrepararCohete += 10;
+
+                if (this.avancePrepararCohete >= 100) {
+                    // this.cohete = fact
+                }
+            }
+
+
+        }
     }
 
 
@@ -643,8 +705,10 @@ const drawSelPos = {
         const origenMar = new Posicion(origen.x + delta, origen.y + delta);
         const sizeCM = gameCacheSize.getSizeCM();
 
-        const x = origenMar.x + (submarino.getPosicionRC().c - 1) * (sizeCM + gameConfig.wDivision);
-        const y = origenMar.y + (submarino.getPosicionRC().r - 1) * (sizeCM + gameConfig.wDivision);
+        const posRel=submarino.getPosicionXYRel();
+
+        const x = origen.x + posRel.x;
+        const y = origen.y + posRel.y;
 
         //se dibuja diferente si esta en drag
         if( submarino.isOnDrag){
@@ -1001,6 +1065,7 @@ class EngineSelPos extends AEngine {
         }
 
         this.isRunning = false;
+        this.jugadorLocal.isPosicionConfirmada=true;
         this.removeEventosMouseAndKeyBoard();
         this.fnOnContinuar();
 
@@ -1263,20 +1328,14 @@ const drawBatallaSubmarinosLocal = {
 
         const delta = gameConfig.deltaSep;
 
-
         const sizeCM = gameCacheSize.getSizeCM();
+        const posRel= submarino.getPosicionXYRel();
 
-        const v1 = (submarino.getPosicionRC().c - 1) * (sizeCM + gameConfig.wDivision);
-        const x = delta + v1;
 
-        const v2 = (submarino.getPosicionRC().r - 1) * (sizeCM + gameConfig.wDivision);
-        const y = delta + v2;
 
         let imgSubmarino= submarino.isActivo? gameConfig.resources.imgTanque : gameConfig.resources.imgTanqueDest;
 
-        ctxRegion.drawImage(imgSubmarino, 0, 0, 100, 100, x, y, sizeCM, sizeCM);
-
-
+        ctxRegion.drawImage(imgSubmarino, 0, 0, 100, 100, posRel.x , posRel.y, sizeCM, sizeCM);
 
     },
 
@@ -1346,6 +1405,10 @@ class EngineBatalla extends AEngine{
         this.isRunning = true;
 
         let idFrame = null;
+
+        //al estar en modo batalla los submarinos comienzan a cargar cohetes
+
+        jugador.prepararCohetes();
 
         const frames = () => {
 
@@ -1684,6 +1747,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190607 10:47');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190607 11:44');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

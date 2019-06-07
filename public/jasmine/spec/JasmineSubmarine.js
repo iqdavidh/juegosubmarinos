@@ -15,7 +15,7 @@ describe('submarines', function () {
             lista.forEach(item => {
                 expect(typeof item).toBe("object");
                 expect(item.isActivo).toBe(true);
-                expect(item.isCoheteListo).toBe(false);
+                expect(item.getIsCoheteListo).toBe(false);
                 expect(item.posicionRC.r >= 0).toBe(true);
                 expect(item.posicionRC.c >= 0).toBe(true);
             });
