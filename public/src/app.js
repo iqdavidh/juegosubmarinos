@@ -1141,7 +1141,7 @@ const drawBatalla = {
         ctx.fillRect(origenLocal.x, origenLocal.y, sizeRegion, sizeRegion);
         //la seccion de mar
         const sizeMar = sizeRegion - 2 * delta;
-        ctx.drawImage(gameConfig.resources.imgMar, 0,0, sizeMar, sizeMar, delta + origenLocal.x, delta + origenLocal.y, sizeMar, sizeMar);
+        ctx.drawImage(gameConfig.resources.imgMar, 0, 0, sizeMar, sizeMar, delta + origenLocal.x, delta + origenLocal.y, sizeMar, sizeMar);
 
         //las divisiones
         const sizeDiv = (sizeRegion - (gameConfig.wDivision * gameConfig.numDivisiones)) / gameConfig.numDivisiones;
@@ -1150,6 +1150,16 @@ const drawBatalla = {
         const sizeCM = (sizeMar - gameConfig.numDivisiones * gameConfig.wDivision) / gameConfig.numDivisiones;
 
 
+        ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+
+        for (let i = 1; i < gameConfig.numDivisiones; i++) {
+            let xCuadro = origenLocal.x + i * (sizeCM + gameConfig.wDivision) + delta;
+            let yCuadro = origenLocal.y + delta;
+            ctx.fillRect(xCuadro, yCuadro, gameConfig.wDivision, rayaSize);
+
+            // xCuadro=origenLocal.x + delta
+            // ctx.fillRect(delta, i * (sizeCM + gameConfig.wDivision) + delta, rayaSize, gameConfig.wDivision);
+        }
 
 
         this.cacheRegionAll = cacheCanvas;
@@ -1516,6 +1526,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190606 20:27');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190606 20:34');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
