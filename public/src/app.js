@@ -1261,7 +1261,6 @@ const drawBatallaSubmarinosLocal = {
 
     drawSubmarino: function (ctxRegion, submarino) {
 
-        const origen = submarino.jugador.getOrigenFromIndex();
         const delta = gameConfig.deltaSep;
 
 
@@ -1273,16 +1272,11 @@ const drawBatallaSubmarinosLocal = {
         const v2 = (submarino.getPosicionRC().r - 1) * (sizeCM + gameConfig.wDivision);
         const y = delta + v2;
 
-        if (submarino.isActivo) {
-            ctxRegion.fillStyle = "rgba(255, 255, 255, 0.5)";
-        } else {
-            ctxRegion.fillStyle = "rgba(0, 0, 0, 0.5)";
-        }
-        let submarinoSize = sizeCM / 2;
-        let dy = sizeCM / 4;
+        let imgSubmarino= submarino.isActivo? gameConfig.resources.imgTanque : gameConfig.resources.imgTanqueDest;
 
-        console.log(`x,y ${x},${y}`);
-        ctxRegion.fillRect(x + dy, y + sizeCM / 4, submarinoSize, submarinoSize);
+        ctxRegion.drawImage(imgSubmarino, 0, 0, 100, 100, x, y, sizeCM, sizeCM);
+
+
 
     },
 
@@ -1690,6 +1684,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190606 23:28');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190607 10:47');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
