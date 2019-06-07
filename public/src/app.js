@@ -1135,10 +1135,21 @@ const drawBatalla = {
         ctx.fillStyle = 'yellow';
         ctx.fillRect(0, 0, gameConfig.size, gameConfig.size);
 
-        //dibujar el sector de jugador local con sus submarinos ******************
+        //dibujar el sector de jugador local con sus submarinos -----------------
         const origenLocal = gameData.jugadorLocal.getOrigenFromIndex();
         ctx.fillStyle = '#000000';
         ctx.fillRect(origenLocal.x, origenLocal.y, sizeRegion, sizeRegion);
+        //la seccion de mar
+        const sizeMar = sizeRegion - 2 * delta;
+        ctx.drawImage(gameConfig.resources.imgMar, 0,0, sizeMar, sizeMar, delta + origenLocal.x, delta + origenLocal.y, sizeMar, sizeMar);
+
+        //las divisiones
+        const sizeDiv = (sizeRegion - (gameConfig.wDivision * gameConfig.numDivisiones)) / gameConfig.numDivisiones;
+        const rayaSize = sizeRegion - 2 * delta;
+
+        const sizeCM = (sizeMar - gameConfig.numDivisiones * gameConfig.wDivision) / gameConfig.numDivisiones;
+
+
 
 
         this.cacheRegionAll = cacheCanvas;
@@ -1505,6 +1516,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190606 20:15');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190606 20:27');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
