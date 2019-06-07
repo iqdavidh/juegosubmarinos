@@ -478,6 +478,7 @@ class Submarino {
 
         this.cohete = null;
         this.avancePrepararCohete = 0;
+        this.isPrimerDraw=true;
 
 
     }
@@ -532,7 +533,7 @@ class Submarino {
 
         if (this.cohete === null) {
             const numIntervalos = 6;
-            const intervalo = gameConfig.msPrepararCohete / numIntervalos;
+            let intervalo = gameConfig.msPrepararCohete / numIntervalos;
             this.avancePrepararCohete = 0;
 
             let idInterval = null;
@@ -549,8 +550,13 @@ class Submarino {
                 }
             };
 
+
+            //ponermos el intervalo al inicio mmuy corto para tener cohetes disponiles
+            intervalo=   this.isPrimerDraw?100:intervalo;
+
             idInterval = window.setInterval(fn, intervalo);
 
+            this.isPrimerDraw=false;
         }
     }
 
@@ -1384,7 +1390,6 @@ const drawBatallaAtaque = {
     contadorCohetes: function (ctx) {
         const jugador = gameData.jugadorLocal;
         const origen = jugador.getOrigenFromIndex();
-        const sizeRegion = gameCacheSize.getSizeRegion();
         const delta = gameConfig.deltaSep;
 
         let numCohetes = jugador.getNumCohetesReady();
@@ -1502,13 +1507,13 @@ class EngineBatalla extends AEngine {
             drawBatallaSubmarinosLocal.exe(ctx);
             drawBatallaAtaque.exe(ctx);
 
-            //idFrame = window.requestAnimationFrame(frames);
+            idFrame = window.requestAnimationFrame(frames);
 
         };
 
-        //idFrame = window.requestAnimationFrame(frames);
+        idFrame = window.requestAnimationFrame(frames);
 
-        frames();
+       // frames();
 
 
     }
@@ -1846,6 +1851,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190607 13:27');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190607 13:34');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

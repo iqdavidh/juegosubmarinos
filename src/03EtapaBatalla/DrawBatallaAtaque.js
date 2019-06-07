@@ -41,7 +41,6 @@ const drawBatallaAtaque = {
     contadorCohetes: function (ctx) {
         const jugador = gameData.jugadorLocal;
         const origen = jugador.getOrigenFromIndex();
-        const sizeRegion = gameCacheSize.getSizeRegion();
         const delta = gameConfig.deltaSep;
 
         let numCohetes = jugador.getNumCohetesReady();

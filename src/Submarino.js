@@ -13,6 +13,7 @@ class Submarino {
 
         this.cohete = null;
         this.avancePrepararCohete = 0;
+        this.isPrimerDraw=true;
 
 
     }
@@ -67,7 +68,7 @@ class Submarino {
 
         if (this.cohete === null) {
             const numIntervalos = 6;
-            const intervalo = gameConfig.msPrepararCohete / numIntervalos;
+            let intervalo = gameConfig.msPrepararCohete / numIntervalos;
             this.avancePrepararCohete = 0;
 
             let idInterval = null;
@@ -84,8 +85,13 @@ class Submarino {
                 }
             };
 
+
+            //ponermos el intervalo al inicio mmuy corto para tener cohetes disponiles
+            intervalo=   this.isPrimerDraw?100:intervalo;
+
             idInterval = window.setInterval(fn, intervalo);
 
+            this.isPrimerDraw=false;
         }
     }
 
