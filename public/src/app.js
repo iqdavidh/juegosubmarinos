@@ -542,17 +542,14 @@ class Submarino {
 
                 if (this.avancePrepararCohete >= numIntervalos) {
 
-
                     window.clearInterval(idInterval);
                     this.cohete = factoryCohete.jugadorLocal(this);
-
-                    //console.log(`cohete listo ${this.cohete.id}`);
+                    gameData.jugadorLocal.listaCohetes.push(this.cohete);
 
                 }
             };
 
-            idInterval = window.setInterval( fn, intervalo);
-
+            idInterval = window.setInterval(fn, intervalo);
 
         }
     }
@@ -1302,10 +1299,12 @@ const drawBatallaAllRegions = {
             }
 
 
-            ctx.drawImage(gameConfig.resources.imgBullet, 0, 0, wCohete, hCohete,
-                origen.x + delta - 2,
-                origen.y + 2,
-                wCohete * .6, hCohete * .6);
+            if(indexJugador===1){
+                ctx.drawImage(gameConfig.resources.imgBullet, 0, 0, wCohete, hCohete,
+                    origen.x + delta - 2,
+                    origen.y + 2,
+                    wCohete * .6, hCohete * .6);
+            }
 
             ctx.font = '18px monospace';
             ctx.fillStyle = "rgba(200, 200, 200, 0.7)";
@@ -1349,22 +1348,50 @@ const drawBatallaAtaque = {
 
     exe: function (ctx) {
 
-        //poner los textos de submarinos y cohetes
+        //para el jugador local
+        this.contadorCohetes(ctx);
+
+        //local y remoito
         this.contadorSubmarinos(ctx);
 
 
-    },
 
+
+
+    },
     contadorSubmarinos: function (ctx) {
+
+        const sizeRegion = gameCacheSize.getSizeRegion();
+        const delta = gameConfig.deltaSep;
+
+        let listaJugador = gameData.listaJugadores.map(j => {
+            return j;
+        });
+
+        listaJugador.unshift(gameData.jugadorLocal);
+
+        listaJugador.map(jugador => {
+
+            const numSubmarino = jugador.getNumSubmarinos();
+            const origen=jugador.getOrigenFromIndex();
+
+            ctx.fillStyle = "rgba(255, 255, 0, 1)";
+            ctx.font = '19px monospace';
+            ctx.fillText(numSubmarino.toString(), origen.x + sizeRegion - delta - 20, origen.y + delta - 4);
+
+        });
+    },
+    contadorCohetes: function (ctx) {
         const jugador = gameData.jugadorLocal;
         const origen = jugador.getOrigenFromIndex();
         const sizeRegion = gameCacheSize.getSizeRegion();
         const delta = gameConfig.deltaSep;
 
-        let numSubmarino = jugador.getNumSubmarinos();
-        ctx.fillStyle = "rgba(255, 255, 0, 1)";
+        let numCohetes = jugador.getNumCohetesReady();
+
+        ctx.fillStyle = "rgba(255, 255, 255, 1)";
         ctx.font = '19px monospace';
-        ctx.fillText(numSubmarino.toString(), origen.x + sizeRegion - delta - 20, origen.y + delta - 4);
+        ctx.fillText(numCohetes.toString(), origen.x +  delta + 20, origen.y + delta - 4);
     }
 
 };
@@ -1819,6 +1846,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190607 13:01');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190607 13:27');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

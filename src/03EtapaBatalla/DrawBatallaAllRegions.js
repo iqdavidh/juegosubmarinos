@@ -63,10 +63,12 @@ const drawBatallaAllRegions = {
             }
 
 
-            ctx.drawImage(gameConfig.resources.imgBullet, 0, 0, wCohete, hCohete,
-                origen.x + delta - 2,
-                origen.y + 2,
-                wCohete * .6, hCohete * .6);
+            if(indexJugador===1){
+                ctx.drawImage(gameConfig.resources.imgBullet, 0, 0, wCohete, hCohete,
+                    origen.x + delta - 2,
+                    origen.y + 2,
+                    wCohete * .6, hCohete * .6);
+            }
 
             ctx.font = '18px monospace';
             ctx.fillStyle = "rgba(200, 200, 200, 0.7)";

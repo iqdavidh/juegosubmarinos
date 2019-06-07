@@ -77,17 +77,14 @@ class Submarino {
 
                 if (this.avancePrepararCohete >= numIntervalos) {
 
-
                     window.clearInterval(idInterval);
                     this.cohete = factoryCohete.jugadorLocal(this);
-
-                    //console.log(`cohete listo ${this.cohete.id}`);
+                    gameData.jugadorLocal.listaCohetes.push(this.cohete);
 
                 }
             };
 
-            idInterval = window.setInterval( fn, intervalo);
-
+            idInterval = window.setInterval(fn, intervalo);
 
         }
     }
