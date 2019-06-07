@@ -5,9 +5,6 @@ const drawSelPos = {
     drawSubmarino: function (ctx, submarino: Submarino) {
 
         const origen = submarino.jugador.getOrigenFromIndex();
-        const delta = gameConfig.deltaSep;
-
-        const origenMar = new Posicion(origen.x + delta, origen.y + delta);
         const sizeCM = gameCacheSize.getSizeCM();
 
         const posRel=submarino.getPosicionXYRel();

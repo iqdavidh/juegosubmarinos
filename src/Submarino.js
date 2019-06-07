@@ -13,6 +13,12 @@ class Submarino {
 
         this.cohete = null;
         this.avancePrepararCohete = 0;
+
+
+    }
+
+    getJugador() {
+        return this.jugador();
     }
 
     setJugador(jugador) {
@@ -52,20 +58,35 @@ class Submarino {
 
     }
 
+    onCoheteListo(cohete: Cohete) {
+
+    }
+
 
     prepararCohete(): void {
 
         if (this.cohete === null) {
-            const intervalo = gameConfig.msPrepararCohete / 6;
+            const numIntervalos = 6;
+            const intervalo = gameConfig.msPrepararCohete / numIntervalos;
             this.avancePrepararCohete = 0;
 
-            let fn = () => {
-                this.avancePrepararCohete += 10;
+            let idInterval = null;
 
-                if (this.avancePrepararCohete >= 100) {
-                    // this.cohete = fact
+            let fn = () => {
+                this.avancePrepararCohete++;
+
+                if (this.avancePrepararCohete >= numIntervalos) {
+
+
+                    window.clearInterval(idInterval);
+                    this.cohete = factoryCohete.jugadorLocal(this);
+
+                    //console.log(`cohete listo ${this.cohete.id}`);
+
                 }
-            }
+            };
+
+            idInterval = window.setInterval( fn, intervalo);
 
 
         }

@@ -30,7 +30,6 @@ class JugadorLocal extends AJugador {
 
     }
 
-
     getNumSubmarinos() {
         return this.listaSubmarinos
             .filter(s => {

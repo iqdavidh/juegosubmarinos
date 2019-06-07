@@ -7,6 +7,7 @@ const gameConfig = {
     numDivisiones: 6,
     wDivision: 2,
     msPrepararCohete:6000,
+    velocidadCohete:10,
     resources: {
         imgMar: null,
         imgBullet:null ,

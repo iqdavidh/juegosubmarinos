@@ -7,6 +7,7 @@ const gameConfig = {
     numDivisiones: 6,
     wDivision: 2,
     msPrepararCohete:6000,
+    velocidadCohete:10,
     resources: {
         imgMar: null,
         imgBullet:null ,
@@ -288,23 +289,25 @@ class AJugador {
 class Cohete {
 
     constructor(posicionIni, jugador) {
+        this.id = IDGenerator();
+
         this.posicionIni = posicionIni;
         this.estado = 'ready';
         this.velocidad = new Posicion(0, 0, 0);
         this.posicion = null;
-        this.jugador=jugador;
+        this.jugador = jugador;
     }
 
     getIsEstadoReady() {
-        return this.estado ==='ready';
+        return this.estado === 'ready';
     }
 
     getIsEstadoLanzado() {
-        return this.estado ==='lanzado';
+        return this.estado === 'lanzado';
     }
 
     lanzar(posicionFinalRC, posicionFinal) {
-        this.estado='lanzado';
+        this.estado = 'lanzado';
         this.posicionFinal = posicionFinal;
         this.posicionFinalRC = posicionFinalRC;
     }
@@ -315,11 +318,27 @@ class Cohete {
 
 }
 
-const factoryCohete= {
-    local:function(submarino){
+const factoryCohete = {
+    jugadorLocal: function (submarino) {
 
         //let posicion= submarino.
-        //return new Cohete()
+
+        let jugador = gameData.jugadorLocal;
+
+        let origen = jugador.getOrigenFromIndex();
+        let posRel = submarino.getPosicionXYRel();
+
+        const sizeCM = gameCacheSize.getSizeCM();
+
+        let x = origen.x + posRel.x + sizeCM / 2;
+        let y = origen.y + posRel.y + sizeCM / 2;
+
+        let posicionCentroCohete=new Posicion(x,y);
+
+
+        return new Cohete( posicionCentroCohete, jugador);
+
+
     }
 };
 
@@ -355,7 +374,6 @@ class JugadorLocal extends AJugador {
 
 
     }
-
 
     getNumSubmarinos() {
         return this.listaSubmarinos
@@ -460,6 +478,12 @@ class Submarino {
 
         this.cohete = null;
         this.avancePrepararCohete = 0;
+
+
+    }
+
+    getJugador() {
+        return this.jugador();
     }
 
     setJugador(jugador) {
@@ -499,20 +523,35 @@ class Submarino {
 
     }
 
+    onCoheteListo(cohete) {
+
+    }
+
 
     prepararCohete() {
 
         if (this.cohete === null) {
-            const intervalo = gameConfig.msPrepararCohete / 6;
+            const numIntervalos = 6;
+            const intervalo = gameConfig.msPrepararCohete / numIntervalos;
             this.avancePrepararCohete = 0;
 
-            let fn = () => {
-                this.avancePrepararCohete += 10;
+            let idInterval = null;
 
-                if (this.avancePrepararCohete >= 100) {
-                    // this.cohete = fact
+            let fn = () => {
+                this.avancePrepararCohete++;
+
+                if (this.avancePrepararCohete >= numIntervalos) {
+
+
+                    window.clearInterval(idInterval);
+                    this.cohete = factoryCohete.jugadorLocal(this);
+
+                    //console.log(`cohete listo ${this.cohete.id}`);
+
                 }
-            }
+            };
+
+            idInterval = window.setInterval( fn, intervalo);
 
 
         }
@@ -700,9 +739,6 @@ const drawSelPos = {
     drawSubmarino: function (ctx, submarino) {
 
         const origen = submarino.jugador.getOrigenFromIndex();
-        const delta = gameConfig.deltaSep;
-
-        const origenMar = new Posicion(origen.x + delta, origen.y + delta);
         const sizeCM = gameCacheSize.getSizeCM();
 
         const posRel=submarino.getPosicionXYRel();
@@ -1747,6 +1783,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190607 11:44');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190607 12:33');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
