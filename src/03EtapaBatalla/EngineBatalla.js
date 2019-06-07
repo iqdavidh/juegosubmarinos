@@ -27,11 +27,13 @@ class EngineBatalla extends AEngine{
 
             drawBatalla.drawAllRegions(ctx);
 
-            idFrame = window.requestAnimationFrame(frames);
+            //idFrame = window.requestAnimationFrame(frames);
 
         };
 
-        idFrame = window.requestAnimationFrame(frames);
+        //idFrame = window.requestAnimationFrame(frames);
+
+        frames();
 
 
     }
