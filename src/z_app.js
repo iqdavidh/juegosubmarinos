@@ -25,7 +25,7 @@ const gameController = {
     engine: {
         selpos: null,
         esperarParticipantes: null,
-        batalla:null
+        batalla: null
     },
     onRegistroSocket: function (token) {
         gameData.tokenRoom = token;
@@ -62,7 +62,7 @@ const gameController = {
         this.engine.selpos.run();
 
     },
-    runEsperarParticipantes: function ( ) {
+    runEsperarParticipantes: function () {
 
         console.log('runEsperarParticipantes');
         gameData.estado = gameEstado.EsperarParticipantes;
@@ -97,11 +97,12 @@ const gameController = {
         };
 
         this.engine.batalla = new EngineBatalla(fnOnContinuar);
-        this.engine.batalla.run();
+
+        setTimeout(this.engine.batalla.run, 2000);
 
 
     },
-    runTerminoBatalla:function(){
+    runTerminoBatalla: function () {
         gameData.estado = gameEstado.TerminoBatalla;
         console.log('batalla terminada');
     },
