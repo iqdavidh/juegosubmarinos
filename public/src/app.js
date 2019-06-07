@@ -1117,6 +1117,33 @@ class EngineEsperar extends AEngine {
 "use strict";
 
 const drawBatalla = {
+
+    cacheSubmarinosLocal:null,
+    drawSubmarinosLocal: function () {
+
+
+        //vamos a dibujar todos los jugadores
+        if (this.cacheSubmarinosLocal !== null) {
+            return this.cacheSubmarinosLocal;
+        }
+
+
+        const sizeRegion = gameCacheSize.getSize;
+        const delta = gameConfig.deltaSep;
+
+        //este canvas tendra todo el mapa
+        const cacheCanvas = document.createElement('canvas');
+        cacheCanvas.width = sizeRegion;
+        cacheCanvas.height = sizeRegion;
+
+        const ctx = cacheCanvas.getContext('2d');
+
+        let origen = jugador.getOrigenFromIndex();
+
+
+
+    },
+
     drawAllRegions: function (ctx) {
 
         let cacheMar = this.getCacheCanvasAll();
@@ -1153,10 +1180,11 @@ const drawBatalla = {
         const sizeCM = (sizeMar - gameConfig.numDivisiones * gameConfig.wDivision) / gameConfig.numDivisiones;
 
 
-        let wCohete=36;
-        let hCohete=24;
+        let wCohete = 36;
+        let hCohete = 24;
 
-        function drawSeccionFromOrigen(origen) {
+
+        function drawSeccionFromOrigen(origen, indexJugador) {
             ctx.fillStyle = '#000000';
             ctx.fillRect(origen.x, origen.y, sizeRegion, sizeRegion);
 
@@ -1175,16 +1203,24 @@ const drawBatalla = {
                 ctx.fillRect(xCuadro, yCuadro, rayaSize, gameConfig.wDivision);
             }
 
-            ctx.font = '19px monospace';
-            ctx.fillStyle = "rgba(200, 200, 200, 0.7)";
 
-            ctx.fillText('SUBMARINOS', origen.x + sizeMar - 112, origen.y + 16);
+
 
 
             ctx.drawImage(gameConfig.resources.imgBullet, 0, 0, wCohete, hCohete,
-                origen.x + delta-2,
-                origen.y +2,
-                wCohete * .6, hCohete*.6);
+                origen.x + delta - 2,
+                origen.y + 2,
+                wCohete * .6, hCohete * .6);
+
+            ctx.font = '18px monospace';
+            ctx.fillStyle = "rgba(200, 200, 200, 0.7)";
+            ctx.fillText('Player ' + indexJugador.toString(), origen.x +( sizeMar-30)/2, origen.y + 16);
+
+
+            ctx.drawImage(gameConfig.resources.imgTanque, 0, 0, 100, 100,
+                origen.x + sizeMar - delta - 6,
+                origen.y - 5,
+                30, 30);
 
 
         }
@@ -1196,8 +1232,10 @@ const drawBatalla = {
 
         listaOrigen.unshift(gameData.jugadorLocal.getOrigenFromIndex());
 
+        let indexJugador=0;
         listaOrigen.map(origen => {
-            drawSeccionFromOrigen(origen);
+            indexJugador++;
+            drawSeccionFromOrigen(origen, indexJugador);
         });
 
 
@@ -1237,6 +1275,7 @@ class EngineBatalla extends AEngine{
             }
 
             drawBatalla.drawAllRegions(ctx);
+            drawBatalla.drawSubmarinosLocal(ctx);
 
             //idFrame = window.requestAnimationFrame(frames);
 
@@ -1565,6 +1604,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190606 22:18');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190606 22:36');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

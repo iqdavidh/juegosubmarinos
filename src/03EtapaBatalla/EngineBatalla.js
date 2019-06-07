@@ -26,6 +26,7 @@ class EngineBatalla extends AEngine{
             }
 
             drawBatalla.drawAllRegions(ctx);
+            drawBatalla.drawSubmarinosLocal(ctx);
 
             //idFrame = window.requestAnimationFrame(frames);
 
