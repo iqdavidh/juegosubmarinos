@@ -15,8 +15,10 @@ const gameData = {
 };
 
 
-loadCanvasAndResources((imgMar) => {
+loadCanvasAndResources((imgMar, imgBullet, imgTanque) => {
     gameConfig.resources.imgMar = imgMar;
+    gameConfig.resources.imgBullet = imgBullet;
+    gameConfig.resources.imgTanque = imgTanque;
 });
 
 
@@ -40,10 +42,15 @@ const gameController = {
 
         } else {
 
-            loadCanvasAndResources((imgMar) => {
+
+            //se verifica si estan cargadoir
+            loadCanvasAndResources((imgMar, imgBullet, imgTanque) => {
                 gameConfig.resources.imgMar = imgMar;
+                gameConfig.resources.imgBullet = imgBullet;
+                gameConfig.resources.imgTanque = imgTanque;
                 this.runConfirmarPosiciones();
             });
+
 
         }
     },
@@ -96,12 +103,12 @@ const gameController = {
 
         };
 
-        let pausa = await setTimeout(()=>{
+        let pausa = await setTimeout(() => {
             return true;
-        },2000);
+        }, 2000);
 
-        let engine=new EngineBatalla(fnOnContinuar);
-        this.engine.batalla=engine;
+        let engine = new EngineBatalla(fnOnContinuar);
+        this.engine.batalla = engine;
 
         engine.run();
 

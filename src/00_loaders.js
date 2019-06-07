@@ -12,9 +12,6 @@ function loadImage(url) {
 
 
 
-function loadImages(){
-    return loadImage('/img/mar1.png')
-}
 
 function loadCanvasAndResources(callback){
 
@@ -34,11 +31,26 @@ function loadCanvasAndResources(callback){
 
     /* precargar archivos *************************** */
 
+
+    function loadMar(){
+        return loadImage('/img/mar1.png')
+    }
+
+    function loadBullet(){
+        return loadImage( '/img/Bullet.png');
+    }
+
+    function loadTanque(){
+        return loadImage( '/img/tanque.png');
+    }
+
+
+
     Promise.all([
-            loadImages()
+            loadMar(),loadBullet(), loadTanque()
         ]
-    ).then(([imgMar]) => {
-        callback(imgMar);
+    ).then(([imgMar, imgBullet, imgTanque]) => {
+        callback(imgMar, imgBullet, imgTanque);
         gameConfig.isResourcesLoaded = true;
     });
 

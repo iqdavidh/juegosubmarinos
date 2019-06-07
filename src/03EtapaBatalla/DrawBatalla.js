@@ -38,6 +38,9 @@ const drawBatalla = {
         const sizeCM = (sizeMar - gameConfig.numDivisiones * gameConfig.wDivision) / gameConfig.numDivisiones;
 
 
+        let wCohete=36;
+        let hCohete=24;
+
         function drawSeccionFromOrigen(origen) {
             ctx.fillStyle = '#000000';
             ctx.fillRect(origen.x, origen.y, sizeRegion, sizeRegion);
@@ -59,7 +62,14 @@ const drawBatalla = {
 
             ctx.font = '19px monospace';
             ctx.fillStyle = "rgba(200, 200, 200, 0.7)";
+
             ctx.fillText('SUBMARINOS', origen.x + sizeMar - 112, origen.y + 16);
+
+
+            ctx.drawImage(gameConfig.resources.imgBullet, 0, 0, wCohete, hCohete,
+                origen.x + delta-2,
+                origen.y +2,
+                wCohete * .6, hCohete*.6);
 
 
         }

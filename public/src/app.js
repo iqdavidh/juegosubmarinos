@@ -91,9 +91,6 @@ function loadImage(url) {
 
 
 
-function loadImages(){
-    return loadImage('/img/mar1.png')
-}
 
 function loadCanvasAndResources(callback){
 
@@ -113,11 +110,26 @@ function loadCanvasAndResources(callback){
 
     /* precargar archivos *************************** */
 
+
+    function loadMar(){
+        return loadImage('/img/mar1.png')
+    }
+
+    function loadBullet(){
+        return loadImage( '/img/Bullet.png');
+    }
+
+    function loadTanque(){
+        return loadImage( '/img/tanque.png');
+    }
+
+
+
     Promise.all([
-            loadImages()
+            loadMar(),loadBullet(), loadTanque()
         ]
-    ).then(([imgMar]) => {
-        callback(imgMar);
+    ).then(([imgMar, imgBullet, imgTanque]) => {
+        callback(imgMar, imgBullet, imgTanque);
         gameConfig.isResourcesLoaded = true;
     });
 
@@ -484,8 +496,10 @@ const gameData = {
 };
 
 
-loadCanvasAndResources((imgMar) => {
+loadCanvasAndResources((imgMar, imgBullet, imgTanque) => {
     gameConfig.resources.imgMar = imgMar;
+    gameConfig.resources.imgBullet = imgBullet;
+    gameConfig.resources.imgTanque = imgTanque;
 });
 
 
@@ -509,10 +523,15 @@ const gameController = {
 
         } else {
 
-            loadCanvasAndResources((imgMar) => {
+
+            //se verifica si estan cargadoir
+            loadCanvasAndResources((imgMar, imgBullet, imgTanque) => {
                 gameConfig.resources.imgMar = imgMar;
+                gameConfig.resources.imgBullet = imgBullet;
+                gameConfig.resources.imgTanque = imgTanque;
                 this.runConfirmarPosiciones();
             });
+
 
         }
     },
@@ -565,12 +584,12 @@ const gameController = {
 
         };
 
-        let pausa = await setTimeout(()=>{
+        let pausa = await setTimeout(() => {
             return true;
-        },2000);
+        }, 2000);
 
-        let engine=new EngineBatalla(fnOnContinuar);
-        this.engine.batalla=engine;
+        let engine = new EngineBatalla(fnOnContinuar);
+        this.engine.batalla = engine;
 
         engine.run();
 
@@ -709,7 +728,7 @@ const drawSelPos = {
         }
 
         /* el cache de texto */
-        ctxCache.font = '19px monospace';
+        ctxCache.font = '18px monospace';
         ctxCache.fillStyle = "rgba(200, 200, 200, 0.7)";
         ctxCache.fillText('SUBMARINOS', sizeMar - 112, 16);
 
@@ -1134,6 +1153,9 @@ const drawBatalla = {
         const sizeCM = (sizeMar - gameConfig.numDivisiones * gameConfig.wDivision) / gameConfig.numDivisiones;
 
 
+        let wCohete=36;
+        let hCohete=24;
+
         function drawSeccionFromOrigen(origen) {
             ctx.fillStyle = '#000000';
             ctx.fillRect(origen.x, origen.y, sizeRegion, sizeRegion);
@@ -1155,7 +1177,14 @@ const drawBatalla = {
 
             ctx.font = '19px monospace';
             ctx.fillStyle = "rgba(200, 200, 200, 0.7)";
+
             ctx.fillText('SUBMARINOS', origen.x + sizeMar - 112, origen.y + 16);
+
+
+            ctx.drawImage(gameConfig.resources.imgBullet, 0, 0, wCohete, hCohete,
+                origen.x + delta-2,
+                origen.y +2,
+                wCohete * .6, hCohete*.6);
 
 
         }
@@ -1536,6 +1565,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190606 21:07');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190606 22:18');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

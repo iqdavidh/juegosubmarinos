@@ -118,7 +118,7 @@ const drawSelPos = {
         }
 
         /* el cache de texto */
-        ctxCache.font = '19px monospace';
+        ctxCache.font = '18px monospace';
         ctxCache.fillStyle = "rgba(200, 200, 200, 0.7)";
         ctxCache.fillText('SUBMARINOS', sizeMar - 112, 16);
 
