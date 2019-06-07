@@ -23,8 +23,6 @@ const drawBatallaSubmarinosLocal = {
         const sizeCM = gameCacheSize.getSizeCM();
         const posRel= submarino.getPosicionXYRel();
 
-
-
         let imgSubmarino= submarino.isActivo? gameConfig.resources.imgTanque : gameConfig.resources.imgTanqueDest;
 
         ctxRegion.drawImage(imgSubmarino, 0, 0, 100, 100, posRel.x , posRel.y, sizeCM, sizeCM);
@@ -63,14 +61,6 @@ const drawBatallaSubmarinosLocal = {
                 }
             );
 
-        //dibujar texto de activos
-
-
-        // /* actualziar dra numero sub*/
-        // let numSubmarino = jugador.getNumSubmarinos();
-        // ctx.fillStyle = "rgba(255, 255, 0, 1)";
-        // ctx.font = '19px monospace';
-        // ctx.fillText(numSubmarino.toString(), origen.x + sizeRegion - delta - 20, origen.y + delta - 4);
 
         this.cacheSubmarinosLocal = cacheCanvasRegion;
 

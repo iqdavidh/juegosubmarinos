@@ -33,6 +33,7 @@ class EngineBatalla extends AEngine {
 
             drawBatallaAllRegions.exe(ctx);
             drawBatallaSubmarinosLocal.exe(ctx);
+            drawBatallaAtaque.exe(ctx);
 
             //idFrame = window.requestAnimationFrame(frames);
 
