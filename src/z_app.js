@@ -1,56 +1,118 @@
 'use strict';
+//@flow
 
-let engineSelPos = null;
-
-let gameData = {
-    tokenRoom:null,
+const gameData = {
+    tokenRoom: null,
     canvas: null,
     ctx: null,
-    jugadorLocal: [],
-    listaJugadores:[],
-    listaCohetes:[],
-    listaMsgSocket:[]
+    jugadorLocal: null,
+    listaJugadores: [],
+    listaCohetes: [],
+    listaMsgSocket: [],
+    estado: null,
+    isResourcesLoaded: false,
+    isCanvasLoaded: false
 };
 
-let gameController = {
 
-    start: async function (tokenRoom) {
+loadCanvasAndResources((imgMar) => {
+    gameConfig.resources.imgMar = imgMar;
+});
 
-        gameData.canvas = document.createElement('canvas');
-        gameData.canvas.width = gameConfig.size;
-        gameData.canvas.height = gameConfig.size;
 
-        let container = document.getElementById('container');
-        container.append(gameData.canvas);
-        gameData.ctx = gameData.canvas.getContext('2d');
+const gameController = {
 
-        Promise.all([
-                loadBGMar()
-            ]
-        ).then(([imgMar]) => {
-            //guardar los archivos cargados
-            gameConfig.resources.imgMar = imgMar;
-
-            this.runConfirmarPosiciones(tokenRoom);
-        });
-
+    engine: {
+        selpos: null,
+        esperarParticipantes: null,
+        batalla: null
     },
-    runConfirmarPosiciones:  function (tokenRoom) {
-
-        gameData.tokenRoom = tokenRoom;
+    onRegistroSocket: function (token) {
+        gameData.tokenRoom = token;
         gameData.jugadorLocal = factoryJugador.local();
 
+        this.start()
+    },
+    start: function () {
 
-        let fnOnConfirmar= ()=>{
+        if (gameData.isResourcesLoaded) {
+            this.runConfirmarPosiciones();
+
+        } else {
+
+            loadCanvasAndResources((imgMar) => {
+                gameConfig.resources.imgMar = imgMar;
+                this.runConfirmarPosiciones();
+            });
+
+        }
+    },
+    runConfirmarPosiciones: function () {
+
+        console.log('runConfirmarPosiciones');
+        gameData.estado = gameEstado.ConfirmarPosicion;
+
+        let fnOnConfirmar = () => {
             gameController.runEsperarParticipantes();
+
+            this.engine.selpos = null;
         };
 
-        engineSelPos = new EngineSelPos(fnOnConfirmar);
-        engineSelPos.run();
+        this.engine.selpos = new EngineSelPos(fnOnConfirmar);
+        this.engine.selpos.run();
 
     },
-    runEsperarParticipantes:function(){
-        console.log('esperando');
+    runEsperarParticipantes: function () {
+
+        console.log('runEsperarParticipantes');
+        gameData.estado = gameEstado.EsperarParticipantes;
+
+        let fnOnContinuar = () => {
+
+            this.engine.esperarParticipantes = null;
+            gameData.ctx.fillStyle = `rgb(0, 0, 0)`;
+            gameData.ctx.fillRect(0, 0, gameConfig.size, gameConfig.size);
+            gameController.runBatalla();
+        };
+
+        this.engine.esperarParticipantes = new EngineEsperar(fnOnContinuar);
+        this.engine.esperarParticipantes.run();
+
+    },
+    runBatalla: function () {
+        console.log('runBatalla');
+        gameData.estado = gameEstado.Batalla;
+
+        let fnOnContinuar = () => {
+
+
+            this.engine.esperarParticipantes = null;
+
+            gameData.ctx.fillStyle = `rgb(0, 0, 0)`;
+            gameData.ctx.fillRect(0, 0, gameConfig.size, gameConfig.size);
+
+            gameController.runTerminoBatalla();
+
+
+        };
+
+        this.engine.batalla = new EngineBatalla(fnOnContinuar);
+
+        setTimeout(this.engine.batalla.run, 2000);
+
+
+    },
+    runTerminoBatalla: function () {
+        gameData.estado = gameEstado.TerminoBatalla;
+        console.log('batalla terminada');
+    },
+    onRecibirMensajeSocket: function (msg) {
+        proRecibirMsgSocket.exe(msg);
+    },
+    onEnviarMensajeSocket: function (msg) {
+
+        //TODO enviar mensaje de confirmar
     }
+
 
 };

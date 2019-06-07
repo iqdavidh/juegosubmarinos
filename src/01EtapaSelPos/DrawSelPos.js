@@ -25,7 +25,7 @@ const drawSelPos = {
 
         ctx.fillRect(x +dy, y +sizeCM/4,submarinoSize , submarinoSize);
     },
-    drawDragSubmarino(ctx,posicionRCC: PosicionRCCuadrante){
+    drawDragSubmarino:function(ctx,posicionRCC: PosicionRCCuadrante){
 
         const origen =factoryPosicionRCCuadrante.getOrigenCuadrante( posicionRCC.getIndexCuadrante());
 
@@ -45,8 +45,9 @@ const drawSelPos = {
     },
 
     local: function (ctx, jugador: JugadorLocal) {
-        const sizeRegion = gameConfig.size / 3;
+
         const delta = gameConfig.deltaSep;
+        const sizeRegion = gameCacheSize.getSizeRegion();
 
         let cacheRegionConMar = this.getCacheCanvasRegionConMar(jugador);
 
@@ -55,15 +56,6 @@ const drawSelPos = {
 
         /* draw el cache  */
         ctx.drawImage(cacheRegionConMar, 0, 0, sizeRegion, sizeRegion, origen.x, origen.y, sizeRegion, sizeRegion);
-
-        //ctxCache.fillText('COHETES LISTOS', delta + 24, sizeMar + delta + 18);
-
-        /* actualziar dra numero coehtes*/
-        // let numCoheteListo = jugador.getNumCohetesReady();
-        //
-        // ctx.font = '20px monospace';
-        // ctx.fillStyle = "rgba(0, 255, 0, 1)";
-        // ctx.fillText(numCoheteListo.toString(), origenMar.x, origenMar.y + sizeMar + 18);
 
 
         /* actualziar dra numero sub*/

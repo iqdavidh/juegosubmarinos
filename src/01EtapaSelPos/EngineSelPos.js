@@ -10,12 +10,7 @@ class EngineSelPos extends AEngine {
         this.submarinoOnDrag = null;
         this.mouseEstatus = null;
 
-        this.addEventosMouseAndKeyboard(
-            this.onMouseDown,
-            this.onMouseUp,
-            this.onMouseMove,
-            this.onKeyDow
-        );
+        this.addEventosMouseAndKeyboard();
 
     }
 
@@ -26,7 +21,14 @@ class EngineSelPos extends AEngine {
         this.mouseEstatus = 'select';
         this.isRunning = true;
 
+        let idFrame = null;
+
         const frames = () => {
+
+            if (!this.isRunning) {
+                window.cancelAnimationFrame(idFrame);
+                return;
+            }
 
             drawSelPos.local(ctx, jugador);
 
@@ -36,14 +38,13 @@ class EngineSelPos extends AEngine {
                 drawSelPos.drawDragSubmarino(ctx, p);
             }
 
-            if (this.isRunning) {
-                window.requestAnimationFrame(frames);
-            }
 
+            idFrame = window.requestAnimationFrame(frames);
 
         };
 
-        frames();
+        idFrame = window.requestAnimationFrame(frames);
+
 
     }
 
@@ -126,6 +127,22 @@ class EngineSelPos extends AEngine {
             return;
         }
 
+        //ver si en la posicion hay un submariuono - no se puede encimar
+        let sub = this.getSubFromPos(posicionRCCuadrante);
+
+
+        if (sub) {
+            //hay submarino
+            this.submarinoOnDrag.isOnDrag = false;
+            this.submarinoOnDrag = null;
+            this.posicionOnDrag = null;
+            this.mouseEstatus = 'select';
+            this.canvas.style.cursor = 'pointer';
+            return;
+        }
+
+
+
         this.submarinoOnDrag.getPosicionRC().c = posicionRCCuadrante.getC();
         this.submarinoOnDrag.getPosicionRC().r = posicionRCCuadrante.getR();
         this.submarinoOnDrag.isOnDrag = false;
@@ -172,6 +189,7 @@ class EngineSelPos extends AEngine {
 
         if (this.mouseEstatus === 'arrastrando') {
 
+            this.canvas.style.cursor = 'pointer';
             // this.canvas.style.cursor = 'move';
 
             if (posicionRCCuadrante === null) {
@@ -209,8 +227,8 @@ class EngineSelPos extends AEngine {
             return;
         }
 
-        this.removeEventosMouseAndKeyBoard();
         this.isRunning = false;
+        this.removeEventosMouseAndKeyBoard();
         this.fnOnContinuar();
 
     }
