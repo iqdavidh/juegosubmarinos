@@ -52,8 +52,9 @@ const drawBatalla = {
             let yCuadro = origenLocal.y + delta;
             ctx.fillRect(xCuadro, yCuadro, gameConfig.wDivision, rayaSize);
 
-            // xCuadro=origenLocal.x + delta
-            // ctx.fillRect(delta, i * (sizeCM + gameConfig.wDivision) + delta, rayaSize, gameConfig.wDivision);
+            xCuadro = origenLocal.x + delta;
+            yCuadro = origenLocal.y + i * (sizeCM + gameConfig.wDivision) + delta;
+            ctx.fillRect(xCuadro, yCuadro, rayaSize, gameConfig.wDivision);
         }
 
 

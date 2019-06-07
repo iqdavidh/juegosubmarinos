@@ -1157,8 +1157,9 @@ const drawBatalla = {
             let yCuadro = origenLocal.y + delta;
             ctx.fillRect(xCuadro, yCuadro, gameConfig.wDivision, rayaSize);
 
-            // xCuadro=origenLocal.x + delta
-            // ctx.fillRect(delta, i * (sizeCM + gameConfig.wDivision) + delta, rayaSize, gameConfig.wDivision);
+            xCuadro = origenLocal.x + delta;
+            yCuadro = origenLocal.y + i * (sizeCM + gameConfig.wDivision) + delta;
+            ctx.fillRect(xCuadro, yCuadro, rayaSize, gameConfig.wDivision);
         }
 
 
@@ -1526,6 +1527,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190606 20:34');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190606 20:36');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
