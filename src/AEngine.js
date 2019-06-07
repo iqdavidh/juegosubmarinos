@@ -19,19 +19,19 @@ class AEngine {
         let canvas = gameData.canvas;
 
         canvas.onmousedown = (event) => {
-            console.log('no listenging');
+            // console.log('no listenging');
         };
 
         canvas.onmouseup = (event) => {
-            console.log('no listenging');
+            // console.log('no listenging');
         };
 
         canvas.onmousemove = (event) => {
-            console.log('no listenging');
+            // console.log('no listenging');
         };
 
         document.onkeydown = (event) => {
-            console.log('no listenging');
+            // console.log('no listenging');
         };
     }
 

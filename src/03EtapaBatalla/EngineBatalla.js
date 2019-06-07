@@ -1,11 +1,13 @@
 //@flow
 
-class EngineBatalla extends AEngine{
+class EngineBatalla extends AEngine {
 
-    constructor(fnOnContinuar){
+    constructor(fnOnContinuar) {
         super(fnOnContinuar);
 
         this.addEventosMouseAndKeyboard();
+
+        this.posicionEnLaMira = null;
 
     }
 
@@ -45,7 +47,6 @@ class EngineBatalla extends AEngine{
 
     addEventosMouseAndKeyboard() {
 
-        return;
 
         let canvas = gameData.canvas;
 
@@ -63,11 +64,12 @@ class EngineBatalla extends AEngine{
     onMouseClick(event) {
 
 
-        return ;
+        return;
 
         let posicionRCCuadrante = factoryPosicionRCCuadrante.fromEventMouse(event);
 
         if (posicionRCCuadrante === null) {
+
             return;
         }
 
@@ -78,7 +80,6 @@ class EngineBatalla extends AEngine{
 
 
         //buscar la posicion en la lista de posiciones atacadas y salir sio ya fue atacada
-
 
 
         let idSub = sub.id;
@@ -97,15 +98,33 @@ class EngineBatalla extends AEngine{
 
         let posicionRCCuadrante = factoryPosicionRCCuadrante.fromEventMouse(event);
 
-        if (posicionRCCuadrante.getIndexCuadrante() === 0) {
-            //salimos porque nos apuntamos a nosotros mismos
+        if (posicionRCCuadrante === null) {
             this.canvas.style.cursor = 'default';
+            this.posicionEnLaMira = null;
+            return;
+        }
+
+
+        let indexCuadrante = posicionRCCuadrante.getIndexCuadrante();
+
+        //salimos porque nos apuntamos a nosotros mismos
+        if (indexCuadrante === 0) {
+            this.canvas.style.cursor = 'default';
+            this.posicionEnLaMira = null;
             return;
 
         }
+        //salimos porque no hay un jugador en ese cuadrante
+        if (gameData.listaJugadores.length < indexCuadrante) {
+            this.canvas.style.cursor = 'default';
+            this.posicionEnLaMira = null;
+            return;
+        }
 
-        //solo cambiar el cu
 
+        //guardar que posicion estamos apuntando
+        this.posicionEnLaMira = posicionRCCuadrante;
+        this.canvas.style.cursor = 'crosshair';
 
 
     }

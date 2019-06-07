@@ -237,19 +237,19 @@ class AEngine {
         let canvas = gameData.canvas;
 
         canvas.onmousedown = (event) => {
-            console.log('no listenging');
+            // console.log('no listenging');
         };
 
         canvas.onmouseup = (event) => {
-            console.log('no listenging');
+            // console.log('no listenging');
         };
 
         canvas.onmousemove = (event) => {
-            console.log('no listenging');
+            // console.log('no listenging');
         };
 
         document.onkeydown = (event) => {
-            console.log('no listenging');
+            // console.log('no listenging');
         };
     }
 
@@ -1424,12 +1424,14 @@ const drawBatallaSubmarinosLocal = {
 };
 //@flow
 
-class EngineBatalla extends AEngine{
+class EngineBatalla extends AEngine {
 
-    constructor(fnOnContinuar){
+    constructor(fnOnContinuar) {
         super(fnOnContinuar);
 
         this.addEventosMouseAndKeyboard();
+
+        this.posicionEnLaMira = null;
 
     }
 
@@ -1469,7 +1471,6 @@ class EngineBatalla extends AEngine{
 
     addEventosMouseAndKeyboard() {
 
-        return;
 
         let canvas = gameData.canvas;
 
@@ -1487,11 +1488,12 @@ class EngineBatalla extends AEngine{
     onMouseClick(event) {
 
 
-        return ;
+        return;
 
         let posicionRCCuadrante = factoryPosicionRCCuadrante.fromEventMouse(event);
 
         if (posicionRCCuadrante === null) {
+
             return;
         }
 
@@ -1502,7 +1504,6 @@ class EngineBatalla extends AEngine{
 
 
         //buscar la posicion en la lista de posiciones atacadas y salir sio ya fue atacada
-
 
 
         let idSub = sub.id;
@@ -1521,15 +1522,33 @@ class EngineBatalla extends AEngine{
 
         let posicionRCCuadrante = factoryPosicionRCCuadrante.fromEventMouse(event);
 
-        if (posicionRCCuadrante.getIndexCuadrante() === 0) {
-            //salimos porque nos apuntamos a nosotros mismos
+        if (posicionRCCuadrante === null) {
             this.canvas.style.cursor = 'default';
+            this.posicionEnLaMira = null;
+            return;
+        }
+
+
+        let indexCuadrante = posicionRCCuadrante.getIndexCuadrante();
+
+        //salimos porque nos apuntamos a nosotros mismos
+        if (indexCuadrante === 0) {
+            this.canvas.style.cursor = 'default';
+            this.posicionEnLaMira = null;
             return;
 
         }
+        //salimos porque no hay un jugador en ese cuadrante
+        if (gameData.listaJugadores.length < indexCuadrante) {
+            this.canvas.style.cursor = 'default';
+            this.posicionEnLaMira = null;
+            return;
+        }
 
-        //solo cambiar el cu
 
+        //guardar que posicion estamos apuntando
+        this.posicionEnLaMira = posicionRCCuadrante;
+        this.canvas.style.cursor = 'crosshair';
 
 
     }
@@ -1546,93 +1565,6 @@ class EngineBatalla extends AEngine{
 
 }
 
-//@flow
-
-const configTipoMensaje = {
-    JugadorIngresa:'JugadorIngresa',
-    JugadorSale:'JugadorSale',
-    IniciarBatalla: 'IniciarBatalla',
-    LanzarCohete:'LanzarCohete',
-    ResultadoAtaque:'ResultadoAtaque',
-    Rendicion:'Rendicion',
-    TerminoBatalla:'TerminoBatalla'
-};
-
-/* @flow */
-const tipoMsgSocket = {
-    ingresa: 'ingresa',
-    sale:'sale',
-    confirma_posiciones:'confirma_posiciones',
-    inicia_batalla:'inicia_batalla',
-    lanza_cohete:'lanza_cohete',
-    resultado_ataque:'resultado_ataque',
-};
-
-
-const factoryMensajeSocket = {
-    JugadorIngresa: function (token, id_jugador ) {
-        return {
-            id_jugador,
-            token,
-            tipo: tipoMsgSocket.ingresa
-        };
-    },
-    JugadorConfirma: function (token, id_jugador) {
-        return {
-            id_jugador,
-            token,
-            tipo: tipoMsgSocket.confirma_posiciones
-        }
-    }
-};
-/* @flow */
-
-const proRecibirMsgSocket = {
-    exe: function (msg) {
-
-        const jugador = this.getJugadorFromId(parseInt(msg.id_jugador));
-
-        if (msg.tipo === tipoMsgSocket.ingresa) {
-            this.jugador_ingresa(jugador);
-
-
-        } else if (msg.tipo === tipoMsgSocket.confirma_posiciones) {
-            this.jugador_confirma_posicion(jugador)
-
-        } else {
-            alert("no esperamos este tipo de mensaje " + msg.tipo)
-        }
-
-
-    },
-    jugador_ingresa: function (jugador) {
-
-    },
-    jugador_confirma_posicion: function (jugador) {
-        jugador.setPosicionConfirmada();
-
-        //notificar al controller - si no esta en la etapa de espera
-
-        if (gameController.engine.esperarParticipantes) {
-            gameController.engine.esperarParticipantes.onJugadorRemotoConfirma();
-        }
-
-    },
-    getJugadorFromId: function (id_jugador) {
-
-
-        return gameData.listaJugadores
-            .find(
-                jugador => {
-                    return jugador.id === id_jugador;
-                }
-            )
-            ;
-
-
-    }
-
-};
 /* @flow */
 
 class Posicion {
@@ -1783,6 +1715,93 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190607 12:33');  /*FBUILD*/
+//@flow
+
+const configTipoMensaje = {
+    JugadorIngresa:'JugadorIngresa',
+    JugadorSale:'JugadorSale',
+    IniciarBatalla: 'IniciarBatalla',
+    LanzarCohete:'LanzarCohete',
+    ResultadoAtaque:'ResultadoAtaque',
+    Rendicion:'Rendicion',
+    TerminoBatalla:'TerminoBatalla'
+};
+
+/* @flow */
+const tipoMsgSocket = {
+    ingresa: 'ingresa',
+    sale:'sale',
+    confirma_posiciones:'confirma_posiciones',
+    inicia_batalla:'inicia_batalla',
+    lanza_cohete:'lanza_cohete',
+    resultado_ataque:'resultado_ataque',
+};
+
+
+const factoryMensajeSocket = {
+    JugadorIngresa: function (token, id_jugador ) {
+        return {
+            id_jugador,
+            token,
+            tipo: tipoMsgSocket.ingresa
+        };
+    },
+    JugadorConfirma: function (token, id_jugador) {
+        return {
+            id_jugador,
+            token,
+            tipo: tipoMsgSocket.confirma_posiciones
+        }
+    }
+};
+/* @flow */
+
+const proRecibirMsgSocket = {
+    exe: function (msg) {
+
+        const jugador = this.getJugadorFromId(parseInt(msg.id_jugador));
+
+        if (msg.tipo === tipoMsgSocket.ingresa) {
+            this.jugador_ingresa(jugador);
+
+
+        } else if (msg.tipo === tipoMsgSocket.confirma_posiciones) {
+            this.jugador_confirma_posicion(jugador)
+
+        } else {
+            alert("no esperamos este tipo de mensaje " + msg.tipo)
+        }
+
+
+    },
+    jugador_ingresa: function (jugador) {
+
+    },
+    jugador_confirma_posicion: function (jugador) {
+        jugador.setPosicionConfirmada();
+
+        //notificar al controller - si no esta en la etapa de espera
+
+        if (gameController.engine.esperarParticipantes) {
+            gameController.engine.esperarParticipantes.onJugadorRemotoConfirma();
+        }
+
+    },
+    getJugadorFromId: function (id_jugador) {
+
+
+        return gameData.listaJugadores
+            .find(
+                jugador => {
+                    return jugador.id === id_jugador;
+                }
+            )
+            ;
+
+
+    }
+
+};
+/*FBUILD*/ console.log( 'FBUILD-20190607 12:48');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
