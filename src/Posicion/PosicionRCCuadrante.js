@@ -20,6 +20,20 @@ class PosicionRCCuadrante {
     toString() {
         return `cuad:${this.indexCuadrante} c:${this.posicionRC.c} r: ${this.posicionRC.r}`;
     }
+
+
+    getPosAbs():Posicion {
+        const delta = gameConfig.deltaSep;
+        const sizeCM = gameCacheSize.getSizeCM();
+        const origenCuadrante = factoryPosicionRCCuadrante.getOrigenCuadrante(this.indexCuadrante);
+
+
+        const x = origenCuadrante.x + (this.getC() - 1) * (sizeCM + gameConfig.wDivision) + delta;
+
+        const y = origenCuadrante.y + (this.getR() - 1) * (sizeCM + gameConfig.wDivision) + delta;
+
+        return new Posicion(x, y, 0);
+    }
 }
 
 const factoryPosicionRCCuadrante = {

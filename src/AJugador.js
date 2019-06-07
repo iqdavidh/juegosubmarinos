@@ -20,7 +20,7 @@ class AJugador {
         this.isPosicionConfirmada = true;
     }
 
-    getListaCohetes(): Array<Cohete> {
+    getListaCohetes(): Array<ACohetel> {
         return this.listaCohetes;
     }
 

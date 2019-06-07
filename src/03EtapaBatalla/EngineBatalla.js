@@ -41,7 +41,7 @@ class EngineBatalla extends AEngine {
 
         idFrame = window.requestAnimationFrame(frames);
 
-       // frames();
+        // frames();
 
 
     }
@@ -51,7 +51,7 @@ class EngineBatalla extends AEngine {
 
         let canvas = gameData.canvas;
 
-        canvas.onmouseclick = (event) => {
+        canvas.onclick = (event) => {
             this.onMouseClick(event);
         };
 
@@ -64,34 +64,25 @@ class EngineBatalla extends AEngine {
 
     onMouseClick(event) {
 
+        console.log('click');
 
-        return;
+        const posicionRCC = this.posicionEnLaMira;
 
-        let posicionRCCuadrante = factoryPosicionRCCuadrante.fromEventMouse(event);
-
-        if (posicionRCCuadrante === null) {
-
+        //el evento mouse determina si tenemos posicion o no, si hay click salir si es null
+        if (posicionRCC === null) {
             return;
         }
 
-        if (posicionRCCuadrante.getIndexCuadrante() === 0) {
-            //salimos si nos apuntamos a nosotros mismos
+        const jugador = gameData.jugadorLocal;
+
+        //salir si no tiene cohetes
+        if (jugador.getNumCohetesReady() === 0) {
             return;
         }
 
 
-        //buscar la posicion en la lista de posiciones atacadas y salir sio ya fue atacada
+        jugador.lanzaCohete(posicionRCC);
 
-
-        let idSub = sub.id;
-        this.jugadorLocal.getListaSubmarinos()
-            .forEach(s => {
-                s.isOnDrag = s.id === idSub;
-            });
-
-
-        //guardar la posicion
-        this.posicionOnDrag = posicionRCCuadrante;
 
     }
 

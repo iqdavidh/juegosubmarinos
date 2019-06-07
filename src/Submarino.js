@@ -13,7 +13,7 @@ class Submarino {
 
         this.cohete = null;
         this.avancePrepararCohete = 0;
-        this.isPrimerDraw=true;
+        this.isPrimerDraw = true;
 
 
     }
@@ -45,9 +45,8 @@ class Submarino {
         const y = (this.getPosicionRC().r - 1) * (sizeCM + gameConfig.wDivision) + delta;
 
         return new Posicion(x, y);
-
-
     }
+
 
     recibeImpacto() {
         this.isActivo = false;
@@ -55,44 +54,46 @@ class Submarino {
     }
 
 
-    lanzaCohete(fnCB): void {
+    lanzaCohete(): void {
 
     }
 
-    onCoheteListo(cohete: Cohete) {
+    onCoheteListo(cohete: CoheteLocal) {
 
     }
 
 
     prepararCohete(): void {
 
-        if (this.cohete === null) {
-            const numIntervalos = 6;
-            let intervalo = gameConfig.msPrepararCohete / numIntervalos;
-            this.avancePrepararCohete = 0;
-
-            let idInterval = null;
-
-            let fn = () => {
-                this.avancePrepararCohete++;
-
-                if (this.avancePrepararCohete >= numIntervalos) {
-
-                    window.clearInterval(idInterval);
-                    this.cohete = factoryCohete.jugadorLocal(this);
-                    gameData.jugadorLocal.listaCohetes.push(this.cohete);
-
-                }
-            };
-
-
-            //ponermos el intervalo al inicio mmuy corto para tener cohetes disponiles
-            intervalo=   this.isPrimerDraw?100:intervalo;
-
-            idInterval = window.setInterval(fn, intervalo);
-
-            this.isPrimerDraw=false;
+        if (this.cohete !== null && this.cohete.getIsEstadoReady()) {
+            return;
         }
+
+        const numIntervalos = 6;
+        const intervalo = this.isPrimerDraw ? 100 : gameConfig.msPrepararCohete / numIntervalos;
+        this.avancePrepararCohete = 0;
+
+        let idInterval = null;
+
+        let fn = () => {
+            this.avancePrepararCohete++;
+
+            if (this.avancePrepararCohete >= numIntervalos) {
+
+                window.clearInterval(idInterval);
+                this.cohete = factoryCohete.jugadorLocal(this);
+                gameData.jugadorLocal.listaCohetes.push(this.cohete);
+
+            }
+        };
+
+
+        //ponermos el intervalo al inicio mmuy corto para tener cohetes disponiles
+
+        idInterval = window.setInterval(fn, intervalo);
+
+        this.isPrimerDraw = false;
+
     }
 
 

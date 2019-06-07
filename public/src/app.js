@@ -286,63 +286,6 @@ class AJugador {
        return factoryPosicionRCCuadrante.getOrigenCuadrante(this.indexCuadrante);
     }
 }
-class Cohete {
-
-    constructor(posicionIni, jugador) {
-        this.id = IDGenerator();
-
-        this.posicionIni = posicionIni;
-        this.estado = 'ready';
-        this.velocidad = new Posicion(0, 0, 0);
-        this.posicion = null;
-        this.jugador = jugador;
-    }
-
-    getIsEstadoReady() {
-        return this.estado === 'ready';
-    }
-
-    getIsEstadoLanzado() {
-        return this.estado === 'lanzado';
-    }
-
-    lanzar(posicionFinalRC, posicionFinal) {
-        this.estado = 'lanzado';
-        this.posicionFinal = posicionFinal;
-        this.posicionFinalRC = posicionFinalRC;
-    }
-
-    mover() {
-
-    }
-
-}
-
-const factoryCohete = {
-    jugadorLocal: function (submarino) {
-
-        //let posicion= submarino.
-
-        let jugador = gameData.jugadorLocal;
-
-        let origen = jugador.getOrigenFromIndex();
-        let posRel = submarino.getPosicionXYRel();
-
-        const sizeCM = gameCacheSize.getSizeCM();
-
-        let x = origen.x + posRel.x + sizeCM / 2;
-        let y = origen.y + posRel.y + sizeCM / 2;
-
-        let posicionCentroCohete=new Posicion(x,y);
-
-
-        return new Cohete( posicionCentroCohete, jugador);
-
-
-    }
-};
-
-
 /* @flow */
 class JugadorLocal extends AJugador {
 
@@ -392,6 +335,19 @@ class JugadorLocal extends AJugador {
         return numCoheteListo;
     }
 
+    lanzaCohete(posicionEnLaMira){
+        //buscar el primer cohete que se agrego a la lista
+        if( this.getNumCohetesReady() ===0){
+            return;
+        }
+
+        const cohete=this.getListaCohetes()[0];
+
+        let posicionAbs = posicionEnLaMira.getPosAbs();
+
+        cohete.lanzar(posicionAbs);
+
+    }
 }
 
 
@@ -478,7 +434,7 @@ class Submarino {
 
         this.cohete = null;
         this.avancePrepararCohete = 0;
-        this.isPrimerDraw=true;
+        this.isPrimerDraw = true;
 
 
     }
@@ -510,9 +466,8 @@ class Submarino {
         const y = (this.getPosicionRC().r - 1) * (sizeCM + gameConfig.wDivision) + delta;
 
         return new Posicion(x, y);
-
-
     }
+
 
     recibeImpacto() {
         this.isActivo = false;
@@ -520,7 +475,7 @@ class Submarino {
     }
 
 
-    lanzaCohete(fnCB) {
+    lanzaCohete() {
 
     }
 
@@ -531,33 +486,35 @@ class Submarino {
 
     prepararCohete() {
 
-        if (this.cohete === null) {
-            const numIntervalos = 6;
-            let intervalo = gameConfig.msPrepararCohete / numIntervalos;
-            this.avancePrepararCohete = 0;
-
-            let idInterval = null;
-
-            let fn = () => {
-                this.avancePrepararCohete++;
-
-                if (this.avancePrepararCohete >= numIntervalos) {
-
-                    window.clearInterval(idInterval);
-                    this.cohete = factoryCohete.jugadorLocal(this);
-                    gameData.jugadorLocal.listaCohetes.push(this.cohete);
-
-                }
-            };
-
-
-            //ponermos el intervalo al inicio mmuy corto para tener cohetes disponiles
-            intervalo=   this.isPrimerDraw?100:intervalo;
-
-            idInterval = window.setInterval(fn, intervalo);
-
-            this.isPrimerDraw=false;
+        if (this.cohete !== null && this.cohete.getIsEstadoReady()) {
+            return;
         }
+
+        const numIntervalos = 6;
+        const intervalo = this.isPrimerDraw ? 100 : gameConfig.msPrepararCohete / numIntervalos;
+        this.avancePrepararCohete = 0;
+
+        let idInterval = null;
+
+        let fn = () => {
+            this.avancePrepararCohete++;
+
+            if (this.avancePrepararCohete >= numIntervalos) {
+
+                window.clearInterval(idInterval);
+                this.cohete = factoryCohete.jugadorLocal(this);
+                gameData.jugadorLocal.listaCohetes.push(this.cohete);
+
+            }
+        };
+
+
+        //ponermos el intervalo al inicio mmuy corto para tener cohetes disponiles
+
+        idInterval = window.setInterval(fn, intervalo);
+
+        this.isPrimerDraw = false;
+
     }
 
 
@@ -1513,7 +1470,7 @@ class EngineBatalla extends AEngine {
 
         idFrame = window.requestAnimationFrame(frames);
 
-       // frames();
+        // frames();
 
 
     }
@@ -1523,7 +1480,7 @@ class EngineBatalla extends AEngine {
 
         let canvas = gameData.canvas;
 
-        canvas.onmouseclick = (event) => {
+        canvas.onclick = (event) => {
             this.onMouseClick(event);
         };
 
@@ -1536,34 +1493,25 @@ class EngineBatalla extends AEngine {
 
     onMouseClick(event) {
 
+        console.log('click');
 
-        return;
+        const posicionRCC = this.posicionEnLaMira;
 
-        let posicionRCCuadrante = factoryPosicionRCCuadrante.fromEventMouse(event);
-
-        if (posicionRCCuadrante === null) {
-
+        //el evento mouse determina si tenemos posicion o no, si hay click salir si es null
+        if (posicionRCC === null) {
             return;
         }
 
-        if (posicionRCCuadrante.getIndexCuadrante() === 0) {
-            //salimos si nos apuntamos a nosotros mismos
+        const jugador = gameData.jugadorLocal;
+
+        //salir si no tiene cohetes
+        if (jugador.getNumCohetesReady() === 0) {
             return;
         }
 
 
-        //buscar la posicion en la lista de posiciones atacadas y salir sio ya fue atacada
+        jugador.lanzaCohete(posicionRCC);
 
-
-        let idSub = sub.id;
-        this.jugadorLocal.getListaSubmarinos()
-            .forEach(s => {
-                s.isOnDrag = s.id === idSub;
-            });
-
-
-        //guardar la posicion
-        this.posicionOnDrag = posicionRCCuadrante;
 
     }
 
@@ -1613,6 +1561,97 @@ class EngineBatalla extends AEngine {
     }
 
 }
+
+//@flow
+"use strict";
+
+class ACohete {
+
+    constructor(posicionIni, id_jugador) {
+        this.id = IDGenerator();
+        this.posicionIni = posicionIni;
+        this.posicionFinal = null;
+        this.posicion = posicionIni.clonar();
+
+        this.estado = 'ready';
+        this.velocidad = new Posicion(0, 0, 0);
+        this.id_jugador = id_jugador;
+        this.callbackAlLanzar=null;
+    }
+
+    getIsEstadoReady() {
+        return this.estado === 'ready';
+    }
+
+    getIsEstadoLanzado() {
+        return this.estado === 'lanzado';
+    }
+
+    lanzar(posicionFinal) {
+        this.estado = 'lanzado';
+        this.posicionFinal = posicionFinal;
+        if(this.callbackAlLanzar){
+            this.callbackAlLanzar();
+        }
+    }
+
+    mover() {
+
+    }
+}
+//@flow
+"use strict";
+
+class CoheteLocal extends ACohete {
+
+    constructor(posicionIni, id_jugador, id_submarino) {
+        super(posicionIni, id_jugador);
+
+        this.id_submarino = id_submarino;
+
+        this.callbackAlLanzar = () => {
+
+            // al lanzar vamos a buscar al submarino que es dueño de  este cohete poara volverlo a mandar
+            let submarino = gameData.jugadorLocal.getListaSubmarinos()
+                .find(s => {
+                    return s.id=this.id_submarino;
+                })
+            ;
+
+            if(submarino){
+                submarino.prepararCohete();
+            }
+
+        }
+
+    }
+
+}
+
+const factoryCohete = {
+    jugadorLocal: function (submarino) {
+
+        //let posicion= submarino.
+
+        let jugador = gameData.jugadorLocal;
+
+        let origen = jugador.getOrigenFromIndex();
+        let posRel = submarino.getPosicionXYRel();
+
+        const sizeCM = gameCacheSize.getSizeCM();
+
+        let x = origen.x + posRel.x + sizeCM / 2;
+        let y = origen.y + posRel.y + sizeCM / 2;
+
+        let posicionCentroCohete = new Posicion(x, y);
+
+
+        return new CoheteLocal(posicionCentroCohete, jugador.id, submarino.id);
+
+
+    }
+};
+
 
 //@flow
 
@@ -1705,16 +1744,19 @@ const proRecibirMsgSocket = {
 
 class Posicion {
 
-    constructor(x, y, z=0) {
+    constructor(x, y, z = 0) {
         this.x = x;
         this.y = y;
         this.z = z;
     }
 
-    toString(){
+    toString() {
         return `${this.x}, ${this.y}`;
     }
 
+    clonar() {
+        return new Posicion(this.x, this.y, this.z);
+    }
 }
 class PosicionRC {
 
@@ -1748,6 +1790,20 @@ class PosicionRCCuadrante {
 
     toString() {
         return `cuad:${this.indexCuadrante} c:${this.posicionRC.c} r: ${this.posicionRC.r}`;
+    }
+
+
+    getPosAbs() {
+        const delta = gameConfig.deltaSep;
+        const sizeCM = gameCacheSize.getSizeCM();
+        const origenCuadrante = factoryPosicionRCCuadrante.getOrigenCuadrante(this.indexCuadrante);
+
+
+        const x = origenCuadrante.x + (this.getC() - 1) * (sizeCM + gameConfig.wDivision) + delta;
+
+        const y = origenCuadrante.y + (this.getR() - 1) * (sizeCM + gameConfig.wDivision) + delta;
+
+        return new Posicion(x, y, 0);
     }
 }
 
@@ -1851,6 +1907,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190607 13:34');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190607 18:26');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
