@@ -7,7 +7,12 @@ const gameConfig = {
     numDivisiones: 6,
     wDivision: 2,
     resources: {
-        imgMar: null
+        imgMar: null,
+        imgBullet:null ,
+        imgTanque:null,
+        imgTanqueDest:null,
+        imgRocket:null,
+        imgExplosion:null
     }
 };
 

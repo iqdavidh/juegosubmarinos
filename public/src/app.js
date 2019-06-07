@@ -7,7 +7,12 @@ const gameConfig = {
     numDivisiones: 6,
     wDivision: 2,
     resources: {
-        imgMar: null
+        imgMar: null,
+        imgBullet:null ,
+        imgTanque:null,
+        imgTanqueDest:null,
+        imgRocket:null,
+        imgExplosion:null
     }
 };
 
@@ -123,13 +128,26 @@ function loadCanvasAndResources(callback){
         return loadImage( '/img/tanque.png');
     }
 
+    function loadTanqueDestruido(){
+        return loadImage( '/img/tanque_destruido.png');
+    }
 
+    function loadRocket(){
+        return loadImage( '/img/Rocket.png');
+    }
+
+    function loadExplosion(){
+        return loadImage( '/img/Explosion.png');
+    }
 
     Promise.all([
-            loadMar(),loadBullet(), loadTanque()
+            loadMar(),loadBullet(), loadTanque(),
+            loadTanqueDestruido(), loadRocket(),loadExplosion()
         ]
-    ).then(([imgMar, imgBullet, imgTanque]) => {
-        callback(imgMar, imgBullet, imgTanque);
+    ).then(([imgMar, imgBullet, imgTanque,
+                           imgTanqueDest, imgRocket, imgExplosion]) => {
+        callback(imgMar, imgBullet, imgTanque
+            , imgTanqueDest, imgRocket, imgExplosion);
         gameConfig.isResourcesLoaded = true;
     });
 
@@ -496,10 +514,15 @@ const gameData = {
 };
 
 
-loadCanvasAndResources((imgMar, imgBullet, imgTanque) => {
+loadCanvasAndResources((imgMar, imgBullet, imgTanque
+    , imgTanqueDest, imgRocket, imgExplosion
+) => {
     gameConfig.resources.imgMar = imgMar;
     gameConfig.resources.imgBullet = imgBullet;
     gameConfig.resources.imgTanque = imgTanque;
+    gameConfig.resources.imgTanqueDest = imgTanqueDest;
+    gameConfig.resources.imgRocket = imgRocket;
+    gameConfig.resources.imgExplosion = imgExplosion;
 });
 
 
@@ -1116,35 +1139,9 @@ class EngineEsperar extends AEngine {
 //@flow
 "use strict";
 
-const drawBatalla = {
+const drawBatallaAllRegions = {
 
-    cacheSubmarinosLocal:null,
-    drawSubmarinosLocal: function () {
-
-
-        //vamos a dibujar todos los jugadores
-        if (this.cacheSubmarinosLocal !== null) {
-            return this.cacheSubmarinosLocal;
-        }
-
-
-        const sizeRegion = gameCacheSize.getSize;
-        const delta = gameConfig.deltaSep;
-
-        //este canvas tendra todo el mapa
-        const cacheCanvas = document.createElement('canvas');
-        cacheCanvas.width = sizeRegion;
-        cacheCanvas.height = sizeRegion;
-
-        const ctx = cacheCanvas.getContext('2d');
-
-        let origen = jugador.getOrigenFromIndex();
-
-
-
-    },
-
-    drawAllRegions: function (ctx) {
+    exe: function (ctx) {
 
         let cacheMar = this.getCacheCanvasAll();
         ctx.drawImage(cacheMar, 0, 0, gameConfig.size, gameConfig.size);
@@ -1204,9 +1201,6 @@ const drawBatalla = {
             }
 
 
-
-
-
             ctx.drawImage(gameConfig.resources.imgBullet, 0, 0, wCohete, hCohete,
                 origen.x + delta - 2,
                 origen.y + 2,
@@ -1214,7 +1208,7 @@ const drawBatalla = {
 
             ctx.font = '18px monospace';
             ctx.fillStyle = "rgba(200, 200, 200, 0.7)";
-            ctx.fillText('Player ' + indexJugador.toString(), origen.x +( sizeMar-30)/2, origen.y + 16);
+            ctx.fillText('Player ' + indexJugador.toString(), origen.x + (sizeMar - 30) / 2, origen.y + 16);
 
 
             ctx.drawImage(gameConfig.resources.imgTanque, 0, 0, 100, 100,
@@ -1232,7 +1226,7 @@ const drawBatalla = {
 
         listaOrigen.unshift(gameData.jugadorLocal.getOrigenFromIndex());
 
-        let indexJugador=0;
+        let indexJugador = 0;
         listaOrigen.map(origen => {
             indexJugador++;
             drawSeccionFromOrigen(origen, indexJugador);
@@ -1246,7 +1240,99 @@ const drawBatalla = {
     resetCacheCanvasAll: function () {
         this.cacheRegionAll = null;
     }
-}
+};
+//@flow
+"use strict";
+
+const drawBatallaSubmarinosLocal = {
+
+    cacheSubmarinosLocal: null,
+    exe: function (ctx) {
+
+        const sizeRegion = gameCacheSize.getSizeRegion();
+
+        let cache = this.getCacheSubmarinosLocal();
+
+        let origen = gameData.jugadorLocal.getOrigenFromIndex();
+
+        ctx.drawImage(cache, 0, 0, sizeRegion, sizeRegion, origen.x, origen.y, sizeRegion, sizeRegion);
+
+    },
+
+    drawSubmarino: function (ctxRegion, submarino) {
+
+        const origen = submarino.jugador.getOrigenFromIndex();
+        const delta = gameConfig.deltaSep;
+
+
+        const sizeCM = gameCacheSize.getSizeCM();
+
+        const v1 = (submarino.getPosicionRC().c - 1) * (sizeCM + gameConfig.wDivision);
+        const x = delta + v1;
+
+        const v2 = (submarino.getPosicionRC().r - 1) * (sizeCM + gameConfig.wDivision);
+        const y = delta + v2;
+
+        if (submarino.isActivo) {
+            ctxRegion.fillStyle = "rgba(255, 255, 255, 0.5)";
+        } else {
+            ctxRegion.fillStyle = "rgba(0, 0, 0, 0.5)";
+        }
+        let submarinoSize = sizeCM / 2;
+        let dy = sizeCM / 4;
+
+        console.log(`x,y ${x},${y}`);
+        ctxRegion.fillRect(x + dy, y + sizeCM / 4, submarinoSize, submarinoSize);
+
+    },
+
+    getCacheSubmarinosLocal: function () {
+
+        //vamos a dibujar todos los jugadores
+        if (this.cacheSubmarinosLocal !== null) {
+            return this.cacheSubmarinosLocal;
+        }
+
+        const jugador = gameData.jugadorLocal;
+
+        const sizeRegion = gameCacheSize.getSizeRegion();
+        const delta = gameConfig.deltaSep;
+
+        //este canvas tendra todo el mapa
+        const cacheCanvasRegion = document.createElement('canvas');
+        cacheCanvasRegion.width = sizeRegion;
+        cacheCanvasRegion.height = sizeRegion;
+
+        const ctxRegion = cacheCanvasRegion.getContext('2d');
+
+        //los submarinos listos
+        let numActivos = 0;
+        jugador.getListaSubmarinos()
+            .forEach(s => {
+
+                    this.drawSubmarino(ctxRegion, s);
+
+                    if (s.isActivo) {
+                        numActivos++;
+                    }
+                }
+            );
+
+        //dibujar texto de activos
+
+
+        // /* actualziar dra numero sub*/
+        // let numSubmarino = jugador.getNumSubmarinos();
+        // ctx.fillStyle = "rgba(255, 255, 0, 1)";
+        // ctx.font = '19px monospace';
+        // ctx.fillText(numSubmarino.toString(), origen.x + sizeRegion - delta - 20, origen.y + delta - 4);
+
+        this.cacheSubmarinosLocal = cacheCanvasRegion;
+
+        return cacheCanvasRegion;
+
+    }
+};
 //@flow
 
 class EngineBatalla extends AEngine{
@@ -1274,8 +1360,8 @@ class EngineBatalla extends AEngine{
                 return;
             }
 
-            drawBatalla.drawAllRegions(ctx);
-            drawBatalla.drawSubmarinosLocal(ctx);
+            drawBatallaAllRegions.exe(ctx);
+            drawBatallaSubmarinosLocal.exe(ctx);
 
             //idFrame = window.requestAnimationFrame(frames);
 
@@ -1604,6 +1690,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190606 22:36');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190606 23:28');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

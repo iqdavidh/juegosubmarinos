@@ -15,10 +15,15 @@ const gameData = {
 };
 
 
-loadCanvasAndResources((imgMar, imgBullet, imgTanque) => {
+loadCanvasAndResources((imgMar, imgBullet, imgTanque
+    , imgTanqueDest, imgRocket, imgExplosion
+) => {
     gameConfig.resources.imgMar = imgMar;
     gameConfig.resources.imgBullet = imgBullet;
     gameConfig.resources.imgTanque = imgTanque;
+    gameConfig.resources.imgTanqueDest = imgTanqueDest;
+    gameConfig.resources.imgRocket = imgRocket;
+    gameConfig.resources.imgExplosion = imgExplosion;
 });
 
 

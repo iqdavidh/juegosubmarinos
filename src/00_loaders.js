@@ -44,13 +44,26 @@ function loadCanvasAndResources(callback){
         return loadImage( '/img/tanque.png');
     }
 
+    function loadTanqueDestruido(){
+        return loadImage( '/img/tanque_destruido.png');
+    }
 
+    function loadRocket(){
+        return loadImage( '/img/Rocket.png');
+    }
+
+    function loadExplosion(){
+        return loadImage( '/img/Explosion.png');
+    }
 
     Promise.all([
-            loadMar(),loadBullet(), loadTanque()
+            loadMar(),loadBullet(), loadTanque(),
+            loadTanqueDestruido(), loadRocket(),loadExplosion()
         ]
-    ).then(([imgMar, imgBullet, imgTanque]) => {
-        callback(imgMar, imgBullet, imgTanque);
+    ).then(([imgMar, imgBullet, imgTanque,
+                           imgTanqueDest, imgRocket, imgExplosion]) => {
+        callback(imgMar, imgBullet, imgTanque
+            , imgTanqueDest, imgRocket, imgExplosion);
         gameConfig.isResourcesLoaded = true;
     });
 
