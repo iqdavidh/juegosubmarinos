@@ -8,6 +8,7 @@ const gameConfig = {
     wDivision: 2,
     sPrepararCohete:6,
     velocidadCohete:10,
+    sizeCohete:50,
     resources: {
         imgMar: null,
         imgBullet:null ,
@@ -1289,32 +1290,43 @@ const drawBatallaCohetesLocal = {
 
     exe: function (ctx, contadorFrames) {
 
-        //ctx.drawImage( gameConfig.resources.imgRocket, 0,0,75,19, 0,0,75,19);
-
-        ctx.drawImage( factoryImgRocket.fromContadorFrame(contadorFrames),0,0);
-
         const listaCohetes = gameData.jugadorLocal.getListaCohetes()
             .filter(c => {
                 return c.getIsEstadoLanzado();
             });
 
         //mover los cohetes
+
+
+        const img = factoryImgRocket.fromContadorFrame(contadorFrames);
+
+
+        const sizeCohete = gameConfig.sizeCohete;
+        const mitadSizeCohete = sizeCohete / 2;
+
+
         listaCohetes.forEach(c => {
             c.mover();
-            console.log('trayectoria');
+            //console.log('trayectoria');
 
-            //dibujar linea
+            //dibujar linea0
             ctx.beginPath();
             ctx.moveTo(c.getPosicionIni().x, c.getPosicionIni().y);
             ctx.lineTo(c.getPosicionFinal().x, c.getPosicionFinal().y);
             ctx.closePath();
             ctx.stroke();
 
+            //sacar el sprite
+            let sx = c.getAngulo() * sizeCohete;
+            let x = c.getPosicion().x - mitadSizeCohete;
+            let y = c.getPosicion().y - mitadSizeCohete;
+
+
+            ctx.drawImage(img, sx, 0, sizeCohete, sizeCohete, x, y, sizeCohete, sizeCohete);
 
 
         });
     },
-
 
 
 };
@@ -1606,36 +1618,38 @@ const factoryImgRocket = {
     cache2: null,
     getCache1() {
 
-        const size = 50;
+        const sizeCohete = gameConfig.sizeCohete;
 
         if (this.cache1) {
             return this.cache1;
         }
 
         const canvasFrame = document.createElement('canvas');
-        canvasFrame.width = size;
-        canvasFrame.height = size;
+        canvasFrame.width = sizeCohete;
+        canvasFrame.height = sizeCohete;
         const ctxFrame = canvasFrame.getContext('2d');
 
 
         const wResource = 75;
         const hResource = 19;
-        const alfa = size / wResource;
+        const alfa = sizeCohete / wResource;
 
 
-        let y = (size - hResource) / 2;
+        let y = (sizeCohete - hResource) / 2;
 
 
         //crear cache de todos amgulos -------------------------
         const canvasCache = document.createElement('canvas');
-        canvasCache.width = size * 359;
-        canvasCache.height = size;
+
+        //son 359 porque 360=0
+        canvasCache.width = sizeCohete * 359;
+        canvasCache.height = sizeCohete;
 
         const ctx = canvasCache.getContext('2d');
 
 
         ctxFrame.drawImage(gameConfig.resources.imgRocket, 0, 0,
-            wResource, hResource, 0, y, size, hResource * alfa);
+            wResource, hResource, 0, y, sizeCohete, hResource * alfa);
 
 
 
@@ -1645,20 +1659,19 @@ const factoryImgRocket = {
         for (let i = 0; i < 360; i++) {
 
             const canvasRot = document.createElement('canvas');
-            canvasRot.width = size;
-            canvasRot.height = size;
+            canvasRot.width = sizeCohete;
+            canvasRot.height = sizeCohete;
             const ctxRot = canvasRot.getContext('2d');
 
-            ctxRot.translate(size / 2, size / 2);
+            ctxRot.translate(sizeCohete / 2, sizeCohete / 2);
             ctxRot.rotate(-i * Math.PI / 180);
-            ctxRot.drawImage(canvasFrame, -(size / 2), -(size / 2));
+            ctxRot.drawImage(canvasFrame, -(sizeCohete / 2), -(sizeCohete / 2));
 
 
             ctx.drawImage(canvasRot, 0, 0,
-                size, size, i * size, 0, size, size);
+                sizeCohete, sizeCohete, i * sizeCohete, 0, sizeCohete, sizeCohete);
 
             ctxRot.restore();
-
 
         }
 
@@ -1748,6 +1761,13 @@ class ACohete {
 
         this.estado = 'ready';
         this.velocidad = new Posicion(0, 0, 0);
+        this.angulo = null;
+
+        this.distancia = 0;
+        this.distanciaAvanzada = 0;
+
+        this.duracionExplosion=0;
+
         this.id_jugador = id_jugador;
         this.callbackAlLanzar = null;
     }
@@ -1760,6 +1780,10 @@ class ACohete {
         return this.estado === 'lanzado';
     }
 
+    getAngulo() {
+        return this.angulo;
+    }
+
     lanzar(posicionFinal) {
         console.log(`cohete lanzado ${this.id}`);
         this.estado = 'lanzado';
@@ -1769,15 +1793,67 @@ class ACohete {
         this.posicionFinal.x += gameCacheSize.getSizeCM() / 2;
         this.posicionFinal.y += gameCacheSize.getSizeCM() / 2;
 
+
+        //definir velocidades y angulo -----------------------
+
+        const dx = this.posicionFinal.x - this.posicionIni.x;
+
+        /*el sitema de coordenadas en y esta invertido, por eso es negativo*/
+        const dy = -(this.posicionFinal.y - this.posicionIni.y);
+
+
+        const distancia = Math.sqrt(dx ** 2 + dy ** 2);
+
+
+        //la distancia que veremos que avance es menos por que le quitamos las diemnsione sdel sprite
+        this.distancia = distancia -Math.sqrt(gameConfig.sizeCohete** 2 + gameConfig.sizeCohete ** 2)/4;
+
+
+        this.velocidad.x = dx / distancia;
+
+        //como y es un eje invertido la velocidad debe ser con negativo
+        this.velocidad.y = -dy / distancia;
+
+        this.angulo = Math.atan(dy / dx);
+
+        //conversion a grados
+        this.angulo = this.angulo * (180 / Math.PI);
+
+        //redondear para usar cache de grados integeer
+        this.angulo = Math.round(this.angulo);
+
+
+        //TODO revisarlo cuando los disparos son haciua abajo
+        if (this.angulo < 0 && this.angulo > -180) {
+            //console.log(`angulo ${this.angulo}`);
+            this.angulo = 180 + this.angulo;
+        }
+
+        //console.log(`angulo ${this.angulo}`);
+
+        //----------------------------------------------------
+
         if (this.callbackAlLanzar) {
             this.callbackAlLanzar();
         }
     }
 
     mover() {
-        this.posicion.x += this.velocidad.x;
-        this.posicion.y += this.velocidad.y;
+
+        if(this.getIsObjetivoAlcanzado()){
+
+        }else{
+            this.posicion.x += this.velocidad.x;
+            this.posicion.y += this.velocidad.y;
+            this.distanciaAvanzada += 1;
+        }
+
     }
+
+    getIsObjetivoAlcanzado() {
+        return this.distanciaAvanzada >= this.distancia;
+    }
+
 
     getPosicionIni() {
         return this.posicionIni;
@@ -1785,6 +1861,10 @@ class ACohete {
 
     getPosicionFinal() {
         return this.posicionFinal;
+    }
+
+    getPosicion() {
+        return this.posicion;
     }
 }
 //@flow
@@ -2100,6 +2180,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190608 07:20');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190608 08:49');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
