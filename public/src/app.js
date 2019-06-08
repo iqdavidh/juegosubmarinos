@@ -6,7 +6,7 @@ const gameConfig = {
     numSubmarinos: 2,
     numDivisiones: 4,
     wDivision: 2,
-    msPrepararCohete:4000,
+    sPrepararCohete:6,
     velocidadCohete:10,
     resources: {
         imgMar: null,
@@ -145,6 +145,54 @@ function loadCanvasAndResources(callback){
 
 }
 //@flow
+/* use strict */
+
+const gameReloj = {
+
+
+    idInterval: null,
+    tiempo: 0,
+    getTiempo() {
+        return this.tiempo;
+    },
+    start: function () {
+        gameReloj.tiempo = 0;
+        this.idInterval = window.setInterval(gameReloj.loop, 500);
+    },
+    stop: function () {
+
+    },
+    loop: () => {
+
+        gameReloj.tiempo += 0.5;
+
+        const tiempo = gameReloj.tiempo;
+
+        // console.log(tiempo);
+
+        //recargar de cohetes los submarinos
+        let listaSubActivos = gameData.jugadorLocal.getListaSubmarinos()
+            .filter(s => {
+                return s.getIsActivo() && s.tiempoCoheteReady <= tiempo && s.tiempoCoheteReady > 0;
+            })
+        ;
+
+        //con estos submarinos construiir cohetes
+        listaSubActivos.forEach(s => {
+            console.log('l1' + s.ToString());
+            const cohete = factoryCohete.jugadorLocal(s);
+
+            gameData.jugadorLocal.listaCohetes.push(cohete);
+
+            s.ResetTiempoCoheteReady();
+            console.log('l2' + s.ToString());
+        });
+
+
+    }
+
+};
+//@flow
 
 let EventoDummy = {
 
@@ -281,31 +329,11 @@ class JugadorLocal extends AJugador {
 
     constructor(listaSubmarinos) {
         super(0);
-
         this.listaSubmarinos = listaSubmarinos;
-
-        //asignar los submarinos al jugador actual
-        this.listaSubmarinos
-            .forEach(submarino => {
-                submarino.setJugador(this);
-            })
-        ;
-
-
     }
 
     getListaSubmarinos() {
         return this.listaSubmarinos;
-    }
-
-    prepararCohetes() {
-        this.listaSubmarinos
-            .forEach(s => {
-                s.prepararCohete();
-            })
-        ;
-
-
     }
 
     getNumSubmarinos() {
@@ -413,6 +441,7 @@ let FactoryResultadoOpe = {
 
 };
 //@flow
+"use strict";
 
 class Submarino {
 
@@ -423,22 +452,15 @@ class Submarino {
         this.posicionRC = posicionRC;
         this.isActivo = true;
 
-        this.jugador = null;
-
-        this.avancePrepararCohete = 0;
-        this.isPrimerDraw = true;
-
-
+        /* al copsntruise se les da 1 segundo para preparar los cohetes*/
+        this.tiempoCoheteReady=gameReloj.tiempo + 1;
     }
 
-    getJugador() {
-        return this.jugador();
+    getIsActivo(){
+        return this.isActivo;
     }
 
-    setJugador(jugador) {
-        this.jugador = jugador;
 
-    }
 
     getPosicionRC() {
         return this.posicionRC;
@@ -450,61 +472,30 @@ class Submarino {
         const sizeCM = gameCacheSize.getSizeCM();
 
         const x = (this.getPosicionRC().c - 1) * (sizeCM + gameConfig.wDivision) + delta;
-
         const y = (this.getPosicionRC().r - 1) * (sizeCM + gameConfig.wDivision) + delta;
 
         return new Posicion(x, y);
     }
 
-
     recibeImpacto() {
         this.isActivo = false;
-
     }
 
-
-    lanzaCohete() {
-
+    ResetTiempoCoheteReady(){
+        this.tiempoCoheteReady=0;
     }
 
-    prepararCohete() {
-
-
-        const numIntervalos = 6;
-        const intervalo = this.isPrimerDraw ? 100 : gameConfig.msPrepararCohete / numIntervalos;
-        this.avancePrepararCohete = 0;
-
-        let idInterval = null;
-
-        let fn = () => {
-
-            this.avancePrepararCohete++;
-
-            console.log(`sub ${this.id}, paso ${this.avancePrepararCohete}`);
-            if (this.avancePrepararCohete >= numIntervalos) {
-
-                console.log(`sub ${this.id} terminado`);
-
-                window.clearInterval(idInterval);
-                const cohete = factoryCohete.jugadorLocal(this);
-                console.log(`cohete creado es ${cohete.id} del sub ${ cohete.id_submarino}`)
-                gameData.jugadorLocal.listaCohetes.push(cohete);
-
-            }
-        };
-
-
-        //ponermos el intervalo al inicio mmuy corto para tener cohetes disponiles
-
-        idInterval = window.setInterval(fn, intervalo);
-
-        this.isPrimerDraw = false;
-
+    setNewTiempoCoheteReady() {
+        this.tiempoCoheteReady=gameReloj.getTiempo()+gameConfig.sPrepararCohete;
     }
 
-
+    ToString(){
+        return `sub id:${this.id}, activo:${this.isActivo?'si':'no'},tiempoCoheteReady:${this.tiempoCoheteReady} `;
+    }
 }
 
+
+//esto lo uso para crear los cohetes
 
 const factoryListaSubmarinos = {
 
@@ -657,6 +648,7 @@ const gameController = {
             return true;
         }, 2000);
 
+        gameReloj.start();
         let engine = new EngineBatalla(fnOnContinuar);
         this.engine.batalla = engine;
 
@@ -683,7 +675,7 @@ const drawSelPos = {
 
     drawSubmarino: function (ctx, submarino) {
 
-        const origen = submarino.jugador.getOrigenFromIndex();
+        const origen = gameData.jugadorLocal.getOrigenFromIndex();
         const sizeCM = gameCacheSize.getSizeCM();
 
         const posRel=submarino.getPosicionXYRel();
@@ -1420,13 +1412,11 @@ class EngineBatalla extends AEngine {
         super(fnOnContinuar);
 
         this.addEventosMouseAndKeyboard();
-
         this.posicionEnLaMira = null;
-
     }
 
-
     run() {
+
         const ctx = this.ctx;
         const jugador = this.jugadorLocal;
 
@@ -1436,7 +1426,7 @@ class EngineBatalla extends AEngine {
 
         //al estar en modo batalla los submarinos comienzan a cargar cohetes
 
-        jugador.prepararCohetes();
+
 
         const frames = () => {
 
@@ -1502,6 +1492,7 @@ class EngineBatalla extends AEngine {
 
     onMouseMove(event) {
 
+
         let posicionRCCuadrante = factoryPosicionRCCuadrante.fromEventMouse(event);
 
         if (posicionRCCuadrante === null) {
@@ -1518,7 +1509,6 @@ class EngineBatalla extends AEngine {
             this.canvas.style.cursor = 'default';
             this.posicionEnLaMira = null;
             return;
-
         }
         //salimos porque no hay un jugador en ese cuadrante
         if (gameData.listaJugadores.length < indexCuadrante) {
@@ -1531,7 +1521,6 @@ class EngineBatalla extends AEngine {
         //guardar que posicion estamos apuntando
         this.posicionEnLaMira = posicionRCCuadrante;
         this.canvas.style.cursor = 'crosshair';
-
 
     }
 
@@ -1597,18 +1586,21 @@ class CoheteLocal extends ACohete {
 
         this.callbackAlLanzar = () => {
 
-            console.log( `id ${this.id} coehte lanzado , el submarino es ${this.id_submarino}`);
+            console.log(`allanzar id_cohete ${this.id}, el submarino es ${this.id_submarino}`);
 
             // al lanzar vamos a buscar al submarino que es dueño de  este cohete poara volverlo a mandar
             let submarino = gameData.jugadorLocal.getListaSubmarinos()
                 .find(s => {
-                    return s.id=this.id_submarino;
+                    return s.id === this.id_submarino;
                 })
             ;
 
-            if(submarino){
+            if (submarino) {
                 console.log(`preparar submarino ${id_submarino}`);
-                submarino.prepararCohete();
+                submarino.setNewTiempoCoheteReady();
+                console.log(`nuevo tiempo del submarino ${id_submarino} es ${submarino.tiempoCoheteReady}`);
+
+
             }
 
 
@@ -1897,6 +1889,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190607 19:39');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190607 21:40');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

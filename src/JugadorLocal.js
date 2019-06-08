@@ -3,31 +3,11 @@ class JugadorLocal extends AJugador {
 
     constructor(listaSubmarinos) {
         super(0);
-
         this.listaSubmarinos = listaSubmarinos;
-
-        //asignar los submarinos al jugador actual
-        this.listaSubmarinos
-            .forEach(submarino => {
-                submarino.setJugador(this);
-            })
-        ;
-
-
     }
 
     getListaSubmarinos() {
         return this.listaSubmarinos;
-    }
-
-    prepararCohetes(): void {
-        this.listaSubmarinos
-            .forEach(s => {
-                s.prepararCohete();
-            })
-        ;
-
-
     }
 
     getNumSubmarinos() {

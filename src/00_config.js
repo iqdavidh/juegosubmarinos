@@ -6,7 +6,7 @@ const gameConfig = {
     numSubmarinos: 2,
     numDivisiones: 4,
     wDivision: 2,
-    msPrepararCohete:4000,
+    sPrepararCohete:6,
     velocidadCohete:10,
     resources: {
         imgMar: null,

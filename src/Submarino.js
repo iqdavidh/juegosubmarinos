@@ -1,4 +1,5 @@
 //@flow
+"use strict";
 
 class Submarino {
 
@@ -9,22 +10,15 @@ class Submarino {
         this.posicionRC = posicionRC;
         this.isActivo = true;
 
-        this.jugador = null;
-
-        this.avancePrepararCohete = 0;
-        this.isPrimerDraw = true;
-
-
+        /* al copsntruise se les da 1 segundo para preparar los cohetes*/
+        this.tiempoCoheteReady=gameReloj.tiempo + 1;
     }
 
-    getJugador() {
-        return this.jugador();
+    getIsActivo(){
+        return this.isActivo;
     }
 
-    setJugador(jugador) {
-        this.jugador = jugador;
 
-    }
 
     getPosicionRC(): PosicionRC {
         return this.posicionRC;
@@ -36,61 +30,30 @@ class Submarino {
         const sizeCM = gameCacheSize.getSizeCM();
 
         const x = (this.getPosicionRC().c - 1) * (sizeCM + gameConfig.wDivision) + delta;
-
         const y = (this.getPosicionRC().r - 1) * (sizeCM + gameConfig.wDivision) + delta;
 
         return new Posicion(x, y);
     }
 
-
     recibeImpacto() {
         this.isActivo = false;
-
     }
 
-
-    lanzaCohete(): void {
-
+    ResetTiempoCoheteReady():void{
+        this.tiempoCoheteReady=0;
     }
 
-    prepararCohete(): void {
-
-
-        const numIntervalos = 6;
-        const intervalo = this.isPrimerDraw ? 100 : gameConfig.msPrepararCohete / numIntervalos;
-        this.avancePrepararCohete = 0;
-
-        let idInterval = null;
-
-        let fn = () => {
-
-            this.avancePrepararCohete++;
-
-            console.log(`sub ${this.id}, paso ${this.avancePrepararCohete}`);
-            if (this.avancePrepararCohete >= numIntervalos) {
-
-                console.log(`sub ${this.id} terminado`);
-
-                window.clearInterval(idInterval);
-                const cohete = factoryCohete.jugadorLocal(this);
-                console.log(`cohete creado es ${cohete.id} del sub ${ cohete.id_submarino}`)
-                gameData.jugadorLocal.listaCohetes.push(cohete);
-
-            }
-        };
-
-
-        //ponermos el intervalo al inicio mmuy corto para tener cohetes disponiles
-
-        idInterval = window.setInterval(fn, intervalo);
-
-        this.isPrimerDraw = false;
-
+    setNewTiempoCoheteReady(): void {
+        this.tiempoCoheteReady=gameReloj.getTiempo()+gameConfig.sPrepararCohete;
     }
 
-
+    ToString(){
+        return `sub id:${this.id}, activo:${this.isActivo?'si':'no'},tiempoCoheteReady:${this.tiempoCoheteReady} `;
+    }
 }
 
+
+//esto lo uso para crear los cohetes
 
 const factoryListaSubmarinos = {
 

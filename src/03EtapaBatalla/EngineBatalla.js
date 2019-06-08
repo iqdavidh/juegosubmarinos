@@ -6,13 +6,11 @@ class EngineBatalla extends AEngine {
         super(fnOnContinuar);
 
         this.addEventosMouseAndKeyboard();
-
         this.posicionEnLaMira = null;
-
     }
 
-
     run() {
+
         const ctx = this.ctx;
         const jugador = this.jugadorLocal;
 
@@ -22,7 +20,7 @@ class EngineBatalla extends AEngine {
 
         //al estar en modo batalla los submarinos comienzan a cargar cohetes
 
-        jugador.prepararCohetes();
+
 
         const frames = () => {
 
@@ -88,6 +86,7 @@ class EngineBatalla extends AEngine {
 
     onMouseMove(event) {
 
+
         let posicionRCCuadrante = factoryPosicionRCCuadrante.fromEventMouse(event);
 
         if (posicionRCCuadrante === null) {
@@ -104,7 +103,6 @@ class EngineBatalla extends AEngine {
             this.canvas.style.cursor = 'default';
             this.posicionEnLaMira = null;
             return;
-
         }
         //salimos porque no hay un jugador en ese cuadrante
         if (gameData.listaJugadores.length < indexCuadrante) {
@@ -117,7 +115,6 @@ class EngineBatalla extends AEngine {
         //guardar que posicion estamos apuntando
         this.posicionEnLaMira = posicionRCCuadrante;
         this.canvas.style.cursor = 'crosshair';
-
 
     }
 

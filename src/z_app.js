@@ -112,6 +112,7 @@ const gameController = {
             return true;
         }, 2000);
 
+        gameReloj.start();
         let engine = new EngineBatalla(fnOnContinuar);
         this.engine.batalla = engine;
 
