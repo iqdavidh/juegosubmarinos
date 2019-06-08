@@ -1628,46 +1628,30 @@ const factoryImgRocket = {
         ctxFrame.drawImage(gameConfig.resources.imgRocket, 0, 0,
             wResource, hResource, 0, y, size, hResource * alfa);
 
-        const canvasRot = document.createElement('canvas');
-        canvasRot.width = size;
-        canvasRot.height = size;
-        const ctxRot = canvasRot.getContext('2d');
 
 
-        ctxRot.save();
-        ctxRot.translate(size/2,size/2);
-        ctxRot.rotate(-90*Math.PI/180);
-        ctxRot.drawImage(canvasFrame, -(size/2), -(size/2));
 
 
-        ctx.drawImage(canvasRot, 0, 0,
-            size, size, 0 * size, 0, size, size);
+        //es el cohete rotado en todos los ángulos
+        for (let i = 0; i < 360; i++) {
+
+            const canvasRot = document.createElement('canvas');
+            canvasRot.width = size;
+            canvasRot.height = size;
+            const ctxRot = canvasRot.getContext('2d');
+
+            ctxRot.translate(size / 2, size / 2);
+            ctxRot.rotate(-i * Math.PI / 180);
+            ctxRot.drawImage(canvasFrame, -(size / 2), -(size / 2));
 
 
-        // //es el cohete rotado en todos los ángulos
-        // for (let i = 0; i < 360; i++) {
-        //
-        //     ctxFrame.clearRect(0,0,size,size);
-        //
-        //     if( i%2){
-        //         ctxFrame.fillStyle="#ffffff";
-        //         ctxFrame.fillRect(0,0,size,size);
-        //     }
-        //
-        //
-        //     ctxFrame.drawImage(gameConfig.resources.imgRocket, 0, 0,
-        //         wResource, hResource, 0, y, size, hResource * alfa);
-        //
-        //
-        //     ctxFrame.translate(size/2, size/2);
-        //     ctxFrame.rotate(90*Math.PI/180);
-        //
-        //     //dibujar el cohete en el frame ----------------------
-        //     ctx.drawImage(canvasFrame, 0, 0,
-        //         size, size, i * size, 0, size, size);
-        //
-        //
-        // }
+            ctx.drawImage(canvasRot, 0, 0,
+                size, size, i * size, 0, size, size);
+
+            ctxRot.restore();
+
+
+        }
 
 
         this.cache1 = canvasCache;
@@ -2077,6 +2061,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190608 00:17');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190608 00:21');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
