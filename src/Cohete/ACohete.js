@@ -27,6 +27,11 @@ class ACohete {
         console.log(`cohete lanzado ${this.id}`);
         this.estado = 'lanzado';
         this.posicionFinal = posicionFinal;
+
+        //centrar el cuadrantes
+        this.posicionFinal.x += gameCacheSize.getSizeCM() / 2;
+        this.posicionFinal.y += gameCacheSize.getSizeCM() / 2;
+
         if (this.callbackAlLanzar) {
             this.callbackAlLanzar();
         }

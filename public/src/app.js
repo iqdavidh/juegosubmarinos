@@ -1289,7 +1289,9 @@ const drawBatallaCohetesLocal = {
 
     exe: function (ctx, contadorFrames) {
 
-        ctx.drawImage( gameConfig.resources.imgRocket, 0,0,75,19, 0,0,75,19);
+        //ctx.drawImage( gameConfig.resources.imgRocket, 0,0,75,19, 0,0,75,19);
+
+        ctx.drawImage( factoryImgRocket.getCache1(),0,0);
 
         const listaCohetes = gameData.jugadorLocal.getListaCohetes()
             .filter(c => {
@@ -1583,8 +1585,84 @@ class EngineBatalla extends AEngine {
 //@flow
 "use strict";
 
-const factoryImgRocket={
+const factoryImgRocket = {
 
+
+    fromContadorFrame: function (contador) {
+
+        //TODO poner que cambie de cahce
+        return this.getCache(true);
+    },
+    cache1: null,
+    cache2: null,
+    getCache1() {
+
+        const size = 50;
+
+        if (this.cache1) {
+            return this.cache1;
+        }
+
+        //crear cache solicitado
+        const canvasCache = document.createElement('canvas');
+        canvasCache.width = size * 360;
+        canvasCache.height = size;
+
+        const ctx=canvasCache.getContext('2d');
+
+        const wResource=75;
+        const hResource=19;
+        const alfa= size/wResource;
+
+        //es el cohete rotado en todos los ángulos
+        for (let i = 0; i < 360; i++) {
+            let y = (size-hResource)/2;
+            ctx.drawImage( gameConfig.resources.imgRocket, 0, 0,
+                wResource , hResource, i* size, y, size, hResource * alfa );
+
+        }
+
+
+        this.cache1=canvasCache;
+
+        return this.cache1;
+
+    },
+    getCache2() {
+
+        const size = 20;
+
+        if (this.cache2) {
+            return this.cache2;
+        }
+
+        //crear cache solicitado
+        const canvasCache = document.createElement('canvas');
+        canvasCache.width = size * 360;
+        canvasCache.height = size;
+
+        const ctx=canvasCache.getContext('2d');
+
+
+        const wResource=75;
+        const hResource=19;
+
+        const alfa= size/wResource;
+
+        //es el cohete rotado en todos los ángulos
+        for (let i = 0; i < 360; i++) {
+            let y = (size-hResource)/2;
+            ctx.drawImage( gameConfig.resources.imgRocket, wResource, 0,
+                wResource , hResource, i* size, y, size, hResource * alfa );
+
+        }
+
+
+        this.cache2=canvasCache;
+
+        return this.cache2;
+
+    },
 
 };
 //@flow
@@ -1616,6 +1694,11 @@ class ACohete {
         console.log(`cohete lanzado ${this.id}`);
         this.estado = 'lanzado';
         this.posicionFinal = posicionFinal;
+
+        //centrar el cuadrantes
+        this.posicionFinal.x += gameCacheSize.getSizeCM() / 2;
+        this.posicionFinal.y += gameCacheSize.getSizeCM() / 2;
+
         if (this.callbackAlLanzar) {
             this.callbackAlLanzar();
         }
@@ -1947,6 +2030,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190607 22:34');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190607 23:18');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

@@ -6,7 +6,9 @@ const drawBatallaCohetesLocal = {
 
     exe: function (ctx, contadorFrames:number) {
 
-        ctx.drawImage( gameConfig.resources.imgRocket, 0,0,75,19, 0,0,75,19);
+        //ctx.drawImage( gameConfig.resources.imgRocket, 0,0,75,19, 0,0,75,19);
+
+        ctx.drawImage( factoryImgRocket.getCache1(),0,0);
 
         const listaCohetes = gameData.jugadorLocal.getListaCohetes()
             .filter(c => {
