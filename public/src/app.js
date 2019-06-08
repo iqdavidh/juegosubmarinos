@@ -125,7 +125,7 @@ function loadCanvasAndResources(callback){
     }
 
     function loadRocket(){
-        return loadImage( '/img/Rocket.png');
+        return loadImage( '/img/Rocket150.png');
     }
 
     function loadExplosion(){
@@ -179,13 +179,13 @@ const gameReloj = {
 
         //con estos submarinos construiir cohetes
         listaSubActivos.forEach(s => {
-            console.log('l1' + s.ToString());
+            //console.log('l1' + s.ToString());
             const cohete = factoryCohete.jugadorLocal(s);
 
             gameData.jugadorLocal.listaCohetes.push(cohete);
 
             s.ResetTiempoCoheteReady();
-            console.log('l2' + s.ToString());
+            //console.log('l2' + s.ToString());
         });
 
 
@@ -1284,20 +1284,49 @@ const drawBatallaAllRegions = {
 //@flow
 "use strict";
 
-const drawBatallaAtaque = {
+const drawBatallaCohetesLocal = {
+
+
+    exe: function (ctx, contadorFrames) {
+
+        ctx.drawImage( gameConfig.resources.imgRocket, 0,0,75,19, 0,0,75,19);
+
+        const listaCohetes = gameData.jugadorLocal.getListaCohetes()
+            .filter(c => {
+                return c.getIsEstadoLanzado();
+            });
+
+        //mover los cohetes
+        listaCohetes.forEach(c => {
+            c.mover();
+            console.log('trayectoria');
+
+            //dibujar linea
+            ctx.beginPath();
+            ctx.moveTo(c.getPosicionIni().x, c.getPosicionIni().y);
+            ctx.lineTo(c.getPosicionFinal().x, c.getPosicionFinal().y);
+            ctx.closePath();
+            ctx.stroke();
+
+
+
+        });
+    },
+
+
+
+};
+//@flow
+"use strict";
+
+const drawBatallaContadores = {
 
     exe: function (ctx) {
-
         //para el jugador local
         this.contadorCohetes(ctx);
 
         //local y remoito
         this.contadorSubmarinos(ctx);
-
-
-
-
-
     },
     contadorSubmarinos: function (ctx) {
 
@@ -1405,6 +1434,17 @@ const drawBatallaSubmarinosLocal = {
     }
 };
 //@flow
+"use strict";
+
+const drawBatallaZonasAtacadas={
+
+
+    exe:function(ctx) {
+
+    }
+
+};
+//@flow
 
 class EngineBatalla extends AEngine {
 
@@ -1413,6 +1453,7 @@ class EngineBatalla extends AEngine {
 
         this.addEventosMouseAndKeyboard();
         this.posicionEnLaMira = null;
+
     }
 
     run() {
@@ -1426,7 +1467,7 @@ class EngineBatalla extends AEngine {
 
         //al estar en modo batalla los submarinos comienzan a cargar cohetes
 
-
+        let contadorFrames=0;
 
         const frames = () => {
 
@@ -1435,9 +1476,12 @@ class EngineBatalla extends AEngine {
                 return;
             }
 
+            contadorFrames++;
+
             drawBatallaAllRegions.exe(ctx);
             drawBatallaSubmarinosLocal.exe(ctx);
-            drawBatallaAtaque.exe(ctx);
+            drawBatallaContadores.exe(ctx);
+            drawBatallaCohetesLocal.exe(ctx, contadorFrames);
 
             idFrame = window.requestAnimationFrame(frames);
 
@@ -1539,6 +1583,13 @@ class EngineBatalla extends AEngine {
 //@flow
 "use strict";
 
+const factoryImgRocket={
+
+
+};
+//@flow
+"use strict";
+
 class ACohete {
 
     constructor(posicionIni, id_jugador) {
@@ -1550,7 +1601,7 @@ class ACohete {
         this.estado = 'ready';
         this.velocidad = new Posicion(0, 0, 0);
         this.id_jugador = id_jugador;
-        this.callbackAlLanzar=null;
+        this.callbackAlLanzar = null;
     }
 
     getIsEstadoReady() {
@@ -1565,13 +1616,22 @@ class ACohete {
         console.log(`cohete lanzado ${this.id}`);
         this.estado = 'lanzado';
         this.posicionFinal = posicionFinal;
-        if(this.callbackAlLanzar){
+        if (this.callbackAlLanzar) {
             this.callbackAlLanzar();
         }
     }
 
     mover() {
+        this.posicion.x += this.velocidad.x;
+        this.posicion.y += this.velocidad.y;
+    }
 
+    getPosicionIni() {
+        return this.posicionIni;
+    }
+
+    getPosicionFinal() {
+        return this.posicionFinal;
     }
 }
 //@flow
@@ -1599,8 +1659,6 @@ class CoheteLocal extends ACohete {
                 console.log(`preparar submarino ${id_submarino}`);
                 submarino.setNewTiempoCoheteReady();
                 console.log(`nuevo tiempo del submarino ${id_submarino} es ${submarino.tiempoCoheteReady}`);
-
-
             }
 
 
@@ -1889,6 +1947,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190607 21:45');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190607 22:34');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

@@ -12,7 +12,7 @@ class ACohete {
         this.estado = 'ready';
         this.velocidad = new Posicion(0, 0, 0);
         this.id_jugador = id_jugador;
-        this.callbackAlLanzar=null;
+        this.callbackAlLanzar = null;
     }
 
     getIsEstadoReady() {
@@ -27,12 +27,21 @@ class ACohete {
         console.log(`cohete lanzado ${this.id}`);
         this.estado = 'lanzado';
         this.posicionFinal = posicionFinal;
-        if(this.callbackAlLanzar){
+        if (this.callbackAlLanzar) {
             this.callbackAlLanzar();
         }
     }
 
     mover() {
+        this.posicion.x += this.velocidad.x;
+        this.posicion.y += this.velocidad.y;
+    }
 
+    getPosicionIni(): Posicion {
+        return this.posicionIni;
+    }
+
+    getPosicionFinal(): Posicion {
+        return this.posicionFinal;
     }
 }

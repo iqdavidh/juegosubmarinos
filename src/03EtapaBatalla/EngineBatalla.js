@@ -7,6 +7,7 @@ class EngineBatalla extends AEngine {
 
         this.addEventosMouseAndKeyboard();
         this.posicionEnLaMira = null;
+
     }
 
     run() {
@@ -20,7 +21,7 @@ class EngineBatalla extends AEngine {
 
         //al estar en modo batalla los submarinos comienzan a cargar cohetes
 
-
+        let contadorFrames=0;
 
         const frames = () => {
 
@@ -29,9 +30,12 @@ class EngineBatalla extends AEngine {
                 return;
             }
 
+            contadorFrames++;
+
             drawBatallaAllRegions.exe(ctx);
             drawBatallaSubmarinosLocal.exe(ctx);
-            drawBatallaAtaque.exe(ctx);
+            drawBatallaContadores.exe(ctx);
+            drawBatallaCohetesLocal.exe(ctx, contadorFrames);
 
             idFrame = window.requestAnimationFrame(frames);
 

@@ -49,7 +49,7 @@ function loadCanvasAndResources(callback){
     }
 
     function loadRocket(){
-        return loadImage( '/img/Rocket.png');
+        return loadImage( '/img/Rocket150.png');
     }
 
     function loadExplosion(){

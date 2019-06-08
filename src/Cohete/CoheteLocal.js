@@ -23,8 +23,6 @@ class CoheteLocal extends ACohete {
                 console.log(`preparar submarino ${id_submarino}`);
                 submarino.setNewTiempoCoheteReady();
                 console.log(`nuevo tiempo del submarino ${id_submarino} es ${submarino.tiempoCoheteReady}`);
-
-
             }
 
 
