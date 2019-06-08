@@ -1889,6 +1889,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190607 21:40');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190607 21:45');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
