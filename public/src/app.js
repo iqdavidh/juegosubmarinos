@@ -1291,7 +1291,7 @@ const drawBatallaCohetesLocal = {
 
         //ctx.drawImage( gameConfig.resources.imgRocket, 0,0,75,19, 0,0,75,19);
 
-        ctx.drawImage( factoryImgRocket.getCache1(),0,0);
+        ctx.drawImage( factoryImgRocket.fromContadorFrame(contadorFrames),0,0);
 
         const listaCohetes = gameData.jugadorLocal.getListaCohetes()
             .filter(c => {
@@ -1590,8 +1590,17 @@ const factoryImgRocket = {
 
     fromContadorFrame: function (contador) {
 
+        let contadorSprite= contador % 10;
+
+        if(contadorSprite<5){
+            return this.getCache1();
+        }else{
+            return this.getCache2();
+        }
+
+
         //TODO poner que cambie de cahce
-        return this.getCache(true);
+
     },
     cache1: null,
     cache2: null,
@@ -1661,30 +1670,61 @@ const factoryImgRocket = {
     },
     getCache2() {
 
-        const size = 20;
+        //copy paste de getCache1
+        const size = 50;
 
         if (this.cache2) {
             return this.cache2;
         }
 
-        //crear cache solicitado
+        const canvasFrame = document.createElement('canvas');
+        canvasFrame.width = size;
+        canvasFrame.height = size;
+        const ctxFrame = canvasFrame.getContext('2d');
+
+
+        const wResource = 75;
+        const hResource = 19;
+        const alfa = size / wResource;
+
+
+        let y = (size - hResource) / 2;
+
+
+        //crear cache de todos amgulos -------------------------
         const canvasCache = document.createElement('canvas');
-        canvasCache.width = size * 360;
+        canvasCache.width = size * 359;
         canvasCache.height = size;
 
         const ctx = canvasCache.getContext('2d');
 
 
-        const wResource = 75;
-        const hResource = 19;
+        /*este frame es desplazado del sprint */
+        ctxFrame.drawImage(gameConfig.resources.imgRocket, wResource, 0,
+            wResource, hResource, 0, y, size, hResource * alfa);
 
-        const alfa = size / wResource;
+
+
+
 
         //es el cohete rotado en todos los ángulos
         for (let i = 0; i < 360; i++) {
-            let y = (size - hResource) / 2;
-            ctx.drawImage(gameConfig.resources.imgRocket, wResource, 0,
-                wResource, hResource, i * size, y, size, hResource * alfa);
+
+            const canvasRot = document.createElement('canvas');
+            canvasRot.width = size;
+            canvasRot.height = size;
+            const ctxRot = canvasRot.getContext('2d');
+
+            ctxRot.translate(size / 2, size / 2);
+            ctxRot.rotate(-i * Math.PI / 180);
+            ctxRot.drawImage(canvasFrame, -(size / 2), -(size / 2));
+
+
+            ctx.drawImage(canvasRot, 0, 0,
+                size, size, i * size, 0, size, size);
+
+            ctxRot.restore();
+
 
         }
 
@@ -1692,7 +1732,6 @@ const factoryImgRocket = {
         this.cache2 = canvasCache;
 
         return this.cache2;
-
     },
 
 };
@@ -2061,6 +2100,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190608 00:21');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190608 07:20');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
