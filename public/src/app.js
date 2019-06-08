@@ -3,7 +3,7 @@
 const gameConfig = {
     size: 700,
     deltaSep: 20,
-    numSubmarinos: 2,
+    numSubmarinos: 4,
     numDivisiones: 4,
     wDivision: 2,
     sPrepararCohete:6,
@@ -2221,6 +2221,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190608 09:33');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190608 09:34');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
