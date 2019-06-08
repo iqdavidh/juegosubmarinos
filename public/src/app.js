@@ -61,15 +61,19 @@ const gameCacheSize = {
     }
 };
 
+let consecutivo=0;
 
-function IDGenerator() {
+function IDGenerator(token){
 
+    consecutivo++;
+    return token + consecutivo.toString();
 
-    let _getRandomInt = function (min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    };
-
-    return _getRandomInt(0, 100000) ;
+    //
+    // let _getRandomInt = function (min, max) {
+    //     return Math.floor(Math.random() * (max - min + 1)) + min;
+    // };
+    //
+    // return _getRandomInt(0, 100000) ;
 
 }
 
@@ -130,7 +134,7 @@ function loadCanvasAndResources(callback){
     }
 
     function loadExplosion(){
-        return loadImage( '/img/Explosion.png');
+        return loadImage( '/img/explosion50.png');
     }
 
     Promise.all([
@@ -448,7 +452,7 @@ class Submarino {
 
     constructor(posicionRC) {
 
-        this.id = IDGenerator();
+        this.id = IDGenerator('s');
         this.isOnDrag = false;
         this.posicionRC = posicionRC;
         this.isActivo = true;
@@ -1295,18 +1299,18 @@ const drawBatallaCohetesLocal = {
                 return c.getIsEstadoLanzado();
             });
 
-        //mover los cohetes
 
-
-        const img = factoryImgRocket.fromContadorFrame(contadorFrames);
-
-
+        const imgCohete = factoryImgRocket.fromContadorFrame(contadorFrames);
         const sizeCohete = gameConfig.sizeCohete;
         const mitadSizeCohete = sizeCohete / 2;
 
+        const spritesExplosion = gameConfig.resources.imgExplosion;
+        const sizeExplosion = 50;
+        const mitadSizeExplosion = sizeExplosion / 2;
+
 
         listaCohetes.forEach(c => {
-            c.mover();
+            c.mover(contadorFrames);
             //console.log('trayectoria');
 
             //dibujar linea0
@@ -1317,12 +1321,26 @@ const drawBatallaCohetesLocal = {
             ctx.stroke();
 
             //sacar el sprite
-            let sx = c.getAngulo() * sizeCohete;
-            let x = c.getPosicion().x - mitadSizeCohete;
-            let y = c.getPosicion().y - mitadSizeCohete;
 
 
-            ctx.drawImage(img, sx, 0, sizeCohete, sizeCohete, x, y, sizeCohete, sizeCohete);
+            if (c.getIsObjetivoAlcanzado()) {
+
+
+                let etapa = c.getEtapaExplosion();
+                if (etapa >= 0) {
+                    let x = c.getPosicionFinal().x - mitadSizeExplosion;
+                    let y = c.getPosicionFinal().y - mitadSizeExplosion;
+                    let sx = etapa * sizeExplosion;
+                    ctx.drawImage(spritesExplosion, sx, 0, sizeExplosion, sizeExplosion, x, y, sizeExplosion, sizeExplosion);
+                }
+
+            } else {
+                let x = c.getPosicion().x - mitadSizeCohete;
+                let y = c.getPosicion().y - mitadSizeCohete;
+
+                let sx = c.getAngulo() * sizeCohete;
+                ctx.drawImage(imgCohete, sx, 0, sizeCohete, sizeCohete, x, y, sizeCohete, sizeCohete);
+            }
 
 
         });
@@ -1754,7 +1772,7 @@ const factoryImgRocket = {
 class ACohete {
 
     constructor(posicionIni, id_jugador) {
-        this.id = IDGenerator();
+        this.id = IDGenerator('c');
         this.posicionIni = posicionIni;
         this.posicionFinal = null;
         this.posicion = posicionIni.clonar();
@@ -1766,10 +1784,16 @@ class ACohete {
         this.distancia = 0;
         this.distanciaAvanzada = 0;
 
-        this.duracionExplosion=0;
+        this.etapaExplosion = 0;
+        this.frameIniciaExplosion = 0;
+
 
         this.id_jugador = id_jugador;
         this.callbackAlLanzar = null;
+    }
+
+    getEtapaExplosion() {
+        return this.etapaExplosion;
     }
 
     getIsEstadoReady() {
@@ -1806,7 +1830,7 @@ class ACohete {
 
 
         //la distancia que veremos que avance es menos por que le quitamos las diemnsione sdel sprite
-        this.distancia = distancia -Math.sqrt(gameConfig.sizeCohete** 2 + gameConfig.sizeCohete ** 2)/4;
+        this.distancia = distancia - Math.sqrt(gameConfig.sizeCohete ** 2 + gameConfig.sizeCohete ** 2) / 4;
 
 
         this.velocidad.x = dx / distancia;
@@ -1838,11 +1862,27 @@ class ACohete {
         }
     }
 
-    mover() {
+    mover(contadorFrames) {
 
-        if(this.getIsObjetivoAlcanzado()){
+        if (this.getIsObjetivoAlcanzado()) {
 
-        }else{
+            //actualizar
+            if (this.frameIniciaExplosion === 0) {
+                this.frameIniciaExplosion = contadorFrames;
+            }
+            const duracionFrame = 10;
+
+
+            this.etapaExplosion = Math.floor((contadorFrames - this.frameIniciaExplosion) / duracionFrame);
+
+            if (this.etapaExplosion > 7) {
+                this.estado = 'explotado';
+                this.etapaExplosion=6;
+                return;
+            }
+
+
+        } else {
             this.posicion.x += this.velocidad.x;
             this.posicion.y += this.velocidad.y;
             this.distanciaAvanzada += 1;
@@ -2180,6 +2220,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190608 08:49');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190608 09:31');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

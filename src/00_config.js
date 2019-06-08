@@ -61,15 +61,19 @@ const gameCacheSize = {
     }
 };
 
+let consecutivo=0;
 
-function IDGenerator() {
+function IDGenerator(token) :string{
 
+    consecutivo++;
+    return token + consecutivo.toString();
 
-    let _getRandomInt = function (min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    };
-
-    return _getRandomInt(0, 100000) ;
+    //
+    // let _getRandomInt = function (min, max) {
+    //     return Math.floor(Math.random() * (max - min + 1)) + min;
+    // };
+    //
+    // return _getRandomInt(0, 100000) ;
 
 }
 

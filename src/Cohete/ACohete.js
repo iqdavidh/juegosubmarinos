@@ -4,7 +4,7 @@
 class ACohete {
 
     constructor(posicionIni: Posicion, id_jugador: string) {
-        this.id = IDGenerator();
+        this.id = IDGenerator('c');
         this.posicionIni = posicionIni;
         this.posicionFinal = null;
         this.posicion = posicionIni.clonar();
@@ -16,10 +16,16 @@ class ACohete {
         this.distancia = 0;
         this.distanciaAvanzada = 0;
 
-        this.duracionExplosion=0;
+        this.etapaExplosion = 0;
+        this.frameIniciaExplosion = 0;
+
 
         this.id_jugador = id_jugador;
         this.callbackAlLanzar = null;
+    }
+
+    getEtapaExplosion(): number {
+        return this.etapaExplosion;
     }
 
     getIsEstadoReady(): string {
@@ -56,7 +62,7 @@ class ACohete {
 
 
         //la distancia que veremos que avance es menos por que le quitamos las diemnsione sdel sprite
-        this.distancia = distancia -Math.sqrt(gameConfig.sizeCohete** 2 + gameConfig.sizeCohete ** 2)/4;
+        this.distancia = distancia - Math.sqrt(gameConfig.sizeCohete ** 2 + gameConfig.sizeCohete ** 2) / 4;
 
 
         this.velocidad.x = dx / distancia;
@@ -88,11 +94,27 @@ class ACohete {
         }
     }
 
-    mover(): void {
+    mover(contadorFrames: number): void {
 
-        if(this.getIsObjetivoAlcanzado()){
+        if (this.getIsObjetivoAlcanzado()) {
 
-        }else{
+            //actualizar
+            if (this.frameIniciaExplosion === 0) {
+                this.frameIniciaExplosion = contadorFrames;
+            }
+            const duracionFrame = 10;
+
+
+            this.etapaExplosion = Math.floor((contadorFrames - this.frameIniciaExplosion) / duracionFrame);
+
+            if (this.etapaExplosion > 7) {
+                this.estado = 'explotado';
+                this.etapaExplosion=6;
+                return;
+            }
+
+
+        } else {
             this.posicion.x += this.velocidad.x;
             this.posicion.y += this.velocidad.y;
             this.distanciaAvanzada += 1;
