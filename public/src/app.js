@@ -3,8 +3,8 @@
 const gameConfig = {
     size: 700,
     deltaSep: 20,
-    numSubmarinos: 8,
-    numDivisiones: 6,
+    numSubmarinos: 2,
+    numDivisiones: 4,
     wDivision: 2,
     msPrepararCohete:4000,
     velocidadCohete:10,
@@ -63,23 +63,13 @@ const gameCacheSize = {
 
 function IDGenerator() {
 
-    let length = 8;
-    let timestamp = new Date;
 
     let _getRandomInt = function (min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     };
 
-    let ts = timestamp.toString();
-    let parts = ts.split("").reverse();
-    let id = "";
+    return _getRandomInt(0, 100000) ;
 
-    for (let i = 0; i < length; ++i) {
-        let index = _getRandomInt(0, parts.length - 1);
-        id += parts[index];
-    }
-
-    return id;
 }
 
 
@@ -435,7 +425,6 @@ class Submarino {
 
         this.jugador = null;
 
-        this.cohete = null;
         this.avancePrepararCohete = 0;
         this.isPrimerDraw = true;
 
@@ -449,10 +438,6 @@ class Submarino {
     setJugador(jugador) {
         this.jugador = jugador;
 
-    }
-
-    getIsCoheteListo() {
-        return this.cohete !== null;
     }
 
     getPosicionRC() {
@@ -474,7 +459,7 @@ class Submarino {
 
     recibeImpacto() {
         this.isActivo = false;
-        this.isCoheteListo = false;
+
     }
 
 
@@ -482,16 +467,8 @@ class Submarino {
 
     }
 
-    onCoheteListo(cohete) {
-
-    }
-
-
     prepararCohete() {
 
-        if (this.cohete !== null && this.cohete.getIsEstadoReady()) {
-            return;
-        }
 
         const numIntervalos = 6;
         const intervalo = this.isPrimerDraw ? 100 : gameConfig.msPrepararCohete / numIntervalos;
@@ -500,13 +477,18 @@ class Submarino {
         let idInterval = null;
 
         let fn = () => {
+
             this.avancePrepararCohete++;
 
+            console.log(`sub ${this.id}, paso ${this.avancePrepararCohete}`);
             if (this.avancePrepararCohete >= numIntervalos) {
 
+                console.log(`sub ${this.id} terminado`);
+
                 window.clearInterval(idInterval);
-                this.cohete = factoryCohete.jugadorLocal(this);
-                gameData.jugadorLocal.listaCohetes.push(this.cohete);
+                const cohete = factoryCohete.jugadorLocal(this);
+                console.log(`cohete creado es ${cohete.id} del sub ${ cohete.id_submarino}`)
+                gameData.jugadorLocal.listaCohetes.push(cohete);
 
             }
         };
@@ -1591,6 +1573,7 @@ class ACohete {
     }
 
     lanzar(posicionFinal) {
+        console.log(`cohete lanzado ${this.id}`);
         this.estado = 'lanzado';
         this.posicionFinal = posicionFinal;
         if(this.callbackAlLanzar){
@@ -1614,7 +1597,7 @@ class CoheteLocal extends ACohete {
 
         this.callbackAlLanzar = () => {
 
-            console.log('lanzado');
+            console.log( `id ${this.id} coehte lanzado , el submarino es ${this.id_submarino}`);
 
             // al lanzar vamos a buscar al submarino que es dueño de  este cohete poara volverlo a mandar
             let submarino = gameData.jugadorLocal.getListaSubmarinos()
@@ -1623,10 +1606,8 @@ class CoheteLocal extends ACohete {
                 })
             ;
 
-
-
             if(submarino){
-                console.log('preparar');
+                console.log(`preparar submarino ${id_submarino}`);
                 submarino.prepararCohete();
             }
 
@@ -1916,6 +1897,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190607 18:44');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190607 19:39');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

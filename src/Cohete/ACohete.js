@@ -24,6 +24,7 @@ class ACohete {
     }
 
     lanzar(posicionFinal: Posicion) {
+        console.log(`cohete lanzado ${this.id}`);
         this.estado = 'lanzado';
         this.posicionFinal = posicionFinal;
         if(this.callbackAlLanzar){

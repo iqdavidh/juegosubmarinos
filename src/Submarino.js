@@ -11,7 +11,6 @@ class Submarino {
 
         this.jugador = null;
 
-        this.cohete = null;
         this.avancePrepararCohete = 0;
         this.isPrimerDraw = true;
 
@@ -25,10 +24,6 @@ class Submarino {
     setJugador(jugador) {
         this.jugador = jugador;
 
-    }
-
-    getIsCoheteListo(): boolean {
-        return this.cohete !== null;
     }
 
     getPosicionRC(): PosicionRC {
@@ -50,7 +45,7 @@ class Submarino {
 
     recibeImpacto() {
         this.isActivo = false;
-        this.isCoheteListo = false;
+
     }
 
 
@@ -58,16 +53,8 @@ class Submarino {
 
     }
 
-    onCoheteListo(cohete: CoheteLocal) {
-
-    }
-
-
     prepararCohete(): void {
 
-        if (this.cohete !== null && this.cohete.getIsEstadoReady()) {
-            return;
-        }
 
         const numIntervalos = 6;
         const intervalo = this.isPrimerDraw ? 100 : gameConfig.msPrepararCohete / numIntervalos;
@@ -76,13 +63,18 @@ class Submarino {
         let idInterval = null;
 
         let fn = () => {
+
             this.avancePrepararCohete++;
 
+            console.log(`sub ${this.id}, paso ${this.avancePrepararCohete}`);
             if (this.avancePrepararCohete >= numIntervalos) {
 
+                console.log(`sub ${this.id} terminado`);
+
                 window.clearInterval(idInterval);
-                this.cohete = factoryCohete.jugadorLocal(this);
-                gameData.jugadorLocal.listaCohetes.push(this.cohete);
+                const cohete = factoryCohete.jugadorLocal(this);
+                console.log(`cohete creado es ${cohete.id} del sub ${ cohete.id_submarino}`)
+                gameData.jugadorLocal.listaCohetes.push(cohete);
 
             }
         };
