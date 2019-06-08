@@ -10,6 +10,7 @@ const gameData = {
     listaCohetes: [],
     listaMsgSocket: [],
     estado: null,
+    listaZonasAtacadas:[],
     isResourcesLoaded: false,
     isCanvasLoaded: false
 };

@@ -1,20 +1,14 @@
 //@flow
 "use strict";
 
-const drawBatallaAtaque = {
+const drawBatallaContadores = {
 
     exe: function (ctx) {
-
         //para el jugador local
         this.contadorCohetes(ctx);
 
         //local y remoito
         this.contadorSubmarinos(ctx);
-
-
-
-
-
     },
     contadorSubmarinos: function (ctx) {
 

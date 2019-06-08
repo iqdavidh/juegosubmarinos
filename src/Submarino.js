@@ -5,7 +5,7 @@ class Submarino {
 
     constructor(posicionRC) {
 
-        this.id = IDGenerator();
+        this.id = IDGenerator('s');
         this.isOnDrag = false;
         this.posicionRC = posicionRC;
         this.isActivo = true;

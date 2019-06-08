@@ -3,11 +3,12 @@
 const gameConfig = {
     size: 700,
     deltaSep: 20,
-    numSubmarinos: 2,
+    numSubmarinos: 4,
     numDivisiones: 4,
     wDivision: 2,
     sPrepararCohete:6,
     velocidadCohete:10,
+    sizeCohete:50,
     resources: {
         imgMar: null,
         imgBullet:null ,
@@ -60,15 +61,19 @@ const gameCacheSize = {
     }
 };
 
+let consecutivo=0;
 
-function IDGenerator() {
+function IDGenerator(token){
 
+    consecutivo++;
+    return token + consecutivo.toString();
 
-    let _getRandomInt = function (min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    };
-
-    return _getRandomInt(0, 100000) ;
+    //
+    // let _getRandomInt = function (min, max) {
+    //     return Math.floor(Math.random() * (max - min + 1)) + min;
+    // };
+    //
+    // return _getRandomInt(0, 100000) ;
 
 }
 
@@ -125,11 +130,11 @@ function loadCanvasAndResources(callback){
     }
 
     function loadRocket(){
-        return loadImage( '/img/Rocket.png');
+        return loadImage( '/img/Rocket150.png');
     }
 
     function loadExplosion(){
-        return loadImage( '/img/Explosion.png');
+        return loadImage( '/img/explosion50.png');
     }
 
     Promise.all([
@@ -179,13 +184,13 @@ const gameReloj = {
 
         //con estos submarinos construiir cohetes
         listaSubActivos.forEach(s => {
-            console.log('l1' + s.ToString());
+            //console.log('l1' + s.ToString());
             const cohete = factoryCohete.jugadorLocal(s);
 
             gameData.jugadorLocal.listaCohetes.push(cohete);
 
             s.ResetTiempoCoheteReady();
-            console.log('l2' + s.ToString());
+            //console.log('l2' + s.ToString());
         });
 
 
@@ -324,6 +329,27 @@ class AJugador {
        return factoryPosicionRCCuadrante.getOrigenCuadrante(this.indexCuadrante);
     }
 }
+//@flow
+"use strict";
+
+const factoryZonaAtacada = {
+    exe: function (posicionRCC, idCohete) {
+
+        const isSubmarino = null;
+        const id = IDGenerator('zona');
+        const indexJugador = posicionRCC.getIndexCuadrante();
+        const isObjetivoAlcanzado = false;
+
+        return {
+            id,
+            idCohete,
+            isObjetivoAlcanzado,
+            indexJugador,
+            posicionRCC,
+            isSubmarino
+        };
+    }
+};
 /* @flow */
 class JugadorLocal extends AJugador {
 
@@ -365,6 +391,11 @@ class JugadorLocal extends AJugador {
             let posicionAbs = posicionEnLaMira.getPosAbs();
 
             cohete.lanzar(posicionAbs);
+
+            //agreagamos la zona atacada
+            
+            let zonaAtacada=factoryZonaAtacada.exe(posicionEnLaMira, cohete.id);
+            gameData.listaZonasAtacadas.push(zonaAtacada);
 
         }
 
@@ -447,7 +478,7 @@ class Submarino {
 
     constructor(posicionRC) {
 
-        this.id = IDGenerator();
+        this.id = IDGenerator('s');
         this.isOnDrag = false;
         this.posicionRC = posicionRC;
         this.isActivo = true;
@@ -546,6 +577,7 @@ const gameData = {
     listaCohetes: [],
     listaMsgSocket: [],
     estado: null,
+    listaZonasAtacadas:[],
     isResourcesLoaded: false,
     isCanvasLoaded: false
 };
@@ -1284,20 +1316,77 @@ const drawBatallaAllRegions = {
 //@flow
 "use strict";
 
-const drawBatallaAtaque = {
+const drawBatallaCohetesLocal = {
+
+    isShowTrayectoria: false,
+
+    exe: function (ctx, contadorFrames) {
+
+        const listaCohetes = gameData.jugadorLocal.getListaCohetes()
+            .filter(c => {
+                return c.getIsEstadoLanzado();
+            });
+
+
+        const imgCohete = factoryImgRocket.fromContadorFrame(contadorFrames);
+        const sizeCohete = gameConfig.sizeCohete;
+        const mitadSizeCohete = sizeCohete / 2;
+
+        const spritesExplosion = gameConfig.resources.imgExplosion;
+        const sizeExplosion = 50;
+        const mitadSizeExplosion = sizeExplosion / 2;
+
+
+        listaCohetes.forEach(c => {
+            c.mover(contadorFrames);
+            //console.log('trayectoria');
+
+            //dibujar linea0
+            if (this.isShowTrayectoria) {
+                ctx.beginPath();
+                ctx.moveTo(c.getPosicionIni().x, c.getPosicionIni().y);
+                ctx.lineTo(c.getPosicionFinal().x, c.getPosicionFinal().y);
+                ctx.closePath();
+                ctx.stroke();
+            }
+
+            //sacar el sprite
+
+            if (c.getIsObjetivoAlcanzado()) {
+
+                let etapa = c.getEtapaExplosion();
+                if (etapa >= 0) {
+                    let x = c.getPosicionFinal().x - mitadSizeExplosion;
+                    let y = c.getPosicionFinal().y - mitadSizeExplosion;
+                    let sx = etapa * sizeExplosion;
+                    ctx.drawImage(spritesExplosion, sx, 0, sizeExplosion, sizeExplosion, x, y, sizeExplosion, sizeExplosion);
+                }
+
+            } else {
+                let x = c.getPosicion().x - mitadSizeCohete;
+                let y = c.getPosicion().y - mitadSizeCohete;
+
+                let sx = c.getAngulo() * sizeCohete;
+                ctx.drawImage(imgCohete, sx, 0, sizeCohete, sizeCohete, x, y, sizeCohete, sizeCohete);
+            }
+
+
+        });
+    },
+
+
+};
+//@flow
+"use strict";
+
+const drawBatallaContadores = {
 
     exe: function (ctx) {
-
         //para el jugador local
         this.contadorCohetes(ctx);
 
         //local y remoito
         this.contadorSubmarinos(ctx);
-
-
-
-
-
     },
     contadorSubmarinos: function (ctx) {
 
@@ -1405,6 +1494,43 @@ const drawBatallaSubmarinosLocal = {
     }
 };
 //@flow
+"use strict";
+
+const drawBatallaZonasAtacadas = {
+
+
+    exe: function (ctx) {
+
+
+        const sizeCM = gameCacheSize.getSizeCM();
+
+        //recorreer todas las zonas para ver cuales estan ya definidas
+        const lista = gameData.listaZonasAtacadas
+            .filter(z => {
+                return z.isObjetivoAlcanzado === true;
+            });
+
+        //con cada zona hacer el dibujo
+        lista.forEach(zona => {
+
+            const posicion = zona.posicionRCC.getPosAbs();
+
+            //dibujar zona en negro
+
+            ctx.fillStyle = 'rgba(0,0,0,0.4)';
+            ctx.fillRect(posicion.x, posicion.y, sizeCM, sizeCM);
+
+
+            if (zona.isSubmarino === true) {
+                //TODO si hay un submarino dibujarlo
+            }
+
+        });
+
+    }
+
+};
+//@flow
 
 class EngineBatalla extends AEngine {
 
@@ -1413,6 +1539,7 @@ class EngineBatalla extends AEngine {
 
         this.addEventosMouseAndKeyboard();
         this.posicionEnLaMira = null;
+
     }
 
     run() {
@@ -1426,7 +1553,7 @@ class EngineBatalla extends AEngine {
 
         //al estar en modo batalla los submarinos comienzan a cargar cohetes
 
-
+        let contadorFrames=0;
 
         const frames = () => {
 
@@ -1435,9 +1562,14 @@ class EngineBatalla extends AEngine {
                 return;
             }
 
+            contadorFrames++;
+
             drawBatallaAllRegions.exe(ctx);
             drawBatallaSubmarinosLocal.exe(ctx);
-            drawBatallaAtaque.exe(ctx);
+            drawBatallaContadores.exe(ctx);
+            drawBatallaZonasAtacadas.exe(ctx);
+
+            drawBatallaCohetesLocal.exe(ctx, contadorFrames);
 
             idFrame = window.requestAnimationFrame(frames);
 
@@ -1518,7 +1650,27 @@ class EngineBatalla extends AEngine {
         }
 
 
-        //guardar que posicion estamos apuntando
+        //validar que no sea una zona atacada anteriormetne --------------------------------
+        const zonaAtacada= gameData.listaZonasAtacadas.find( z=>{
+
+            const p=z.posicionRCC;
+
+            return  p.getIndexCuadrante()=== posicionRCCuadrante.getIndexCuadrante() &&
+                    p.getR() === posicionRCCuadrante.getR() &&
+                    p.getC() === posicionRCCuadrante.getC() &&
+                    z.isObjetivoAlcanzado === true
+        });
+
+        if(zonaAtacada){
+            this.canvas.style.cursor = 'default';
+            this.posicionEnLaMira = null;
+            return;
+        }
+
+
+
+
+        // poscion valida para atacar - guardar que posicion estamos apuntando ------------
         this.posicionEnLaMira = posicionRCCuadrante;
         this.canvas.style.cursor = 'crosshair';
 
@@ -1539,18 +1691,185 @@ class EngineBatalla extends AEngine {
 //@flow
 "use strict";
 
+const factoryImgRocket = {
+
+
+    fromContadorFrame: function (contador) {
+
+        let contadorSprite= contador % 10;
+
+        if(contadorSprite<5){
+            return this.getCache1();
+        }else{
+            return this.getCache2();
+        }
+
+
+        //TODO poner que cambie de cahce
+
+    },
+    cache1: null,
+    cache2: null,
+    getCache1() {
+
+        const sizeCohete = gameConfig.sizeCohete;
+
+        if (this.cache1) {
+            return this.cache1;
+        }
+
+        const canvasFrame = document.createElement('canvas');
+        canvasFrame.width = sizeCohete;
+        canvasFrame.height = sizeCohete;
+        const ctxFrame = canvasFrame.getContext('2d');
+
+
+        const wResource = 75;
+        const hResource = 19;
+        const alfa = sizeCohete / wResource;
+
+
+        let y = (sizeCohete - hResource) / 2;
+
+
+        //crear cache de todos amgulos -------------------------
+        const canvasCache = document.createElement('canvas');
+
+        //son 359 porque 360=0
+        canvasCache.width = sizeCohete * 359;
+        canvasCache.height = sizeCohete;
+
+        const ctx = canvasCache.getContext('2d');
+
+
+        ctxFrame.drawImage(gameConfig.resources.imgRocket, 0, 0,
+            wResource, hResource, 0, y, sizeCohete, hResource * alfa);
+
+
+
+
+
+        //es el cohete rotado en todos los ángulos
+        for (let i = 0; i < 360; i++) {
+
+            const canvasRot = document.createElement('canvas');
+            canvasRot.width = sizeCohete;
+            canvasRot.height = sizeCohete;
+            const ctxRot = canvasRot.getContext('2d');
+
+            ctxRot.translate(sizeCohete / 2, sizeCohete / 2);
+            ctxRot.rotate(-i * Math.PI / 180);
+            ctxRot.drawImage(canvasFrame, -(sizeCohete / 2), -(sizeCohete / 2));
+
+
+            ctx.drawImage(canvasRot, 0, 0,
+                sizeCohete, sizeCohete, i * sizeCohete, 0, sizeCohete, sizeCohete);
+
+            ctxRot.restore();
+
+        }
+
+
+        this.cache1 = canvasCache;
+
+        return this.cache1;
+
+    },
+    getCache2() {
+
+        //copy paste de getCache1
+        const size = 50;
+
+        if (this.cache2) {
+            return this.cache2;
+        }
+
+        const canvasFrame = document.createElement('canvas');
+        canvasFrame.width = size;
+        canvasFrame.height = size;
+        const ctxFrame = canvasFrame.getContext('2d');
+
+
+        const wResource = 75;
+        const hResource = 19;
+        const alfa = size / wResource;
+
+
+        let y = (size - hResource) / 2;
+
+
+        //crear cache de todos amgulos -------------------------
+        const canvasCache = document.createElement('canvas');
+        canvasCache.width = size * 359;
+        canvasCache.height = size;
+
+        const ctx = canvasCache.getContext('2d');
+
+
+        /*este frame es desplazado del sprint */
+        ctxFrame.drawImage(gameConfig.resources.imgRocket, wResource, 0,
+            wResource, hResource, 0, y, size, hResource * alfa);
+
+
+
+
+
+        //es el cohete rotado en todos los ángulos
+        for (let i = 0; i < 360; i++) {
+
+            const canvasRot = document.createElement('canvas');
+            canvasRot.width = size;
+            canvasRot.height = size;
+            const ctxRot = canvasRot.getContext('2d');
+
+            ctxRot.translate(size / 2, size / 2);
+            ctxRot.rotate(-i * Math.PI / 180);
+            ctxRot.drawImage(canvasFrame, -(size / 2), -(size / 2));
+
+
+            ctx.drawImage(canvasRot, 0, 0,
+                size, size, i * size, 0, size, size);
+
+            ctxRot.restore();
+
+
+        }
+
+
+        this.cache2 = canvasCache;
+
+        return this.cache2;
+    },
+
+};
+//@flow
+"use strict";
+
 class ACohete {
 
     constructor(posicionIni, id_jugador) {
-        this.id = IDGenerator();
+        this.id = IDGenerator('c');
         this.posicionIni = posicionIni;
         this.posicionFinal = null;
         this.posicion = posicionIni.clonar();
 
         this.estado = 'ready';
         this.velocidad = new Posicion(0, 0, 0);
+        this.angulo = null;
+
+        this.distancia = 0;
+        this.distanciaAvanzada = 0;
+
+        this.etapaExplosion = 0;
+        this.frameIniciaExplosion = 0;
+
+
         this.id_jugador = id_jugador;
-        this.callbackAlLanzar=null;
+        this.callbackAlLanzar = null;
+    }
+
+    getEtapaExplosion() {
+        return this.etapaExplosion;
     }
 
     getIsEstadoReady() {
@@ -1561,17 +1880,114 @@ class ACohete {
         return this.estado === 'lanzado';
     }
 
+    getAngulo() {
+        return this.angulo;
+    }
+
     lanzar(posicionFinal) {
         console.log(`cohete lanzado ${this.id}`);
         this.estado = 'lanzado';
         this.posicionFinal = posicionFinal;
-        if(this.callbackAlLanzar){
+
+        //centrar el cuadrantes
+        this.posicionFinal.x += gameCacheSize.getSizeCM() / 2;
+        this.posicionFinal.y += gameCacheSize.getSizeCM() / 2;
+
+
+        //definir velocidades y angulo -----------------------
+
+        const dx = this.posicionFinal.x - this.posicionIni.x;
+
+        /*el sitema de coordenadas en y esta invertido, por eso es negativo*/
+        const dy = -(this.posicionFinal.y - this.posicionIni.y);
+
+
+        const distancia = Math.sqrt(dx ** 2 + dy ** 2);
+
+
+        //la distancia que veremos que avance es menos por que le quitamos las diemnsione sdel sprite
+        this.distancia = distancia - Math.sqrt(gameConfig.sizeCohete ** 2 + gameConfig.sizeCohete ** 2) / 4;
+
+
+        this.velocidad.x = dx / distancia;
+
+        //como y es un eje invertido la velocidad debe ser con negativo
+        this.velocidad.y = -dy / distancia;
+
+        this.angulo = Math.atan(dy / dx);
+
+        //conversion a grados
+        this.angulo = this.angulo * (180 / Math.PI);
+
+        //redondear para usar cache de grados integeer
+        this.angulo = Math.round(this.angulo);
+
+
+        //TODO revisarlo cuando los disparos son haciua abajo
+        if (this.angulo < 0 && this.angulo > -180) {
+            //console.log(`angulo ${this.angulo}`);
+            this.angulo = 180 + this.angulo;
+        }
+
+        //console.log(`angulo ${this.angulo}`);
+
+        //----------------------------------------------------
+
+        if (this.callbackAlLanzar) {
             this.callbackAlLanzar();
         }
     }
 
-    mover() {
+    mover(contadorFrames) {
 
+        if (this.getIsObjetivoAlcanzado()) {
+
+            //actualizar
+            if (this.frameIniciaExplosion === 0) {
+                this.frameIniciaExplosion = contadorFrames;
+            }
+            const duracionFrame = 10;
+
+
+            this.etapaExplosion = Math.floor((contadorFrames - this.frameIniciaExplosion) / duracionFrame);
+
+            if (this.etapaExplosion >= 7) {
+                this.estado = 'explotado';
+                this.etapaExplosion=6;
+
+                //poner que ya se alcanzo el objetivo
+                const zona = gameData.listaZonasAtacadas
+                    .find( z=>{
+                        return z.idCohete === this.id;
+                    });
+                //esta propiedad es la que se usa para draw
+                zona.isObjetivoAlcanzado=true;
+            }
+
+
+        } else {
+            this.posicion.x += this.velocidad.x;
+            this.posicion.y += this.velocidad.y;
+            this.distanciaAvanzada += 1;
+        }
+
+    }
+
+    getIsObjetivoAlcanzado() {
+        return this.distanciaAvanzada >= this.distancia;
+    }
+
+
+    getPosicionIni() {
+        return this.posicionIni;
+    }
+
+    getPosicionFinal() {
+        return this.posicionFinal;
+    }
+
+    getPosicion() {
+        return this.posicion;
     }
 }
 //@flow
@@ -1599,8 +2015,6 @@ class CoheteLocal extends ACohete {
                 console.log(`preparar submarino ${id_submarino}`);
                 submarino.setNewTiempoCoheteReady();
                 console.log(`nuevo tiempo del submarino ${id_submarino} es ${submarino.tiempoCoheteReady}`);
-
-
             }
 
 
@@ -1889,6 +2303,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190607 21:45');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190608 10:25');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

@@ -33,13 +33,13 @@ const gameReloj = {
 
         //con estos submarinos construiir cohetes
         listaSubActivos.forEach(s => {
-            console.log('l1' + s.ToString());
+            //console.log('l1' + s.ToString());
             const cohete = factoryCohete.jugadorLocal(s);
 
             gameData.jugadorLocal.listaCohetes.push(cohete);
 
             s.ResetTiempoCoheteReady();
-            console.log('l2' + s.ToString());
+            //console.log('l2' + s.ToString());
         });
 
 
