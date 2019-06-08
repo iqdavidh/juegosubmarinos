@@ -3,6 +3,7 @@
 
 const drawBatallaCohetesLocal = {
 
+    isShowTrayectoria: false,
 
     exe: function (ctx, contadorFrames: number) {
 
@@ -26,17 +27,17 @@ const drawBatallaCohetesLocal = {
             //console.log('trayectoria');
 
             //dibujar linea0
-            ctx.beginPath();
-            ctx.moveTo(c.getPosicionIni().x, c.getPosicionIni().y);
-            ctx.lineTo(c.getPosicionFinal().x, c.getPosicionFinal().y);
-            ctx.closePath();
-            ctx.stroke();
+            if (this.isShowTrayectoria) {
+                ctx.beginPath();
+                ctx.moveTo(c.getPosicionIni().x, c.getPosicionIni().y);
+                ctx.lineTo(c.getPosicionFinal().x, c.getPosicionFinal().y);
+                ctx.closePath();
+                ctx.stroke();
+            }
 
             //sacar el sprite
 
-
             if (c.getIsObjetivoAlcanzado()) {
-
 
                 let etapa = c.getEtapaExplosion();
                 if (etapa >= 0) {
