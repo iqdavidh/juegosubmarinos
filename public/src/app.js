@@ -329,6 +329,27 @@ class AJugador {
        return factoryPosicionRCCuadrante.getOrigenCuadrante(this.indexCuadrante);
     }
 }
+//@flow
+"use strict";
+
+const factoryZonaAtacada = {
+    exe: function (posicionRCC, idCohete) {
+
+        const isSubmarino = null;
+        const id = IDGenerator('zona');
+        const indexJugador = posicionRCC.getIndexCuadrante();
+        const isObjetivoAlcanzado = false;
+
+        return {
+            id,
+            idCohete,
+            isObjetivoAlcanzado,
+            indexJugador,
+            posicionRCC,
+            isSubmarino
+        };
+    }
+};
 /* @flow */
 class JugadorLocal extends AJugador {
 
@@ -370,6 +391,11 @@ class JugadorLocal extends AJugador {
             let posicionAbs = posicionEnLaMira.getPosAbs();
 
             cohete.lanzar(posicionAbs);
+
+            //agreagamos la zona atacada
+            
+            let zonaAtacada=factoryZonaAtacada.exe(posicionEnLaMira, cohete.id);
+            gameData.listaZonasAtacadas.push(zonaAtacada);
 
         }
 
@@ -551,6 +577,7 @@ const gameData = {
     listaCohetes: [],
     listaMsgSocket: [],
     estado: null,
+    listaZonasAtacadas:[],
     isResourcesLoaded: false,
     isCanvasLoaded: false
 };
@@ -1469,10 +1496,36 @@ const drawBatallaSubmarinosLocal = {
 //@flow
 "use strict";
 
-const drawBatallaZonasAtacadas={
+const drawBatallaZonasAtacadas = {
 
 
-    exe:function(ctx) {
+    exe: function (ctx) {
+
+
+        const sizeCM = gameCacheSize.getSizeCM();
+
+        //recorreer todas las zonas para ver cuales estan ya definidas
+        const lista = gameData.listaZonasAtacadas
+            .filter(z => {
+                return z.isObjetivoAlcanzado === true;
+            });
+
+        //con cada zona hacer el dibujo
+        lista.forEach(zona => {
+
+            const posicion = zona.posicionRCC.getPosAbs();
+
+            //dibujar zona en negro
+
+            ctx.fillStyle = 'rgba(0,0,0,0.4)';
+            ctx.fillRect(posicion.x, posicion.y, sizeCM, sizeCM);
+
+
+            if (zona.isSubmarino === true) {
+                //TODO si hay un submarino dibujarlo
+            }
+
+        });
 
     }
 
@@ -1514,6 +1567,8 @@ class EngineBatalla extends AEngine {
             drawBatallaAllRegions.exe(ctx);
             drawBatallaSubmarinosLocal.exe(ctx);
             drawBatallaContadores.exe(ctx);
+            drawBatallaZonasAtacadas.exe(ctx);
+
             drawBatallaCohetesLocal.exe(ctx, contadorFrames);
 
             idFrame = window.requestAnimationFrame(frames);
@@ -1876,10 +1931,17 @@ class ACohete {
 
             this.etapaExplosion = Math.floor((contadorFrames - this.frameIniciaExplosion) / duracionFrame);
 
-            if (this.etapaExplosion > 7) {
+            if (this.etapaExplosion >= 7) {
                 this.estado = 'explotado';
                 this.etapaExplosion=6;
-                return;
+
+                //poner que ya se alcanzo el objetivo
+                const zona = gameData.listaZonasAtacadas
+                    .find( z=>{
+                        return z.idCohete === this.id;
+                    });
+                //esta propiedad es la que se usa para draw
+                zona.isObjetivoAlcanzado=true;
             }
 
 
@@ -2221,6 +2283,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190608 09:34');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190608 10:17');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

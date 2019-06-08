@@ -107,10 +107,17 @@ class ACohete {
 
             this.etapaExplosion = Math.floor((contadorFrames - this.frameIniciaExplosion) / duracionFrame);
 
-            if (this.etapaExplosion > 7) {
+            if (this.etapaExplosion >= 7) {
                 this.estado = 'explotado';
                 this.etapaExplosion=6;
-                return;
+
+                //poner que ya se alcanzo el objetivo
+                const zona = gameData.listaZonasAtacadas
+                    .find( z=>{
+                        return z.idCohete === this.id;
+                    });
+                //esta propiedad es la que se usa para draw
+                zona.isObjetivoAlcanzado=true;
             }
 
 
