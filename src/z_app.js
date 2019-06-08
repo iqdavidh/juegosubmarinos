@@ -15,8 +15,15 @@ const gameData = {
 };
 
 
-loadCanvasAndResources((imgMar) => {
+loadCanvasAndResources((imgMar, imgBullet, imgTanque
+    , imgTanqueDest, imgRocket, imgExplosion
+) => {
     gameConfig.resources.imgMar = imgMar;
+    gameConfig.resources.imgBullet = imgBullet;
+    gameConfig.resources.imgTanque = imgTanque;
+    gameConfig.resources.imgTanqueDest = imgTanqueDest;
+    gameConfig.resources.imgRocket = imgRocket;
+    gameConfig.resources.imgExplosion = imgExplosion;
 });
 
 
@@ -40,10 +47,15 @@ const gameController = {
 
         } else {
 
-            loadCanvasAndResources((imgMar) => {
+
+            //se verifica si estan cargadoir
+            loadCanvasAndResources((imgMar, imgBullet, imgTanque) => {
                 gameConfig.resources.imgMar = imgMar;
+                gameConfig.resources.imgBullet = imgBullet;
+                gameConfig.resources.imgTanque = imgTanque;
                 this.runConfirmarPosiciones();
             });
+
 
         }
     },
@@ -79,7 +91,7 @@ const gameController = {
         this.engine.esperarParticipantes.run();
 
     },
-    runBatalla: function () {
+    runBatalla: async function () {
         console.log('runBatalla');
         gameData.estado = gameEstado.Batalla;
 
@@ -96,10 +108,15 @@ const gameController = {
 
         };
 
-        this.engine.batalla = new EngineBatalla(fnOnContinuar);
+        let pausa = await setTimeout(() => {
+            return true;
+        }, 2000);
 
-        setTimeout(this.engine.batalla.run, 2000);
+        gameReloj.start();
+        let engine = new EngineBatalla(fnOnContinuar);
+        this.engine.batalla = engine;
 
+        engine.run();
 
     },
     runTerminoBatalla: function () {

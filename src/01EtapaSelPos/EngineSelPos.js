@@ -228,6 +228,7 @@ class EngineSelPos extends AEngine {
         }
 
         this.isRunning = false;
+        this.jugadorLocal.isPosicionConfirmada=true;
         this.removeEventosMouseAndKeyBoard();
         this.fnOnContinuar();
 

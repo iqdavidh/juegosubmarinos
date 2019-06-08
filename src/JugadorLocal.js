@@ -3,20 +3,10 @@ class JugadorLocal extends AJugador {
 
     constructor(listaSubmarinos) {
         super(0);
-
         this.listaSubmarinos = listaSubmarinos;
-
-        //asignar los submarinos al jugador actual
-        this.listaSubmarinos
-            .forEach(submarino => {
-                submarino.setJugador(this);
-            })
-        ;
-
-
     }
 
-    getListaSubmarinos(){
+    getListaSubmarinos() {
         return this.listaSubmarinos;
     }
 
@@ -37,13 +27,29 @@ class JugadorLocal extends AJugador {
         return numCoheteListo;
     }
 
+    lanzaCohete(posicionEnLaMira: PosicionRCCuadrante) {
+
+        //buscar un cohete que este en estado ready
+        const cohete = this.getListaCohetes()
+            .find(s => {
+                return s.getIsEstadoReady();
+            });
+
+        if (cohete) {
+            let posicionAbs = posicionEnLaMira.getPosAbs();
+
+            cohete.lanzar(posicionAbs);
+
+        }
+
+    }
 }
 
 
 const factoryJugador = {
     local: function () {
         let listaSubmarinos = factoryListaSubmarinos.random();
-        return new JugadorLocal( listaSubmarinos);
+        return new JugadorLocal(listaSubmarinos);
     },
     remoto: function (index) {
 

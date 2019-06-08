@@ -3,11 +3,18 @@
 const gameConfig = {
     size: 700,
     deltaSep: 20,
-    numSubmarinos: 8,
-    numDivisiones: 6,
+    numSubmarinos: 2,
+    numDivisiones: 4,
     wDivision: 2,
+    sPrepararCohete:6,
+    velocidadCohete:10,
     resources: {
-        imgMar: null
+        imgMar: null,
+        imgBullet:null ,
+        imgTanque:null,
+        imgTanqueDest:null,
+        imgRocket:null,
+        imgExplosion:null
     }
 };
 
@@ -56,23 +63,13 @@ const gameCacheSize = {
 
 function IDGenerator() {
 
-    let length = 8;
-    let timestamp = new Date;
 
     let _getRandomInt = function (min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     };
 
-    let ts = timestamp.toString();
-    let parts = ts.split("").reverse();
-    let id = "";
+    return _getRandomInt(0, 100000) ;
 
-    for (let i = 0; i < length; ++i) {
-        let index = _getRandomInt(0, parts.length - 1);
-        id += parts[index];
-    }
-
-    return id;
 }
 
 

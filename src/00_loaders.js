@@ -12,9 +12,6 @@ function loadImage(url) {
 
 
 
-function loadImages(){
-    return loadImage('/img/mar1.png')
-}
 
 function loadCanvasAndResources(callback){
 
@@ -34,11 +31,39 @@ function loadCanvasAndResources(callback){
 
     /* precargar archivos *************************** */
 
+
+    function loadMar(){
+        return loadImage('/img/mar1.png')
+    }
+
+    function loadBullet(){
+        return loadImage( '/img/Bullet.png');
+    }
+
+    function loadTanque(){
+        return loadImage( '/img/tanque.png');
+    }
+
+    function loadTanqueDestruido(){
+        return loadImage( '/img/tanque_destruido.png');
+    }
+
+    function loadRocket(){
+        return loadImage( '/img/Rocket.png');
+    }
+
+    function loadExplosion(){
+        return loadImage( '/img/Explosion.png');
+    }
+
     Promise.all([
-            loadImages()
+            loadMar(),loadBullet(), loadTanque(),
+            loadTanqueDestruido(), loadRocket(),loadExplosion()
         ]
-    ).then(([imgMar]) => {
-        callback(imgMar);
+    ).then(([imgMar, imgBullet, imgTanque,
+                           imgTanqueDest, imgRocket, imgExplosion]) => {
+        callback(imgMar, imgBullet, imgTanque
+            , imgTanqueDest, imgRocket, imgExplosion);
         gameConfig.isResourcesLoaded = true;
     });
 

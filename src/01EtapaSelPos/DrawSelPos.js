@@ -4,14 +4,13 @@ const drawSelPos = {
 
     drawSubmarino: function (ctx, submarino: Submarino) {
 
-        const origen = submarino.jugador.getOrigenFromIndex();
-        const delta = gameConfig.deltaSep;
-
-        const origenMar = new Posicion(origen.x + delta, origen.y + delta);
+        const origen = gameData.jugadorLocal.getOrigenFromIndex();
         const sizeCM = gameCacheSize.getSizeCM();
 
-        const x = origenMar.x + (submarino.getPosicionRC().c - 1) * (sizeCM + gameConfig.wDivision);
-        const y = origenMar.y + (submarino.getPosicionRC().r - 1) * (sizeCM + gameConfig.wDivision);
+        const posRel=submarino.getPosicionXYRel();
+
+        const x = origen.x + posRel.x;
+        const y = origen.y + posRel.y;
 
         //se dibuja diferente si esta en drag
         if( submarino.isOnDrag){
@@ -118,7 +117,7 @@ const drawSelPos = {
         }
 
         /* el cache de texto */
-        ctxCache.font = '19px monospace';
+        ctxCache.font = '18px monospace';
         ctxCache.fillStyle = "rgba(200, 200, 200, 0.7)";
         ctxCache.fillText('SUBMARINOS', sizeMar - 112, 16);
 
