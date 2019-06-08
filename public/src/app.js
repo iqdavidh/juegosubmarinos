@@ -1650,7 +1650,27 @@ class EngineBatalla extends AEngine {
         }
 
 
-        //guardar que posicion estamos apuntando
+        //validar que no sea una zona atacada anteriormetne --------------------------------
+        const zonaAtacada= gameData.listaZonasAtacadas.find( z=>{
+
+            const p=z.posicionRCC;
+
+            return  p.getIndexCuadrante()=== posicionRCCuadrante.getIndexCuadrante() &&
+                    p.getR() === posicionRCCuadrante.getR() &&
+                    p.getC() === posicionRCCuadrante.getC() &&
+                    z.isObjetivoAlcanzado === true
+        });
+
+        if(zonaAtacada){
+            this.canvas.style.cursor = 'default';
+            this.posicionEnLaMira = null;
+            return;
+        }
+
+
+
+
+        // poscion valida para atacar - guardar que posicion estamos apuntando ------------
         this.posicionEnLaMira = posicionRCCuadrante;
         this.canvas.style.cursor = 'crosshair';
 
@@ -2283,6 +2303,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190608 10:17');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190608 10:25');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
