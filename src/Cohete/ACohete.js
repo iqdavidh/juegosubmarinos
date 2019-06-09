@@ -127,7 +127,7 @@ class ACohete {
                 this.frameIniciaExplosion = contadorFrames;
                 //mandar mensaje de explosion si es local
             }
-            const duracionFrame = 10;
+            const duracionFrame = 7;
 
 
             this.etapaExplosion = Math.floor((contadorFrames - this.frameIniciaExplosion) / duracionFrame);

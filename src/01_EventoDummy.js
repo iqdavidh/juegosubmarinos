@@ -29,7 +29,7 @@ let EventoDummy = {
             )
         ;
 
-        let msg = factoryMensajeSocket.JugadorConfirma(this.token, j.id);
+        let msg = factoryMensajeSocket.JugadorConfirma(j.id);
 
 
         gameController.onRecibirMensajeSocket(msg);
@@ -63,7 +63,6 @@ let EventoDummy = {
     simularJugadorRemotoAtaca: function () {
 
         let id = gameData.listaJugadores[0].id;
-        let token = gameData.tokenRoom;
 
 
         //ver que no sea una zona atacada
@@ -79,14 +78,31 @@ let EventoDummy = {
         let r = 1;
         let c = numAtaques + 1;
 
-        if(c>4){
-            c=numAtaques-3;
+        if (c > 4) {
+            c = numAtaques - 3;
             r++;
         }
 
+        let id_jugador_recibe_ataque = gameData.jugadorLocal.id;
 
-        let msg = factoryMensajeSocket.LanzaCohete(token, id, 0, r, c)
+        let msg = factoryMensajeSocket.LanzaCohete(id, id_jugador_recibe_ataque, r, c);
         gameController.onRecibirMensajeSocket(msg);
 
-    }
+    },
+    simularJ1RecibeAtaque: function (r, c, isSubmarino: false) {
+
+
+        let id = gameData.listaJugadores[0].id;
+
+        const jugador1 = gameData.listaJugadores
+            .find(j => {
+                return j.id === id;
+            });
+
+
+        let msg = factoryMensajeSocket.ResultadoAtaque(id, r, c, isSubmarino, false);
+        gameController.onRecibirMensajeSocket(msg);
+    },
+
+
 };

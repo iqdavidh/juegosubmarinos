@@ -16,6 +16,7 @@ const drawBatallaZonasAtacadas = {
             });
 
         //con cada zona hacer el dibujo
+
         lista.forEach(zona => {
 
             const posicion = zona.posicionRCC.getPosAbs();
@@ -27,7 +28,8 @@ const drawBatallaZonasAtacadas = {
 
 
             if (zona.isSubmarino === true) {
-                //TODO si hay un submarino dibujarlo
+                let imgSubmarino=  gameConfig.resources.imgTanqueDest;
+                ctx.drawImage(imgSubmarino, 0, 0, 100, 100, posicion.x , posicion.y, sizeCM, sizeCM);
             }
 
         });
