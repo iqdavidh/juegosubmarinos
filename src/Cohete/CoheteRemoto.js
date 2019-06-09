@@ -58,7 +58,7 @@ class CoheteRemoto extends ACohete {
                 //buscar si el submarino tiene un cohete ready y quitarlos
                 let coheteLocal = gameData.jugadorLocal.listaCohetes
                     .find(c => {
-                        return c.id_submarino === submarino.id;
+                        return c.id_submarino === submarino.id && c.getIsEstadoReady();
                     });
 
                 if (coheteLocal) {
