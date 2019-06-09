@@ -268,14 +268,25 @@ let EventoDummy = {
         //ver que no sea una zona atacada
         let lista = gameData.listaZonasAtacadas
             .filter(z => {
-                return z.id_jugador
+                return z.indexCuadrante === 0;
             })
         ;
 
-        let r = 0;
-        let c = 0;
+        let numAtaques = lista.length;
+
+
+        let r = 1;
+        let c = numAtaques + 1;
+
+        if(c>4){
+            c=1;
+            r++;
+        }
+
 
         let msg = factoryMensajeSocket.LanzaCohete(token, id, 0, r, c)
+        gameController.onRecibirMensajeSocket(msg);
+
     }
 };
 // @flow
@@ -322,8 +333,9 @@ class AEngine {
 class AJugador {
 
     constructor(indexCuadrante) {
-        this.indexCuadrante = indexCuadrante;
+
         this.id = IDGenerator('player');
+        this.indexCuadrante = indexCuadrante;
         this.isPosicionConfirmada = false;
 
         this.getIsLocal = () => {
@@ -450,6 +462,23 @@ class JugadorRemoto extends AJugador {
         return this.numSubmarinos;
     }
 
+    lanzaCohete(indexCuadrante, r, c) {
+
+        //el cohete remoto solo necesito del jugador, alli sle su punto de inicio siempre
+        const cohete = new CoheteRemoto(this);
+
+        gameData.listaCohetes.push(cohete);
+
+
+        let posicionRC = new PosicionRC(r, c);
+        let posicionEnLaMira = new PosicionRCCuadrante(indexCuadrante, posicionRC);
+        let posicionAbs = posicionEnLaMira.getPosAbs();
+        cohete.lanzar(posicionAbs);
+
+        let zonaAtacada = factoryZonaAtacada.exe(posicionEnLaMira, cohete.id, this.id);
+
+        gameData.listaZonasAtacadas.push(zonaAtacada);
+    }
 
 }
 
@@ -457,7 +486,7 @@ class JugadorRemoto extends AJugador {
 const factoryJugadorRemoto = {
     fromMsgJugadorIngresa: function (mensaje) {
 
-        let numJugador=gameData.listaJugadores.length +1 ;
+        let numJugador = gameData.listaJugadores.length + 1;
 
         return new JugadorRemoto(numJugador)
     }
@@ -1341,12 +1370,8 @@ const drawBatallaCohetesLocal = {
 
     isShowTrayectoria: false,
 
-    exe: function (ctx, contadorFrames) {
+    exe: function (ctx, contadorFrames ,listaCohetes) {
 
-        const listaCohetes = gameData.jugadorLocal.getListaCohetes()
-            .filter(c => {
-                return c.getIsEstadoLanzado();
-            });
 
 
         const imgCohete = factoryImgRocket.fromContadorFrame(contadorFrames);
@@ -1590,7 +1615,27 @@ class EngineBatalla extends AEngine {
             drawBatallaContadores.exe(ctx);
             drawBatallaZonasAtacadas.exe(ctx);
 
-            drawBatallaCohetesLocal.exe(ctx, contadorFrames);
+
+            //Los cohete local
+            const listaCohetesLocal = gameData.jugadorLocal.getListaCohetes()
+                .filter(c => {
+                    return c.getIsEstadoLanzado();
+                });
+
+            drawBatallaCohetesLocal.exe(ctx, contadorFrames, listaCohetesLocal);
+
+
+            //Los cohetes dreotos
+            const listaCohetesRemoto = gameData.listaCohetes
+                .filter(c => {
+                    return c.getIsEstadoLanzado();
+                });
+
+            drawBatallaCohetesLocal.exe(ctx, contadorFrames, listaCohetesRemoto);
+
+
+
+
 
             idFrame = window.requestAnimationFrame(frames);
 
@@ -1707,6 +1752,24 @@ class EngineBatalla extends AEngine {
         return sub;
     }
 
+    onJugadorRemotoLanzaCohete( id_jugador, indexCuadrante, r, c){
+
+        let jugadorRemoto= gameData.listaJugadores
+            .find( j=>{
+                return j.id=== id_jugador;
+        });
+
+        if(jugadorRemoto=== undefined || jugadorRemoto === null){
+            console.log('no se eocntro el jugador ' + id_jugador);
+        }
+
+        //con el jugador encontrado atacar
+        jugadorRemoto.lanzaCohete( indexCuadrante, r,c);
+
+
+
+
+    }
 }
 
 //@flow
@@ -2045,6 +2108,43 @@ class CoheteLocal extends ACohete {
 
 }
 
+
+//@flow
+"use strict";
+
+class CoheteRemoto extends ACohete {
+
+
+    constructor(jugador) {
+
+        //poner del origen en el centro del mar
+
+        const origen=factoryPosicionRCCuadrante.getOrigenCuadrante(jugador.indexCuadrante);
+
+        origen.x+=gameCacheSize.getSizeRegion()/2;
+        origen.y+=gameCacheSize.getSizeRegion()/2;
+
+
+
+        super(origen, jugador.id);
+
+
+        //inmediatametne se cra se lanza
+
+
+        this.callbackAlLanzar = () => {
+            console.log(`player ataca id_cohete ${this.id}, el jugador es ${this.id}`);
+        }
+
+    }
+
+}
+
+
+//@flow
+"use strict";
+
+
 const factoryCohete = {
     jugadorLocal: function (submarino) {
 
@@ -2065,10 +2165,9 @@ const factoryCohete = {
 
         return new CoheteLocal(posicionCentroCohete, jugador.id, submarino.id);
 
-
     }
-};
 
+};
 
 /* @flow */
 const tipoMsgSocket = {
@@ -2123,6 +2222,9 @@ const proRecibirMsgSocket = {
         } else if (msg.tipo === tipoMsgSocket.confirma_posiciones) {
             this.jugador_confirma_posicion(jugador)
 
+        } else if (msg.tipo === tipoMsgSocket.lanza_cohete) {
+            this.lanza_cohete(msg)
+
         } else {
             alert("no esperamos este tipo de mensaje " + msg.tipo)
         }
@@ -2133,6 +2235,7 @@ const proRecibirMsgSocket = {
 
     },
     jugador_confirma_posicion: function (jugador) {
+
         jugador.setPosicionConfirmada();
 
         //notificar al controller - si no esta en la etapa de espera
@@ -2140,6 +2243,17 @@ const proRecibirMsgSocket = {
         if (gameController.engine.esperarParticipantes) {
             gameController.engine.esperarParticipantes.onJugadorRemotoConfirma();
         }
+
+    },
+    lanza_cohete: function (msg) {
+
+        //si es el mensaje del jugador local no hacemos nada
+        if(msg.id_jugador === gameData.jugadorLocal.id){
+            return ;
+        }
+
+        gameController.engine.batalla.onJugadorRemotoLanzaCohete(msg.id_jugador, msg.indexCuadrante, msg.r, msg.c);
+
 
     },
     getJugadorFromId: function (id_jugador) {
@@ -2232,6 +2346,7 @@ const factoryPosicionRCCuadrante = {
 
         return this.fromXY(x, y);
     },
+
     fromXY: function (x, y) {
 
         //paso 1 determinar el cuadrante
@@ -2324,6 +2439,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190608 21:04');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190608 22:39');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

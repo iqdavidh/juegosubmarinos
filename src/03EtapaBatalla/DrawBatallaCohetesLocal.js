@@ -5,12 +5,8 @@ const drawBatallaCohetesLocal = {
 
     isShowTrayectoria: false,
 
-    exe: function (ctx, contadorFrames: number) {
+    exe: function (ctx, contadorFrames: number ,listaCohetes :Array<ACohete>) {
 
-        const listaCohetes = gameData.jugadorLocal.getListaCohetes()
-            .filter(c => {
-                return c.getIsEstadoLanzado();
-            });
 
 
         const imgCohete = factoryImgRocket.fromContadorFrame(contadorFrames);

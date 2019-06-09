@@ -44,6 +44,7 @@ const factoryPosicionRCCuadrante = {
 
         return this.fromXY(x, y);
     },
+
     fromXY: function (x, y) {
 
         //paso 1 determinar el cuadrante

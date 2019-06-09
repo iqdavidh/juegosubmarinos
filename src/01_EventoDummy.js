@@ -69,13 +69,24 @@ let EventoDummy = {
         //ver que no sea una zona atacada
         let lista = gameData.listaZonasAtacadas
             .filter(z => {
-                return z.id_jugador
+                return z.indexCuadrante === 0;
             })
         ;
 
-        let r = 0;
-        let c = 0;
+        let numAtaques = lista.length;
+
+
+        let r = 1;
+        let c = numAtaques + 1;
+
+        if(c>4){
+            c=1;
+            r++;
+        }
+
 
         let msg = factoryMensajeSocket.LanzaCohete(token, id, 0, r, c)
+        gameController.onRecibirMensajeSocket(msg);
+
     }
 };
