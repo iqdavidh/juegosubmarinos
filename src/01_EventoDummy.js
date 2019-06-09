@@ -147,35 +147,6 @@ let EventoDummy = {
         }
 
     },
-    simularJugadorRemotoAtaca: function () {
-
-        let id = gameData.listaJugadores[0].id;
-
-
-        //ver que no sea una zona atacada
-        let lista = gameData.listaZonasAtacadas
-            .filter(z => {
-                return z.indexCuadrante === 0;
-            })
-        ;
-
-        let numAtaques = lista.length;
-
-
-        let r = 1;
-        let c = numAtaques + 1;
-
-        if (c > 4) {
-            c = numAtaques - 3;
-            r++;
-        }
-
-        let id_jugador_recibe_ataque = gameData.jugadorLocal.id;
-
-        let msg = factoryMensajeSocket.LanzaCohete(id, id_jugador_recibe_ataque, r, c);
-        gameController.onRecibirMensajeSocket(msg);
-
-    },
     simularJ1RecibeAtaque: function (r, c, isSubmarino: false) {
 
 
@@ -190,6 +161,35 @@ let EventoDummy = {
         let msg = factoryMensajeSocket.ResultadoAtaque(id, r, c, isSubmarino, false);
         gameController.onRecibirMensajeSocket(msg);
     },
+    j1Recibe:function(){
+        return this._rRecibe(1);
+    },
+    j2Recibe:function(){
+        return this._rRecibe(2);
+    },
+    j3Recibe:function(){
+        return this._rRecibe(3);
+    },
+    j4Recibe:function(){
+        return this._rRecibe(4);
+    },
+    j5Recibe:function(){
+        return this._rRecibe(5);
+    },
+    _rRecibe:function(indexCuadrante:number){
 
+        let id = gameData.listaJugadores.find( j=>{
+            return j.indexCuadrante === indexCuadrante
+        }).id;
+
+
+        let msg = factoryMensajeSocket.ResultadoAtaque(id, 1, 1, false, false);
+        gameController.onRecibirMensajeSocket(msg);
+
+        msg = factoryMensajeSocket.ResultadoAtaque(id, 2, 2, true, false);
+        gameController.onRecibirMensajeSocket(msg);
+
+
+    }
 
 };

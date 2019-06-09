@@ -346,35 +346,6 @@ let EventoDummy = {
         }
 
     },
-    simularJugadorRemotoAtaca: function () {
-
-        let id = gameData.listaJugadores[0].id;
-
-
-        //ver que no sea una zona atacada
-        let lista = gameData.listaZonasAtacadas
-            .filter(z => {
-                return z.indexCuadrante === 0;
-            })
-        ;
-
-        let numAtaques = lista.length;
-
-
-        let r = 1;
-        let c = numAtaques + 1;
-
-        if (c > 4) {
-            c = numAtaques - 3;
-            r++;
-        }
-
-        let id_jugador_recibe_ataque = gameData.jugadorLocal.id;
-
-        let msg = factoryMensajeSocket.LanzaCohete(id, id_jugador_recibe_ataque, r, c);
-        gameController.onRecibirMensajeSocket(msg);
-
-    },
     simularJ1RecibeAtaque: function (r, c, isSubmarino) {
 
 
@@ -389,7 +360,36 @@ let EventoDummy = {
         let msg = factoryMensajeSocket.ResultadoAtaque(id, r, c, isSubmarino, false);
         gameController.onRecibirMensajeSocket(msg);
     },
+    j1Recibe:function(){
+        return this._rRecibe(1);
+    },
+    j2Recibe:function(){
+        return this._rRecibe(2);
+    },
+    j3Recibe:function(){
+        return this._rRecibe(3);
+    },
+    j4Recibe:function(){
+        return this._rRecibe(4);
+    },
+    j5Recibe:function(){
+        return this._rRecibe(5);
+    },
+    _rRecibe:function(indexCuadrante){
 
+        let id = gameData.listaJugadores.find( j=>{
+            return j.indexCuadrante === indexCuadrante
+        }).id;
+
+
+        let msg = factoryMensajeSocket.ResultadoAtaque(id, 1, 1, false, false);
+        gameController.onRecibirMensajeSocket(msg);
+
+        msg = factoryMensajeSocket.ResultadoAtaque(id, 2, 2, true, false);
+        gameController.onRecibirMensajeSocket(msg);
+
+
+    }
 
 };
 // @flow
@@ -1256,6 +1256,125 @@ class EngineSelPos extends AEngine {
 }
 
 
+/*@flow*/
+
+const drawEsperar = {
+
+
+    oscurecer: (ctx, fnCallback) => {
+
+        let numPasos = 100;
+        let indexFrame = 0;
+
+        let key = null;
+        const framesOscurecer = () => {
+
+            indexFrame++;
+
+            ctx.fillStyle = `rgba(0, 0, 0, 0.02)`;
+            ctx.fillRect(0, 0, gameConfig.size, gameConfig.size);
+
+            if (indexFrame < numPasos) {
+                key = window.requestAnimationFrame(framesOscurecer);
+            } else {
+                ctx.fillStyle = "rgb(0,0,0)";
+                ctx.fillRect(0, 0, gameConfig.size, gameConfig.size);
+                window.cancelAnimationFrame(key);
+                fnCallback();
+            }
+
+        };
+
+        framesOscurecer();
+
+    },
+
+
+    actualizarTextoEspera: (ctx, numJugadores, numConfirmados) => {
+
+        /* no es una animación solo se pintan los textos despues de poner pondo negro*/
+
+        let idFrame=null;
+        /*Fondo negro*/
+        function frame(){
+
+            console.log( `jugadore-confirmados ${numJugadores},${numConfirmados}`);
+            ctx.fillStyle = `rgb(0, 0, 0)`;
+            ctx.fillRect(0, 0, gameConfig.size, gameConfig.size);
+
+
+            let textoTop = 'Esperando a los demás jugadores';
+            //textos
+            let texto = `${numConfirmados} de ${numJugadores} han confirmado posiciones`;
+
+            ctx.fillStyle = "rgb(255, 255, 0)";
+            ctx.font = '28px monospace';
+            ctx.fillText(textoTop, (gameConfig.size - 476) / 2, 150);
+            ctx.fillText(texto, (gameConfig.size - 465) / 2, gameConfig.size / 2);
+
+        }
+
+        frame();
+
+    }
+
+};
+/* @flow */
+
+class EngineEsperar extends AEngine {
+
+    constructor(fnOnContinuar) {
+
+        super(fnOnContinuar);
+
+
+        this.estado = '';
+    }
+
+    run() {
+        const ctx = this.ctx;
+        const jugador = this.jugadorLocal;
+        const listaJugadores = gameData.listaJugadores;
+
+        this.isRunning = true;
+
+        //Fase 1 oscurecer la ultima vista
+
+        let fnCallback = () => {
+            //actulizar texto de jugadores confirmados
+            this.onJugadorRemotoConfirma();
+        };
+
+        this.estado = 'oscurecer';
+
+        drawEsperar.oscurecer(ctx, fnCallback);
+    }
+
+    onJugadorRemotoConfirma() {
+        const ctx = this.ctx;
+        let numJugadores = gameData.listaJugadores.length;
+
+        let numConfirmados = gameData.listaJugadores
+            .filter(j => {
+                return j.isPosicionConfirmada;
+            }).length;
+
+        if (this.estado !== 'saliendo') {
+            //poner el texto caundots jugadores estan confirmados
+            drawEsperar.actualizarTextoEspera(ctx, numJugadores, numConfirmados);
+        }
+
+        if (numJugadores === numConfirmados) {
+            this.estado = 'saliendo';
+            setTimeout(this.fnOnContinuar, 2000);
+        }
+
+
+
+
+    }
+
+}
 //@flow
 "use strict";
 
@@ -1928,125 +2047,6 @@ const factoryImgRocket = {
     },
 
 };
-/*@flow*/
-
-const drawEsperar = {
-
-
-    oscurecer: (ctx, fnCallback) => {
-
-        let numPasos = 100;
-        let indexFrame = 0;
-
-        let key = null;
-        const framesOscurecer = () => {
-
-            indexFrame++;
-
-            ctx.fillStyle = `rgba(0, 0, 0, 0.02)`;
-            ctx.fillRect(0, 0, gameConfig.size, gameConfig.size);
-
-            if (indexFrame < numPasos) {
-                key = window.requestAnimationFrame(framesOscurecer);
-            } else {
-                ctx.fillStyle = "rgb(0,0,0)";
-                ctx.fillRect(0, 0, gameConfig.size, gameConfig.size);
-                window.cancelAnimationFrame(key);
-                fnCallback();
-            }
-
-        };
-
-        framesOscurecer();
-
-    },
-
-
-    actualizarTextoEspera: (ctx, numJugadores, numConfirmados) => {
-
-        /* no es una animación solo se pintan los textos despues de poner pondo negro*/
-
-        let idFrame=null;
-        /*Fondo negro*/
-        function frame(){
-
-            console.log( `jugadore-confirmados ${numJugadores},${numConfirmados}`);
-            ctx.fillStyle = `rgb(0, 0, 0)`;
-            ctx.fillRect(0, 0, gameConfig.size, gameConfig.size);
-
-
-            let textoTop = 'Esperando a los demás jugadores';
-            //textos
-            let texto = `${numConfirmados} de ${numJugadores} han confirmado posiciones`;
-
-            ctx.fillStyle = "rgb(255, 255, 0)";
-            ctx.font = '28px monospace';
-            ctx.fillText(textoTop, (gameConfig.size - 476) / 2, 150);
-            ctx.fillText(texto, (gameConfig.size - 465) / 2, gameConfig.size / 2);
-
-        }
-
-        frame();
-
-    }
-
-};
-/* @flow */
-
-class EngineEsperar extends AEngine {
-
-    constructor(fnOnContinuar) {
-
-        super(fnOnContinuar);
-
-
-        this.estado = '';
-    }
-
-    run() {
-        const ctx = this.ctx;
-        const jugador = this.jugadorLocal;
-        const listaJugadores = gameData.listaJugadores;
-
-        this.isRunning = true;
-
-        //Fase 1 oscurecer la ultima vista
-
-        let fnCallback = () => {
-            //actulizar texto de jugadores confirmados
-            this.onJugadorRemotoConfirma();
-        };
-
-        this.estado = 'oscurecer';
-
-        drawEsperar.oscurecer(ctx, fnCallback);
-    }
-
-    onJugadorRemotoConfirma() {
-        const ctx = this.ctx;
-        let numJugadores = gameData.listaJugadores.length;
-
-        let numConfirmados = gameData.listaJugadores
-            .filter(j => {
-                return j.isPosicionConfirmada;
-            }).length;
-
-        if (this.estado !== 'saliendo') {
-            //poner el texto caundots jugadores estan confirmados
-            drawEsperar.actualizarTextoEspera(ctx, numJugadores, numConfirmados);
-        }
-
-        if (numJugadores === numConfirmados) {
-            this.estado = 'saliendo';
-            setTimeout(this.fnOnContinuar, 2000);
-        }
-
-
-
-
-    }
-
-}
 //@flow
 "use strict";
 
@@ -2768,6 +2768,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190609 13:56');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190609 14:05');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
