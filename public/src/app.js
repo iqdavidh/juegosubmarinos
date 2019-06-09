@@ -239,10 +239,10 @@ let EventoDummy = {
         this.iniciar2Jugadores();
         this.confirmaJugadorRemoto();
         // //confirma jugador local
-         let fn = () => {
-             gameController.engine.selpos.onKeyDow({code: "Enter"});
-         };
-         setTimeout(fn, 1000);
+        let fn = () => {
+            gameController.engine.selpos.onKeyDow({code: "Enter"});
+        };
+        setTimeout(fn, 1000);
 
     },
 
@@ -251,12 +251,31 @@ let EventoDummy = {
 
 
         let msg = {
-            id_jugador: 3000,
+            id_jugador: 'player-dumy2',
             token: this.token
         };
 
         let jugador3 = factoryJugadorRemoto.fromMsgJugadorIngresa(msg);
         gameData.listaJugadores.push(jugador3);
+    },
+
+    simularJugadorRemotoAtaca: function () {
+
+        let id = gameData.listaJugadores[0].id;
+        let token = gameData.tokenRoom;
+
+
+        //ver que no sea una zona atacada
+        let lista = gameData.listaZonasAtacadas
+            .filter(z => {
+                return z.id_jugador
+            })
+        ;
+
+        let r = 0;
+        let c = 0;
+
+        let msg = factoryMensajeSocket.LanzaCohete(token, id, 0, r, c)
     }
 };
 // @flow
@@ -304,7 +323,7 @@ class AJugador {
 
     constructor(indexCuadrante) {
         this.indexCuadrante = indexCuadrante;
-        this.id = parseInt(Math.random() * 100000);
+        this.id = IDGenerator('player');
         this.isPosicionConfirmada = false;
 
         this.getIsLocal = () => {
@@ -333,18 +352,19 @@ class AJugador {
 "use strict";
 
 const factoryZonaAtacada = {
-    exe: function (posicionRCC, idCohete) {
+    exe: function (posicionRCC, idCohete, id_jugador) {
 
         const isSubmarino = null;
         const id = IDGenerator('zona');
-        const indexJugador = posicionRCC.getIndexCuadrante();
+        const indexCuadrante = posicionRCC.getIndexCuadrante();
         const isObjetivoAlcanzado = false;
 
         return {
             id,
             idCohete,
             isObjetivoAlcanzado,
-            indexJugador,
+            indexCuadrante,
+            id_jugador,
             posicionRCC,
             isSubmarino
         };
@@ -394,7 +414,7 @@ class JugadorLocal extends AJugador {
 
             //agreagamos la zona atacada
             
-            let zonaAtacada=factoryZonaAtacada.exe(posicionEnLaMira, cohete.id);
+            let zonaAtacada=factoryZonaAtacada.exe(posicionEnLaMira, cohete.id , gameData.jugadorLocal.id);
             gameData.listaZonasAtacadas.push(zonaAtacada);
 
         }
@@ -603,6 +623,7 @@ const gameController = {
         batalla: null
     },
     onRegistroSocket: function (token) {
+
         gameData.tokenRoom = token;
         gameData.jugadorLocal = factoryJugador.local();
 
@@ -2049,18 +2070,6 @@ const factoryCohete = {
 };
 
 
-//@flow
-
-const configTipoMensaje = {
-    JugadorIngresa:'JugadorIngresa',
-    JugadorSale:'JugadorSale',
-    IniciarBatalla: 'IniciarBatalla',
-    LanzarCohete:'LanzarCohete',
-    ResultadoAtaque:'ResultadoAtaque',
-    Rendicion:'Rendicion',
-    TerminoBatalla:'TerminoBatalla'
-};
-
 /* @flow */
 const tipoMsgSocket = {
     ingresa: 'ingresa',
@@ -2080,12 +2089,24 @@ const factoryMensajeSocket = {
             tipo: tipoMsgSocket.ingresa
         };
     },
-    JugadorConfirma: function (token, id_jugador) {
+    JugadorConfirma: function (token, id_jugador ) {
         return {
             id_jugador,
             token,
             tipo: tipoMsgSocket.confirma_posiciones
         }
+    },
+    LanzaCohete :function(  token , id_jugador,  indexCuadrante, r, c){
+
+        return {
+            id_jugador,
+            token,
+            tipo: tipoMsgSocket.lanza_cohete,
+            indexCuadrante : indexCuadrante ,
+            r:r,
+            c:c
+        }
+
     }
 };
 /* @flow */
@@ -2093,7 +2114,7 @@ const factoryMensajeSocket = {
 const proRecibirMsgSocket = {
     exe: function (msg) {
 
-        const jugador = this.getJugadorFromId(parseInt(msg.id_jugador));
+        const jugador = this.getJugadorFromId(msg.id_jugador);
 
         if (msg.tipo === tipoMsgSocket.ingresa) {
             this.jugador_ingresa(jugador);
@@ -2303,6 +2324,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190608 10:25');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190608 21:04');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

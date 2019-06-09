@@ -3,7 +3,7 @@
 const proRecibirMsgSocket = {
     exe: function (msg) {
 
-        const jugador = this.getJugadorFromId(parseInt(msg.id_jugador));
+        const jugador = this.getJugadorFromId(msg.id_jugador);
 
         if (msg.tipo === tipoMsgSocket.ingresa) {
             this.jugador_ingresa(jugador);

@@ -3,7 +3,7 @@ class AJugador {
 
     constructor(indexCuadrante) {
         this.indexCuadrante = indexCuadrante;
-        this.id = parseInt(Math.random() * 100000);
+        this.id = IDGenerator('player');
         this.isPosicionConfirmada = false;
 
         this.getIsLocal = () => {
