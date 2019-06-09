@@ -51,6 +51,8 @@ class CoheteRemoto extends ACohete {
             if (submarino) {
                 //esta en un submarino debemnos de poner estado como explotado
 
+                gameAudio.getInstance().explosion();
+
                 //TODO mandar mensaje al sockete de que nos destruyeron un submarino
 
 

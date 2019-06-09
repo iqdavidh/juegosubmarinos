@@ -3,12 +3,13 @@
 const gameConfig = {
     size: 700,
     deltaSep: 20,
-    numSubmarinos: 1,
+    numSubmarinos: 4,
     numDivisiones: 4,
     wDivision: 2,
     sPrepararCohete:0, /*<------------*/
     velocidadCohete:10,
     sizeCohete:50,
+    isAudio:false,
     resources: {
         imgMar: null,
         imgBullet:null ,
@@ -831,6 +832,8 @@ const gameController = {
     runBatalla: async function () {
         console.log('runBatalla');
         gameData.estado = gameEstado.Batalla;
+
+        gameAudio.getInstance().startBG();
 
         let fnOnContinuar = () => {
 
@@ -2047,6 +2050,129 @@ const factoryImgRocket = {
     },
 
 };
+const gameAudio = (function () {
+
+    let _instance = null;
+
+
+    function init() {
+
+        const sounds = {
+            "disparo": {
+                url: "sonido/disparo.mp3"
+            },
+            "explosion": {
+                url: "sonido/explosion.wav"
+            },
+            "main": {
+                url: "sonido/main.mp3",
+                duracion: 197,
+                volume:0.6
+            },
+        };
+
+        function loadSound(name) {
+            var sound = sounds[name];
+
+            var url = sound.url;
+            var buffer = sound.buffer;
+
+            var request = new XMLHttpRequest();
+            request.open('GET', url, true);
+            request.responseType = 'arraybuffer';
+
+            request.onload = function () {
+                soundContext.decodeAudioData(request.response, function (newBuffer) {
+                    sound.buffer = newBuffer;
+                });
+            };
+
+            request.send();
+        }
+
+        for (var key in sounds) {
+            loadSound(key);
+        }
+
+        var soundContext = new AudioContext();
+
+
+        function playSound(name) {
+            var sound = sounds[name];
+            var soundVolume = sounds[name].volume || 1;
+
+            var buffer = sound.buffer;
+            if (buffer) {
+                var source = soundContext.createBufferSource();
+                source.buffer = buffer;
+
+                var volume = soundContext.createGain();
+
+                volume.gain.value = soundVolume;
+
+                volume.connect(soundContext.destination);
+                source.connect(volume);
+                source.start(0);
+            }
+        }
+
+
+        let playBG = () => {
+            playSound('main', 0.6);
+        };
+
+        let idSoundBG = null;
+        return {
+            load:()=>{
+              return true;
+            },
+            startBG: () => {
+                if(!gameConfig.isAudio){
+                    return;
+                }
+
+                playSound('main');
+                idSoundBG = setInterval(playBG, sounds.main.duracion * 1000)
+            },
+            stopBG: () => {
+                if(!gameConfig.isAudio){
+                    return;
+                }
+
+                clearInterval(idSoundBG);
+            },
+            lanzamiento: () => {
+                if(!gameConfig.isAudio){
+                    return;
+                }
+
+                playSound('disparo');
+            },
+            explosion:()=>{
+                if(!gameConfig.isAudio){
+                    return;
+                }
+
+                playSound('explosion')
+            }
+        };
+    }
+
+    return {
+        getInstance: () => {
+            if (_instance === null) {
+                _instance = init();
+            }
+
+            return _instance;
+        }
+    }
+
+})();
+
+
+gameAudio.getInstance().load();
+
 //@flow
 "use strict";
 
@@ -2271,6 +2397,8 @@ class CoheteLocal extends ACohete {
                 //console.log(`nuevo tiempo del submarino ${id_submarino} es ${submarino.tiempoCoheteReady}`);
             }
 
+            gameAudio.getInstance().lanzamiento();
+
         };
 
         this.callbackAlExplotar = (zona) => {
@@ -2336,6 +2464,8 @@ class CoheteRemoto extends ACohete {
 
             if (submarino) {
                 //esta en un submarino debemnos de poner estado como explotado
+
+                gameAudio.getInstance().explosion();
 
                 //TODO mandar mensaje al sockete de que nos destruyeron un submarino
 
@@ -2768,6 +2898,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190609 14:05');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190609 17:51');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

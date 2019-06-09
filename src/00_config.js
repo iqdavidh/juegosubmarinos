@@ -3,12 +3,13 @@
 const gameConfig = {
     size: 700,
     deltaSep: 20,
-    numSubmarinos: 1,
+    numSubmarinos: 4,
     numDivisiones: 4,
     wDivision: 2,
     sPrepararCohete:0, /*<------------*/
     velocidadCohete:10,
     sizeCohete:50,
+    isAudio:false,
     resources: {
         imgMar: null,
         imgBullet:null ,

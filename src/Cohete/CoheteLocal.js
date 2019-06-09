@@ -28,6 +28,8 @@ class CoheteLocal extends ACohete {
                 //console.log(`nuevo tiempo del submarino ${id_submarino} es ${submarino.tiempoCoheteReady}`);
             }
 
+            gameAudio.getInstance().lanzamiento();
+
         };
 
         this.callbackAlExplotar = (zona: Object) => {
