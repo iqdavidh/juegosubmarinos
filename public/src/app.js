@@ -228,7 +228,7 @@ let EventoDummy = {
             )
         ;
 
-        let msg = factoryMensajeSocket.JugadorConfirma(this.token, j.id);
+        let msg = factoryMensajeSocket.JugadorConfirma(j.id);
 
 
         gameController.onRecibirMensajeSocket(msg);
@@ -262,7 +262,6 @@ let EventoDummy = {
     simularJugadorRemotoAtaca: function () {
 
         let id = gameData.listaJugadores[0].id;
-        let token = gameData.tokenRoom;
 
 
         //ver que no sea una zona atacada
@@ -283,8 +282,9 @@ let EventoDummy = {
             r++;
         }
 
+        let id_jugador_recibe_ataque = gameData.jugadorLocal.id;
 
-        let msg = factoryMensajeSocket.LanzaCohete(token, id, 0, r, c)
+        let msg = factoryMensajeSocket.LanzaCohete(id, id_jugador_recibe_ataque, r, c)
         gameController.onRecibirMensajeSocket(msg);
 
     }
@@ -334,7 +334,7 @@ class AJugador {
 
     constructor(indexCuadrante) {
 
-        this.id = IDGenerator('player');
+        this.id = 'player-' + (Math.random().toString(36).substring(2, 16) + Math.random().toString(36).substring(2, 16)).toUpperCase();
         this.indexCuadrante = indexCuadrante;
         this.isPosicionConfirmada = false;
 
@@ -347,6 +347,10 @@ class AJugador {
 
     }
 
+
+    getIndexCuatrante(){
+        return this.indexCuadrante;
+    }
 
     setPosicionConfirmada() {
         this.isPosicionConfirmada = true;
@@ -2126,9 +2130,9 @@ class CoheteLocal extends ACohete {
             ;
 
             if (submarino) {
-                console.log(`preparar submarino ${id_submarino}`);
+                //console.log(`preparar submarino ${id_submarino}`);
                 submarino.setNewTiempoCoheteReady();
-                console.log(`nuevo tiempo del submarino ${id_submarino} es ${submarino.tiempoCoheteReady}`);
+                //console.log(`nuevo tiempo del submarino ${id_submarino} es ${submarino.tiempoCoheteReady}`);
             }
 
 
@@ -2177,7 +2181,7 @@ class CoheteRemoto extends ACohete {
             }
 
 
-            //buscamos si un submarino esta en la zona
+            //buscamos si alcanzaron un submarino local ---------------------------------
 
             let rZona = zona.posicionRCC.posicionRC.r;
             let cZona = zona.posicionRCC.posicionRC.c;
@@ -2211,6 +2215,15 @@ class CoheteRemoto extends ACohete {
             } else {
                 zona.isSubmarino = false;
             }
+
+            let  numSubActivos= gameData.jugadorLocal.listaSubmarinos
+                .filter(s=>{
+                    return s.getIsActivo();
+                }).length;
+
+            let isRendicion=numSubActivos>0;
+
+            let msg=factoryMensajeSocket.ResultadoAtaque( gameData.jugadorLocal.id,  rZona, cZona,   zona.isSubmarino, isRendicion);
         };
 
     }
@@ -2251,38 +2264,51 @@ const factoryCohete = {
 /* @flow */
 const tipoMsgSocket = {
     ingresa: 'ingresa',
-    sale:'sale',
-    confirma_posiciones:'confirma_posiciones',
-    inicia_batalla:'inicia_batalla',
-    lanza_cohete:'lanza_cohete',
-    resultado_ataque:'resultado_ataque',
+    sale: 'sale',
+    confirma_posiciones: 'confirma_posiciones',
+    inicia_batalla: 'inicia_batalla',
+    lanza_cohete: 'lanza_cohete',
+    resultado_ataque: 'resultado_ataque',
 };
 
 
 const factoryMensajeSocket = {
-    JugadorIngresa: function (token, id_jugador ) {
+    JugadorIngresa: function (id_jugador) {
         return {
+            token: gameData.tokenRoom,
             id_jugador,
-            token,
             tipo: tipoMsgSocket.ingresa
         };
     },
-    JugadorConfirma: function (token, id_jugador ) {
+    JugadorConfirma: function (id_jugador) {
         return {
+            token: gameData.tokenRoom,
             id_jugador,
-            token,
             tipo: tipoMsgSocket.confirma_posiciones
         }
     },
-    LanzaCohete :function(  token , id_jugador,  indexCuadrante, r, c){
+    LanzaCohete: function (id_jugador, id_jugador_recibe_ataque, r, c) {
 
         return {
+            token: gameData.tokenRoom,
             id_jugador,
-            token,
+            id_jugador_recibe_ataque,
             tipo: tipoMsgSocket.lanza_cohete,
-            indexCuadrante : indexCuadrante ,
-            r:r,
-            c:c
+            r,
+            c
+        }
+
+    },
+    ResultadoAtaque: function (id_jugador, indexCuadrante, r, c, is_submarino, is_rendicion) {
+
+        return {
+            token: gameData.tokenRoom,
+            id_jugador,
+            tipo: tipoMsgSocket.resultado_ataque,
+            r,
+            c,
+            is_submarino,
+            is_rendicion
         }
 
     }
@@ -2327,11 +2353,30 @@ const proRecibirMsgSocket = {
     lanza_cohete: function (msg) {
 
         //si es el mensaje del jugador local no hacemos nada
-        if(msg.id_jugador === gameData.jugadorLocal.id){
-            return ;
+        if (msg.id_jugador === gameData.jugadorLocal.id) {
+            return;
         }
 
-        gameController.engine.batalla.onJugadorRemotoLanzaCohete(msg.id_jugador, msg.indexCuadrante, msg.r, msg.c);
+        let indexCuadranteAtacado = null;
+
+        if (msg.id_jugador_recibe_ataque === gameData.jugadorLocal.id) {
+            indexCuadranteAtacado = 0;
+        } else {
+            //buscar que cuadrante tiene ese jugador
+            let jugadorAtacado = gameData.listaJugadores
+                .find(j => {
+                    return j.id === msg.id_jugador_recibe_ataque;
+                })
+            ;
+
+            if (jugadorAtacado) {
+                indexCuadranteAtacado = jugadorAtacado.getIndexCuadrante();
+            }
+        }
+
+        if (indexCuadranteAtacado!== null) {
+            gameController.engine.batalla.onJugadorRemotoLanzaCohete(msg.id_jugador, indexCuadranteAtacado, msg.r, msg.c);
+        }
 
 
     },
@@ -2518,6 +2563,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190609 08:42');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190609 09:34');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

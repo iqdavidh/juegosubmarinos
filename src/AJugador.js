@@ -3,7 +3,7 @@ class AJugador {
 
     constructor(indexCuadrante) {
 
-        this.id = IDGenerator('player');
+        this.id = 'player-' + (Math.random().toString(36).substring(2, 16) + Math.random().toString(36).substring(2, 16)).toUpperCase();
         this.indexCuadrante = indexCuadrante;
         this.isPosicionConfirmada = false;
 
@@ -16,6 +16,10 @@ class AJugador {
 
     }
 
+
+    getIndexCuatrante(){
+        return this.indexCuadrante;
+    }
 
     setPosicionConfirmada() {
         this.isPosicionConfirmada = true;

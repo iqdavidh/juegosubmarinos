@@ -36,7 +36,7 @@ class CoheteRemoto extends ACohete {
             }
 
 
-            //buscamos si un submarino esta en la zona
+            //buscamos si alcanzaron un submarino local ---------------------------------
 
             let rZona = zona.posicionRCC.posicionRC.r;
             let cZona = zona.posicionRCC.posicionRC.c;
@@ -70,6 +70,15 @@ class CoheteRemoto extends ACohete {
             } else {
                 zona.isSubmarino = false;
             }
+
+            let  numSubActivos= gameData.jugadorLocal.listaSubmarinos
+                .filter(s=>{
+                    return s.getIsActivo();
+                }).length;
+
+            let isRendicion=numSubActivos>0;
+
+            let msg=factoryMensajeSocket.ResultadoAtaque( gameData.jugadorLocal.id,  rZona, cZona,   zona.isSubmarino, isRendicion);
         };
 
     }

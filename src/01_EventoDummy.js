@@ -29,7 +29,7 @@ let EventoDummy = {
             )
         ;
 
-        let msg = factoryMensajeSocket.JugadorConfirma(this.token, j.id);
+        let msg = factoryMensajeSocket.JugadorConfirma(j.id);
 
 
         gameController.onRecibirMensajeSocket(msg);
@@ -63,7 +63,6 @@ let EventoDummy = {
     simularJugadorRemotoAtaca: function () {
 
         let id = gameData.listaJugadores[0].id;
-        let token = gameData.tokenRoom;
 
 
         //ver que no sea una zona atacada
@@ -84,8 +83,9 @@ let EventoDummy = {
             r++;
         }
 
+        let id_jugador_recibe_ataque = gameData.jugadorLocal.id;
 
-        let msg = factoryMensajeSocket.LanzaCohete(token, id, 0, r, c)
+        let msg = factoryMensajeSocket.LanzaCohete(id, id_jugador_recibe_ataque, r, c)
         gameController.onRecibirMensajeSocket(msg);
 
     }

@@ -38,11 +38,30 @@ const proRecibirMsgSocket = {
     lanza_cohete: function (msg) {
 
         //si es el mensaje del jugador local no hacemos nada
-        if(msg.id_jugador === gameData.jugadorLocal.id){
-            return ;
+        if (msg.id_jugador === gameData.jugadorLocal.id) {
+            return;
         }
 
-        gameController.engine.batalla.onJugadorRemotoLanzaCohete(msg.id_jugador, msg.indexCuadrante, msg.r, msg.c);
+        let indexCuadranteAtacado = null;
+
+        if (msg.id_jugador_recibe_ataque === gameData.jugadorLocal.id) {
+            indexCuadranteAtacado = 0;
+        } else {
+            //buscar que cuadrante tiene ese jugador
+            let jugadorAtacado = gameData.listaJugadores
+                .find(j => {
+                    return j.id === msg.id_jugador_recibe_ataque;
+                })
+            ;
+
+            if (jugadorAtacado) {
+                indexCuadranteAtacado = jugadorAtacado.getIndexCuadrante();
+            }
+        }
+
+        if (indexCuadranteAtacado!== null) {
+            gameController.engine.batalla.onJugadorRemotoLanzaCohete(msg.id_jugador, indexCuadranteAtacado, msg.r, msg.c);
+        }
 
 
     },
