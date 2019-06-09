@@ -236,6 +236,7 @@ let EventoDummy = {
     ,
     iniciar2JugadoresyConfirmar: function () {
 
+
         this.iniciar2Jugadores();
         this.confirmaJugadorRemoto();
         // //confirma jugador local
@@ -246,17 +247,35 @@ let EventoDummy = {
 
     },
 
-    iniciar8Jugadores: function () {
-        this.iniciar2Jugadores();
+    t8: function () {
+        gameController.onRegistroSocket(this.token);
+
+        //regsitrar
+        for (let i = 1; i <= 8; i++) {
+            let msg = {
+                id_jugador: (i * 1000).toString(),
+                token: gameData.tokenRoom
+            };
+            let j = factoryJugadorRemoto.fromMsgJugadorIngresa(msg);
+            gameData.listaJugadores.push(j);
+        }
 
 
-        let msg = {
-            id_jugador: 'player-dumy2',
-            token: this.token
+        //confirmar
+        gameData.listaJugadores
+            .forEach(j => {
+
+                let msg = factoryMensajeSocket.JugadorConfirma(j.id);
+                gameController.onRecibirMensajeSocket(msg)
+
+            });
+
+        // //confirma jugador local
+        let fn = () => {
+            gameController.engine.selpos.onKeyDow({code: "Enter"});
         };
+        setTimeout(fn, 1000);
 
-        let jugador3 = factoryJugadorRemoto.fromMsgJugadorIngresa(msg);
-        gameData.listaJugadores.push(jugador3);
     },
 
     simularJugadorRemotoAtaca: function () {
@@ -2664,6 +2683,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190609 12:28');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190609 12:43');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
