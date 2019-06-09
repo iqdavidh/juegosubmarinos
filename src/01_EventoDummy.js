@@ -8,7 +8,7 @@ let EventoDummy = {
 
 
         let msg = {
-            id_jugador: 2000,
+            id_jugador: "2000",
             token: this.token
         };
 
@@ -47,7 +47,7 @@ let EventoDummy = {
 
     },
 
-    iniciar3Jugadores: function () {
+    iniciar8Jugadores: function () {
         this.iniciar2Jugadores();
 
 

@@ -207,7 +207,7 @@ let EventoDummy = {
 
 
         let msg = {
-            id_jugador: 2000,
+            id_jugador: "2000",
             token: this.token
         };
 
@@ -246,7 +246,7 @@ let EventoDummy = {
 
     },
 
-    iniciar3Jugadores: function () {
+    iniciar8Jugadores: function () {
         this.iniciar2Jugadores();
 
 
@@ -348,9 +348,14 @@ class AEngine {
 /* @flow*/
 class AJugador {
 
-    constructor(indexCuadrante) {
+    constructor(indexCuadrante, id_jugador) {
 
-        this.id = 'player-' + (Math.random().toString(36).substring(2, 16) + Math.random().toString(36).substring(2, 16)).toUpperCase();
+        if (id_jugador) {
+            this.id = id_jugador;
+        } else {
+            this.id = 'player-' + (Math.random().toString(36).substring(2, 16) + Math.random().toString(36).substring(2, 16)).toUpperCase();
+        }
+
         this.indexCuadrante = indexCuadrante;
         this.isPosicionConfirmada = false;
 
@@ -364,7 +369,7 @@ class AJugador {
     }
 
 
-    getIndexCuadrante(){
+    getIndexCuadrante() {
         return this.indexCuadrante;
     }
 
@@ -377,7 +382,7 @@ class AJugador {
     }
 
     getOrigenFromIndex() {
-       return factoryPosicionRCCuadrante.getOrigenCuadrante(this.indexCuadrante);
+        return factoryPosicionRCCuadrante.getOrigenCuadrante(this.indexCuadrante);
     }
 }
 //@flow
@@ -473,9 +478,9 @@ const factoryJugador = {
 };
 class JugadorRemoto extends AJugador {
 
-    constructor(indexCuadrante) {
+    constructor(indexCuadrante, id_jugador) {
 
-        super(indexCuadrante);
+        super(indexCuadrante, id_jugador);
 
         this.numSubmarinos = gameConfig.numSubmarinos;
 
@@ -511,11 +516,11 @@ class JugadorRemoto extends AJugador {
 
 
 const factoryJugadorRemoto = {
-    fromMsgJugadorIngresa: function (mensaje) {
+    fromMsgJugadorIngresa: function (msg) {
 
         let numJugador = gameData.listaJugadores.length + 1;
 
-        return new JugadorRemoto(numJugador)
+        return new JugadorRemoto(numJugador, msg.id_jugador)
     }
 };
 class ResultadoOpe {
@@ -2370,7 +2375,7 @@ const proRecibirMsgSocket = {
             this.lanza_cohete(msg)
 
         } else if (msg.tipo === tipoMsgSocket.resultado_ataque) {
-            this.resultado_ataque( jugador, msg);
+            this.resultado_ataque(jugador, msg);
 
         } else {
             alert("no esperamos este tipo de mensaje " + msg.tipo)
@@ -2430,33 +2435,45 @@ const proRecibirMsgSocket = {
             );
 
 
+        let isZonaNueva = false;
 
         if (!zona) {
             //crear la zona
-            const indexCuadrante=jugador.getIndexCuadrante();
-            const pos=new PosicionRCCuadrante(indexCuadrante, new PosicionRC( msg.r, msg.c));
-            zona=factoryZonaAtacada.exe(pos,null, jugador.id);
-            gameData.listaZonasAtacadas.push(zona);
-        }else{
 
+            isZonaNueva = true;
+
+            const indexCuadrante = jugador.getIndexCuadrante();
+            const pos = new PosicionRCCuadrante(indexCuadrante, new PosicionRC(msg.r, msg.c));
+            zona = factoryZonaAtacada.exe(pos, null, jugador.id);
+            gameData.listaZonasAtacadas.push(zona);
         }
 
-        zona.isObjetivoAlcanzado = true;
-        zona.isSubmarino=msg.isSubmarino;
 
-        if(zona.isSubmarino){
+        zona.isObjetivoAlcanzado = true;
+
+        if (zona.isSubmarino !== true && msg.isSubmarino) {
+            zona.isSubmarino = true;
             jugador.onSubmarinoDestruido();
+        }else{
+            zona.isSubmarino = msg.isSubmarino;
+        }
+
+
+
+
+        //si destruyeon un submarino evaluar si ya ganamos
+        if (zona.isSubmarino) {
 
             //ver cuantos jugadores quedan
 
-            let numJugadores =gameData.listaJugadores
-                .filter(j=>{
-                    return j.getNumSubmarinos()>0;
+            let numJugadores = gameData.listaJugadores
+                .filter(j => {
+                    return j.getNumSubmarinos() > 0;
                 })
                 .length
             ;
 
-            if(numJugadores===0){
+            if (numJugadores === 0) {
                 alert("ganaste");
             }
 
@@ -2647,6 +2664,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190609 11:14');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190609 12:28');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
