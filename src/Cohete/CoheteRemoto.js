@@ -15,7 +15,7 @@ class CoheteRemoto extends ACohete {
 
 
 
-        super(origen, jugador.id);
+        super(origen, jugador.id , jugador.indexCuadrante);
 
 
         //inmediatametne se cra se lanza

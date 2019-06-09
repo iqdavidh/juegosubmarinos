@@ -80,7 +80,7 @@ let EventoDummy = {
         let c = numAtaques + 1;
 
         if(c>4){
-            c=1;
+            c=numAtaques-3;
             r++;
         }
 

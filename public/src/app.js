@@ -279,7 +279,7 @@ let EventoDummy = {
         let c = numAtaques + 1;
 
         if(c>4){
-            c=1;
+            c=numAtaques-3;
             r++;
         }
 
@@ -1931,7 +1931,7 @@ const factoryImgRocket = {
 
 class ACohete {
 
-    constructor(posicionIni, id_jugador) {
+    constructor(posicionIni, id_jugador, indexCuadrante) {
         this.id = IDGenerator('c');
         this.posicionIni = posicionIni;
         this.posicionFinal = null;
@@ -1950,6 +1950,7 @@ class ACohete {
 
         this.id_jugador = id_jugador;
         this.callbackAlLanzar = null;
+        this.indexCuadrante = indexCuadrante;
     }
 
     getEtapaExplosion() {
@@ -2007,13 +2008,33 @@ class ACohete {
         this.angulo = Math.round(this.angulo);
 
 
-        //TODO revisarlo cuando los disparos son haciua abajo
-        if (this.angulo < 0 && this.angulo > -180) {
-            //console.log(`angulo ${this.angulo}`);
-            this.angulo = 180 + this.angulo;
+        const indexCuadrante = this.indexCuadrante;
+
+        console.log(`angulo de cohete ${this.angulo}`);
+
+
+        //TRANSFORMACION DEL ANGULO - DEPENDE DEL CUADRANTE
+        console.log('indexCuadrante ' + indexCuadrante.toString());
+
+        if (indexCuadrante === 0) {
+            if (this.angulo < 0 && this.angulo > -180) {
+                this.angulo = 180 + this.angulo;
+            }
         }
 
-        //console.log(`angulo ${this.angulo}`);
+        if (indexCuadrante === 1) {
+
+            if (this.angulo < 90 && this.angulo > 0) {
+                this.angulo += 180;
+            } else if (this.angulo < 0 && this.angulo > -90) {
+                this.angulo += 360;
+            }
+
+        }
+
+
+        console.log(` angulo transformado  ${this.angulo}`);
+
 
         //----------------------------------------------------
 
@@ -2037,15 +2058,15 @@ class ACohete {
 
             if (this.etapaExplosion >= 7) {
                 this.estado = 'explotado';
-                this.etapaExplosion=6;
+                this.etapaExplosion = 6;
 
                 //poner que ya se alcanzo el objetivo
                 const zona = gameData.listaZonasAtacadas
-                    .find( z=>{
+                    .find(z => {
                         return z.idCohete === this.id;
                     });
                 //esta propiedad es la que se usa para draw
-                zona.isObjetivoAlcanzado=true;
+                zona.isObjetivoAlcanzado = true;
             }
 
 
@@ -2080,7 +2101,7 @@ class ACohete {
 class CoheteLocal extends ACohete {
 
     constructor(posicionIni, id_jugador, id_submarino) {
-        super(posicionIni, id_jugador);
+        super(posicionIni, id_jugador,0);
 
         this.id_submarino = id_submarino;
 
@@ -2126,7 +2147,7 @@ class CoheteRemoto extends ACohete {
 
 
 
-        super(origen, jugador.id);
+        super(origen, jugador.id , jugador.indexCuadrante);
 
 
         //inmediatametne se cra se lanza
@@ -2163,7 +2184,7 @@ const factoryCohete = {
         let posicionCentroCohete = new Posicion(x, y);
 
 
-        return new CoheteLocal(posicionCentroCohete, jugador.id, submarino.id);
+        return new CoheteLocal(posicionCentroCohete, jugador.id, submarino.id, 0);
 
     }
 
@@ -2439,6 +2460,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190608 22:39');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190608 23:13');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
