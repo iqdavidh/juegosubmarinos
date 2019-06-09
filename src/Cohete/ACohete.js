@@ -94,67 +94,38 @@ class ACohete {
         //TRANSFORMACION DEL ANGULO - DEPENDE DEL CUADRANTE
         console.log('indexCuadrante ' + indexCuadrante.toString());
 
-        const anguloOriginal = this.angulo;
+        //const anguloOriginal = this.angulo; //<- es para debuig
 
-        if (indexCuadrante === 0) {
-            // if (this.angulo < 0 && this.angulo > -180) {
-            //     this.angulo = 180 + this.angulo;
-            // }
+        if (isDxNegativo) {
+            if (this.angulo === 0) {
+                this.angulo = 180;
 
-
-            if (isDxNegativo) {
-
-                if (this.angulo === 0) {
-                    this.angulo = 180;
-
-                } else if (this.angulo < 0) {
-
-                    if (isDyNegativo) {
-
-                        this.angulo -= 360;
-                    } else {
-                        this.angulo += 180;
-                    }
-                }else{
-
-
-                    if(isDyNegativo){
-                        this.angulo += 180;
-                    }
-                }
-
-
-            } else {
+            } else if (this.angulo < 0) {
 
                 if (isDyNegativo) {
+                    this.angulo -= 360;
+                } else {
+                    this.angulo += 180;
+                }
+            }else{
+                if(isDyNegativo){
+                    this.angulo += 180;
+                }
+            }
+        } else {
 
-                    if (this.angulo === 0) {
+            if (isDyNegativo) {
+                if (this.angulo === 0) {
 
-                    } else if (this.angulo < 0) {
-
-                        this.angulo += 360;
-                    }
-
-
+                } else if (this.angulo < 0) {
+                    this.angulo += 360;
                 }
 
             }
-
-
-        }
-
-        if (indexCuadrante === 1) {
-
-            if (this.angulo < 90 && this.angulo > 0) {
-                this.angulo += 180;
-            } else if (this.angulo < 0 && this.angulo > -90) {
-                this.angulo += 360;
-            }
-
         }
 
 
-        console.log(`cuadrante :: angulo original -> angulo transformado   ${indexCuadrante}:: ${anguloOriginal} -> ${this.angulo} | ${isDxNegativo ? 'isDxNegativo' : ''} ${isDyNegativo ? 'isDyNegativo' : ''}`);
+        //console.log(`cuadrante :: angulo original -> angulo transformado   ${indexCuadrante}:: ${anguloOriginal} -> ${this.angulo} | ${isDxNegativo ? 'isDxNegativo' : ''} ${isDyNegativo ? 'isDyNegativo' : ''}`);
 
 
         //----------------------------------------------------
