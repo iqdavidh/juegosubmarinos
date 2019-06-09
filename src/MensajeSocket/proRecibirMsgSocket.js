@@ -23,7 +23,7 @@ const proRecibirMsgSocket = {
             this.lanza_cohete(msg)
 
         } else if (msg.tipo === tipoMsgSocket.resultado_ataque) {
-            this.resultado_ataque( jugador, msg);
+            this.resultado_ataque(jugador, msg);
 
         } else {
             alert("no esperamos este tipo de mensaje " + msg.tipo)
@@ -83,33 +83,45 @@ const proRecibirMsgSocket = {
             );
 
 
+        let isZonaNueva = false;
 
         if (!zona) {
             //crear la zona
-            const indexCuadrante=jugador.getIndexCuadrante();
-            const pos=new PosicionRCCuadrante(indexCuadrante, new PosicionRC( msg.r, msg.c));
-            zona=factoryZonaAtacada.exe(pos,null, jugador.id);
-            gameData.listaZonasAtacadas.push(zona);
-        }else{
 
+            isZonaNueva = true;
+
+            const indexCuadrante = jugador.getIndexCuadrante();
+            const pos = new PosicionRCCuadrante(indexCuadrante, new PosicionRC(msg.r, msg.c));
+            zona = factoryZonaAtacada.exe(pos, null, jugador.id);
+            gameData.listaZonasAtacadas.push(zona);
         }
 
-        zona.isObjetivoAlcanzado = true;
-        zona.isSubmarino=msg.isSubmarino;
 
-        if(zona.isSubmarino){
+        zona.isObjetivoAlcanzado = true;
+
+        if (zona.isSubmarino !== true && msg.isSubmarino) {
+            zona.isSubmarino = true;
             jugador.onSubmarinoDestruido();
+        }else{
+            zona.isSubmarino = msg.isSubmarino;
+        }
+
+
+
+
+        //si destruyeon un submarino evaluar si ya ganamos
+        if (zona.isSubmarino) {
 
             //ver cuantos jugadores quedan
 
-            let numJugadores =gameData.listaJugadores
-                .filter(j=>{
-                    return j.getNumSubmarinos()>0;
+            let numJugadores = gameData.listaJugadores
+                .filter(j => {
+                    return j.getNumSubmarinos() > 0;
                 })
                 .length
             ;
 
-            if(numJugadores===0){
+            if (numJugadores === 0) {
                 alert("ganaste");
             }
 

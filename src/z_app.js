@@ -97,6 +97,8 @@ const gameController = {
         console.log('runBatalla');
         gameData.estado = gameEstado.Batalla;
 
+        gameAudio.getInstance().startBG();
+
         let fnOnContinuar = () => {
 
 

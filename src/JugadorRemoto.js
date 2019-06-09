@@ -1,8 +1,8 @@
 class JugadorRemoto extends AJugador {
 
-    constructor(indexCuadrante) {
+    constructor(indexCuadrante, id_jugador) {
 
-        super(indexCuadrante);
+        super(indexCuadrante, id_jugador);
 
         this.numSubmarinos = gameConfig.numSubmarinos;
 
@@ -38,10 +38,10 @@ class JugadorRemoto extends AJugador {
 
 
 const factoryJugadorRemoto = {
-    fromMsgJugadorIngresa: function (mensaje: MsgJugadorIngresa): JugadorRemoto {
+    fromMsgJugadorIngresa: function (msg): JugadorRemoto {
 
         let numJugador = gameData.listaJugadores.length + 1;
 
-        return new JugadorRemoto(numJugador)
+        return new JugadorRemoto(numJugador, msg.id_jugador)
     }
 };

@@ -76,6 +76,10 @@ class ACohete {
 
         this.angulo = Math.atan(dy / dx);
 
+        const isDyNegativo = dy < 0;
+        const isDxNegativo = dx < 0;
+
+
         //conversion a grados
         this.angulo = this.angulo * (180 / Math.PI);
 
@@ -83,32 +87,45 @@ class ACohete {
         this.angulo = Math.round(this.angulo);
 
 
+        //este es de donde sale el cohete
         const indexCuadrante = this.indexCuadrante;
-
-        console.log(`angulo de cohete ${this.angulo}`);
 
 
         //TRANSFORMACION DEL ANGULO - DEPENDE DEL CUADRANTE
         console.log('indexCuadrante ' + indexCuadrante.toString());
 
-        if (indexCuadrante === 0) {
-            if (this.angulo < 0 && this.angulo > -180) {
-                this.angulo = 180 + this.angulo;
+        //const anguloOriginal = this.angulo; //<- es para debuig
+
+        if (isDxNegativo) {
+            if (this.angulo === 0) {
+                this.angulo = 180;
+
+            } else if (this.angulo < 0) {
+
+                if (isDyNegativo) {
+                    this.angulo -= 360;
+                } else {
+                    this.angulo += 180;
+                }
+            }else{
+                if(isDyNegativo){
+                    this.angulo += 180;
+                }
+            }
+        } else {
+
+            if (isDyNegativo) {
+                if (this.angulo === 0) {
+
+                } else if (this.angulo < 0) {
+                    this.angulo += 360;
+                }
+
             }
         }
 
-        if (indexCuadrante === 1) {
 
-            if (this.angulo < 90 && this.angulo > 0) {
-                this.angulo += 180;
-            } else if (this.angulo < 0 && this.angulo > -90) {
-                this.angulo += 360;
-            }
-
-        }
-
-
-        console.log(` angulo transformado  ${this.angulo}`);
+        //console.log(`cuadrante :: angulo original -> angulo transformado   ${indexCuadrante}:: ${anguloOriginal} -> ${this.angulo} | ${isDxNegativo ? 'isDxNegativo' : ''} ${isDyNegativo ? 'isDyNegativo' : ''}`);
 
 
         //----------------------------------------------------

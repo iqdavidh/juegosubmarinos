@@ -6,9 +6,10 @@ const gameConfig = {
     numSubmarinos: 4,
     numDivisiones: 4,
     wDivision: 2,
-    sPrepararCohete:6,
+    sPrepararCohete:0, /*<------------*/
     velocidadCohete:10,
     sizeCohete:50,
+    isAudio:false,
     resources: {
         imgMar: null,
         imgBullet:null ,
@@ -207,7 +208,7 @@ let EventoDummy = {
 
 
         let msg = {
-            id_jugador: 2000,
+            id_jugador: "2000",
             token: this.token
         };
 
@@ -236,6 +237,7 @@ let EventoDummy = {
     ,
     iniciar2JugadoresyConfirmar: function () {
 
+
         this.iniciar2Jugadores();
         this.confirmaJugadorRemoto();
         // //confirma jugador local
@@ -246,46 +248,103 @@ let EventoDummy = {
 
     },
 
-    iniciar3Jugadores: function () {
-        this.iniciar2Jugadores();
+    t8: function () {
+        gameController.onRegistroSocket(this.token);
 
-
-        let msg = {
-            id_jugador: 'player-dumy2',
-            token: this.token
-        };
-
-        let jugador3 = factoryJugadorRemoto.fromMsgJugadorIngresa(msg);
-        gameData.listaJugadores.push(jugador3);
-    },
-
-    simularJugadorRemotoAtaca: function () {
-
-        let id = gameData.listaJugadores[0].id;
-
-
-        //ver que no sea una zona atacada
-        let lista = gameData.listaZonasAtacadas
-            .filter(z => {
-                return z.indexCuadrante === 0;
-            })
-        ;
-
-        let numAtaques = lista.length;
-
-
-        let r = 1;
-        let c = numAtaques + 1;
-
-        if (c > 4) {
-            c = numAtaques - 3;
-            r++;
+        //regsitrar
+        for (let i = 1; i <= 8; i++) {
+            let msg = {
+                id_jugador: (i * 1000).toString(),
+                token: gameData.tokenRoom
+            };
+            let j = factoryJugadorRemoto.fromMsgJugadorIngresa(msg);
+            gameData.listaJugadores.push(j);
         }
 
-        let id_jugador_recibe_ataque = gameData.jugadorLocal.id;
 
-        let msg = factoryMensajeSocket.LanzaCohete(id, id_jugador_recibe_ataque, r, c);
-        gameController.onRecibirMensajeSocket(msg);
+        //confirmar
+        gameData.listaJugadores
+            .forEach(j => {
+
+                let msg = factoryMensajeSocket.JugadorConfirma(j.id);
+                gameController.onRecibirMensajeSocket(msg)
+
+            });
+
+        // //confirma jugador local
+        let fn = () => {
+            gameController.engine.selpos.onKeyDow({code: "Enter"});
+        };
+        setTimeout(fn, 1000);
+
+    },
+    j1Ataca: function () {
+        return this._jAtaca(1);
+    },
+    j2Ataca: function () {
+        return this._jAtaca(2);
+    },
+    j3Ataca: function () {
+        return this._jAtaca(3);
+    },
+    j4Ataca: function () {
+        return this._jAtaca(4);
+    },
+    j5Ataca: function () {
+        return this._jAtaca(5);
+    },
+    j6Ataca: function () {
+        return this._jAtaca(6);
+    },
+    j7Ataca: function () {
+        return this._jAtaca(7);
+    },
+    j8Ataca: function () {
+        return this._jAtaca(8);
+    },
+
+
+    _jAtaca: function (indexCuadranteAtacante) {
+
+        let idAtacante = null;
+
+        if (indexCuadranteAtacante === 0) {
+            idAtacante = gameData.jugadorLocal.id;
+        } else {
+            idAtacante = gameData.listaJugadores
+                .find(j => {
+                    return j.indexCuadrante === indexCuadranteAtacante;
+                })
+                .id
+            ;
+        }
+
+
+        for (indexCuadrante = 0; indexCuadrante < 9; indexCuadrante++) {
+
+            if (indexCuadrante !== indexCuadranteAtacante) {
+
+                let j = null;
+
+                if (indexCuadrante === 0) {
+                    j = gameData.jugadorLocal;
+                } else {
+
+                    j = gameData.listaJugadores
+                        .find(item => {
+                            return item.indexCuadrante === indexCuadrante;
+                        });
+                }
+
+
+                let msg = factoryMensajeSocket.LanzaCohete(idAtacante, j.id, 1, 1);
+                gameController.onRecibirMensajeSocket(msg);
+
+
+            }
+
+
+        }
 
     },
     simularJ1RecibeAtaque: function (r, c, isSubmarino) {
@@ -302,7 +361,36 @@ let EventoDummy = {
         let msg = factoryMensajeSocket.ResultadoAtaque(id, r, c, isSubmarino, false);
         gameController.onRecibirMensajeSocket(msg);
     },
+    j1Recibe:function(){
+        return this._rRecibe(1);
+    },
+    j2Recibe:function(){
+        return this._rRecibe(2);
+    },
+    j3Recibe:function(){
+        return this._rRecibe(3);
+    },
+    j4Recibe:function(){
+        return this._rRecibe(4);
+    },
+    j5Recibe:function(){
+        return this._rRecibe(5);
+    },
+    _rRecibe:function(indexCuadrante){
 
+        let id = gameData.listaJugadores.find( j=>{
+            return j.indexCuadrante === indexCuadrante
+        }).id;
+
+
+        let msg = factoryMensajeSocket.ResultadoAtaque(id, 1, 1, false, false);
+        gameController.onRecibirMensajeSocket(msg);
+
+        msg = factoryMensajeSocket.ResultadoAtaque(id, 2, 2, true, false);
+        gameController.onRecibirMensajeSocket(msg);
+
+
+    }
 
 };
 // @flow
@@ -348,9 +436,14 @@ class AEngine {
 /* @flow*/
 class AJugador {
 
-    constructor(indexCuadrante) {
+    constructor(indexCuadrante, id_jugador) {
 
-        this.id = 'player-' + (Math.random().toString(36).substring(2, 16) + Math.random().toString(36).substring(2, 16)).toUpperCase();
+        if (id_jugador) {
+            this.id = id_jugador;
+        } else {
+            this.id = 'player-' + (Math.random().toString(36).substring(2, 16) + Math.random().toString(36).substring(2, 16)).toUpperCase();
+        }
+
         this.indexCuadrante = indexCuadrante;
         this.isPosicionConfirmada = false;
 
@@ -364,7 +457,7 @@ class AJugador {
     }
 
 
-    getIndexCuadrante(){
+    getIndexCuadrante() {
         return this.indexCuadrante;
     }
 
@@ -377,7 +470,7 @@ class AJugador {
     }
 
     getOrigenFromIndex() {
-       return factoryPosicionRCCuadrante.getOrigenCuadrante(this.indexCuadrante);
+        return factoryPosicionRCCuadrante.getOrigenCuadrante(this.indexCuadrante);
     }
 }
 //@flow
@@ -473,9 +566,9 @@ const factoryJugador = {
 };
 class JugadorRemoto extends AJugador {
 
-    constructor(indexCuadrante) {
+    constructor(indexCuadrante, id_jugador) {
 
-        super(indexCuadrante);
+        super(indexCuadrante, id_jugador);
 
         this.numSubmarinos = gameConfig.numSubmarinos;
 
@@ -511,11 +604,11 @@ class JugadorRemoto extends AJugador {
 
 
 const factoryJugadorRemoto = {
-    fromMsgJugadorIngresa: function (mensaje) {
+    fromMsgJugadorIngresa: function (msg) {
 
         let numJugador = gameData.listaJugadores.length + 1;
 
-        return new JugadorRemoto(numJugador)
+        return new JugadorRemoto(numJugador, msg.id_jugador)
     }
 };
 class ResultadoOpe {
@@ -739,6 +832,8 @@ const gameController = {
     runBatalla: async function () {
         console.log('runBatalla');
         gameData.estado = gameEstado.Batalla;
+
+        gameAudio.getInstance().startBG();
 
         let fnOnContinuar = () => {
 
@@ -1955,6 +2050,129 @@ const factoryImgRocket = {
     },
 
 };
+const gameAudio = (function () {
+
+    let _instance = null;
+
+
+    function init() {
+
+        const sounds = {
+            "disparo": {
+                url: "sonido/disparo.mp3"
+            },
+            "explosion": {
+                url: "sonido/explosion.wav"
+            },
+            "main": {
+                url: "sonido/main.mp3",
+                duracion: 197,
+                volume:0.6
+            },
+        };
+
+        function loadSound(name) {
+            var sound = sounds[name];
+
+            var url = sound.url;
+            var buffer = sound.buffer;
+
+            var request = new XMLHttpRequest();
+            request.open('GET', url, true);
+            request.responseType = 'arraybuffer';
+
+            request.onload = function () {
+                soundContext.decodeAudioData(request.response, function (newBuffer) {
+                    sound.buffer = newBuffer;
+                });
+            };
+
+            request.send();
+        }
+
+        for (var key in sounds) {
+            loadSound(key);
+        }
+
+        var soundContext = new AudioContext();
+
+
+        function playSound(name) {
+            var sound = sounds[name];
+            var soundVolume = sounds[name].volume || 1;
+
+            var buffer = sound.buffer;
+            if (buffer) {
+                var source = soundContext.createBufferSource();
+                source.buffer = buffer;
+
+                var volume = soundContext.createGain();
+
+                volume.gain.value = soundVolume;
+
+                volume.connect(soundContext.destination);
+                source.connect(volume);
+                source.start(0);
+            }
+        }
+
+
+        let playBG = () => {
+            playSound('main', 0.6);
+        };
+
+        let idSoundBG = null;
+        return {
+            load:()=>{
+              return true;
+            },
+            startBG: () => {
+                if(!gameConfig.isAudio){
+                    return;
+                }
+
+                playSound('main');
+                idSoundBG = setInterval(playBG, sounds.main.duracion * 1000)
+            },
+            stopBG: () => {
+                if(!gameConfig.isAudio){
+                    return;
+                }
+
+                clearInterval(idSoundBG);
+            },
+            lanzamiento: () => {
+                if(!gameConfig.isAudio){
+                    return;
+                }
+
+                playSound('disparo');
+            },
+            explosion:()=>{
+                if(!gameConfig.isAudio){
+                    return;
+                }
+
+                playSound('explosion')
+            }
+        };
+    }
+
+    return {
+        getInstance: () => {
+            if (_instance === null) {
+                _instance = init();
+            }
+
+            return _instance;
+        }
+    }
+
+})();
+
+
+gameAudio.getInstance().load();
+
 //@flow
 "use strict";
 
@@ -2033,6 +2251,10 @@ class ACohete {
 
         this.angulo = Math.atan(dy / dx);
 
+        const isDyNegativo = dy < 0;
+        const isDxNegativo = dx < 0;
+
+
         //conversion a grados
         this.angulo = this.angulo * (180 / Math.PI);
 
@@ -2040,32 +2262,45 @@ class ACohete {
         this.angulo = Math.round(this.angulo);
 
 
+        //este es de donde sale el cohete
         const indexCuadrante = this.indexCuadrante;
-
-        console.log(`angulo de cohete ${this.angulo}`);
 
 
         //TRANSFORMACION DEL ANGULO - DEPENDE DEL CUADRANTE
         console.log('indexCuadrante ' + indexCuadrante.toString());
 
-        if (indexCuadrante === 0) {
-            if (this.angulo < 0 && this.angulo > -180) {
-                this.angulo = 180 + this.angulo;
+        //const anguloOriginal = this.angulo; //<- es para debuig
+
+        if (isDxNegativo) {
+            if (this.angulo === 0) {
+                this.angulo = 180;
+
+            } else if (this.angulo < 0) {
+
+                if (isDyNegativo) {
+                    this.angulo -= 360;
+                } else {
+                    this.angulo += 180;
+                }
+            }else{
+                if(isDyNegativo){
+                    this.angulo += 180;
+                }
+            }
+        } else {
+
+            if (isDyNegativo) {
+                if (this.angulo === 0) {
+
+                } else if (this.angulo < 0) {
+                    this.angulo += 360;
+                }
+
             }
         }
 
-        if (indexCuadrante === 1) {
 
-            if (this.angulo < 90 && this.angulo > 0) {
-                this.angulo += 180;
-            } else if (this.angulo < 0 && this.angulo > -90) {
-                this.angulo += 360;
-            }
-
-        }
-
-
-        console.log(` angulo transformado  ${this.angulo}`);
+        //console.log(`cuadrante :: angulo original -> angulo transformado   ${indexCuadrante}:: ${anguloOriginal} -> ${this.angulo} | ${isDxNegativo ? 'isDxNegativo' : ''} ${isDyNegativo ? 'isDyNegativo' : ''}`);
 
 
         //----------------------------------------------------
@@ -2162,6 +2397,8 @@ class CoheteLocal extends ACohete {
                 //console.log(`nuevo tiempo del submarino ${id_submarino} es ${submarino.tiempoCoheteReady}`);
             }
 
+            gameAudio.getInstance().lanzamiento();
+
         };
 
         this.callbackAlExplotar = (zona) => {
@@ -2227,6 +2464,8 @@ class CoheteRemoto extends ACohete {
 
             if (submarino) {
                 //esta en un submarino debemnos de poner estado como explotado
+
+                gameAudio.getInstance().explosion();
 
                 //TODO mandar mensaje al sockete de que nos destruyeron un submarino
 
@@ -2370,7 +2609,7 @@ const proRecibirMsgSocket = {
             this.lanza_cohete(msg)
 
         } else if (msg.tipo === tipoMsgSocket.resultado_ataque) {
-            this.resultado_ataque( jugador, msg);
+            this.resultado_ataque(jugador, msg);
 
         } else {
             alert("no esperamos este tipo de mensaje " + msg.tipo)
@@ -2430,33 +2669,45 @@ const proRecibirMsgSocket = {
             );
 
 
+        let isZonaNueva = false;
 
         if (!zona) {
             //crear la zona
-            const indexCuadrante=jugador.getIndexCuadrante();
-            const pos=new PosicionRCCuadrante(indexCuadrante, new PosicionRC( msg.r, msg.c));
-            zona=factoryZonaAtacada.exe(pos,null, jugador.id);
-            gameData.listaZonasAtacadas.push(zona);
-        }else{
 
+            isZonaNueva = true;
+
+            const indexCuadrante = jugador.getIndexCuadrante();
+            const pos = new PosicionRCCuadrante(indexCuadrante, new PosicionRC(msg.r, msg.c));
+            zona = factoryZonaAtacada.exe(pos, null, jugador.id);
+            gameData.listaZonasAtacadas.push(zona);
         }
 
-        zona.isObjetivoAlcanzado = true;
-        zona.isSubmarino=msg.isSubmarino;
 
-        if(zona.isSubmarino){
+        zona.isObjetivoAlcanzado = true;
+
+        if (zona.isSubmarino !== true && msg.isSubmarino) {
+            zona.isSubmarino = true;
             jugador.onSubmarinoDestruido();
+        }else{
+            zona.isSubmarino = msg.isSubmarino;
+        }
+
+
+
+
+        //si destruyeon un submarino evaluar si ya ganamos
+        if (zona.isSubmarino) {
 
             //ver cuantos jugadores quedan
 
-            let numJugadores =gameData.listaJugadores
-                .filter(j=>{
-                    return j.getNumSubmarinos()>0;
+            let numJugadores = gameData.listaJugadores
+                .filter(j => {
+                    return j.getNumSubmarinos() > 0;
                 })
                 .length
             ;
 
-            if(numJugadores===0){
+            if (numJugadores === 0) {
                 alert("ganaste");
             }
 
@@ -2647,6 +2898,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190609 11:14');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190609 17:53');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

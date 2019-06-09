@@ -1,9 +1,14 @@
 /* @flow*/
 class AJugador {
 
-    constructor(indexCuadrante) {
+    constructor(indexCuadrante, id_jugador: null) {
 
-        this.id = 'player-' + (Math.random().toString(36).substring(2, 16) + Math.random().toString(36).substring(2, 16)).toUpperCase();
+        if (id_jugador) {
+            this.id = id_jugador;
+        } else {
+            this.id = 'player-' + (Math.random().toString(36).substring(2, 16) + Math.random().toString(36).substring(2, 16)).toUpperCase();
+        }
+
         this.indexCuadrante = indexCuadrante;
         this.isPosicionConfirmada = false;
 
@@ -17,7 +22,7 @@ class AJugador {
     }
 
 
-    getIndexCuadrante(){
+    getIndexCuadrante() {
         return this.indexCuadrante;
     }
 
@@ -30,6 +35,6 @@ class AJugador {
     }
 
     getOrigenFromIndex(): Posicion {
-       return factoryPosicionRCCuadrante.getOrigenCuadrante(this.indexCuadrante);
+        return factoryPosicionRCCuadrante.getOrigenCuadrante(this.indexCuadrante);
     }
 }
