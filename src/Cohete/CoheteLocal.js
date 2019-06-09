@@ -5,6 +5,7 @@ class CoheteLocal extends ACohete {
 
     constructor(posicionIni: Posicion, id_jugador: string, id_submarino: string) {
         super(posicionIni, id_jugador,0);
+        this.isLocal=true;
 
         this.id_submarino = id_submarino;
 

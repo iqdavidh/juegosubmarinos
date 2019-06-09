@@ -22,7 +22,10 @@ class ACohete {
 
         this.id_jugador = id_jugador;
         this.callbackAlLanzar = null;
+        this.callbackAlExplotar = null;
+
         this.indexCuadrante = indexCuadrante;
+        this.isLocal = null;
     }
 
     getEtapaExplosion(): number {
@@ -122,6 +125,7 @@ class ACohete {
             //actualizar
             if (this.frameIniciaExplosion === 0) {
                 this.frameIniciaExplosion = contadorFrames;
+                //mandar mensaje de explosion si es local
             }
             const duracionFrame = 10;
 
@@ -139,6 +143,10 @@ class ACohete {
                     });
                 //esta propiedad es la que se usa para draw
                 zona.isObjetivoAlcanzado = true;
+
+                if (this.callbackAlExplotar) {
+                    this.callbackAlExplotar(zona);
+                }
             }
 
 

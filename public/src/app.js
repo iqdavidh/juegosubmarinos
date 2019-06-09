@@ -1950,7 +1950,10 @@ class ACohete {
 
         this.id_jugador = id_jugador;
         this.callbackAlLanzar = null;
+        this.callbackAlExplotar = null;
+
         this.indexCuadrante = indexCuadrante;
+        this.isLocal = null;
     }
 
     getEtapaExplosion() {
@@ -2050,6 +2053,7 @@ class ACohete {
             //actualizar
             if (this.frameIniciaExplosion === 0) {
                 this.frameIniciaExplosion = contadorFrames;
+                //mandar mensaje de explosion si es local
             }
             const duracionFrame = 10;
 
@@ -2067,6 +2071,10 @@ class ACohete {
                     });
                 //esta propiedad es la que se usa para draw
                 zona.isObjetivoAlcanzado = true;
+
+                if (this.callbackAlExplotar) {
+                    this.callbackAlExplotar(zona);
+                }
             }
 
 
@@ -2102,6 +2110,7 @@ class CoheteLocal extends ACohete {
 
     constructor(posicionIni, id_jugador, id_submarino) {
         super(posicionIni, id_jugador,0);
+        this.isLocal=true;
 
         this.id_submarino = id_submarino;
 
@@ -2140,22 +2149,69 @@ class CoheteRemoto extends ACohete {
 
         //poner del origen en el centro del mar
 
-        const origen=factoryPosicionRCCuadrante.getOrigenCuadrante(jugador.indexCuadrante);
+        const origen = factoryPosicionRCCuadrante.getOrigenCuadrante(jugador.indexCuadrante);
 
-        origen.x+=gameCacheSize.getSizeRegion()/2;
-        origen.y+=gameCacheSize.getSizeRegion()/2;
+        origen.x += gameCacheSize.getSizeRegion() / 2;
+        origen.y += gameCacheSize.getSizeRegion() / 2;
 
 
-
-        super(origen, jugador.id , jugador.indexCuadrante);
-
+        super(origen, jugador.id, jugador.indexCuadrante);
+        this.isLocal = false;
 
         //inmediatametne se cra se lanza
 
 
         this.callbackAlLanzar = () => {
             console.log(`player ataca id_cohete ${this.id}, el jugador es ${this.id}`);
-        }
+        };
+
+
+        this.callbackAlExplotar = (zona) => {
+
+
+            //este procedimeinto tiene la funcion de evaluar si el coehte remoto alcanzo un submarino local
+
+            if (zona.indexCuadrante !== 0) {
+                //si no es una zona del jugador local salimos
+                return;
+            }
+
+
+            //buscamos si un submarino esta en la zona
+
+            let rZona = zona.posicionRCC.posicionRC.r;
+            let cZona = zona.posicionRCC.posicionRC.c;
+
+
+            let submarino = gameData.jugadorLocal.listaSubmarinos
+                .find(s => {
+                    return s.posicionRC.r === rZona && s.posicionRC.c === cZona;
+                });
+
+
+            if (submarino) {
+                //esta en un submarino debemnos de poner estado como explotado
+
+                //TODO mandar mensaje al sockete de que nos destruyeron un submarino
+
+
+                submarino.isActivo = false;
+                //buscar si el submarino tiene un cohete ready y quitarlos
+                let coheteLocal = gameData.jugadorLocal.listaCohetes
+                    .find(c => {
+                        return c.id_submarino === submarino.id;
+                    });
+
+                if (coheteLocal) {
+                    coheteLocal.estado = 'explotado';
+                }
+
+                zona.isSubmarino = true;
+
+            } else {
+                zona.isSubmarino = false;
+            }
+        };
 
     }
 
@@ -2183,8 +2239,10 @@ const factoryCohete = {
 
         let posicionCentroCohete = new Posicion(x, y);
 
+        //el cohete sale de este cuadrante
+        const indexCuadrante=0;
 
-        return new CoheteLocal(posicionCentroCohete, jugador.id, submarino.id, 0);
+        return new CoheteLocal(posicionCentroCohete, jugador.id, submarino.id, indexCuadrante);
 
     }
 
@@ -2460,6 +2518,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190608 23:13');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190609 08:34');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

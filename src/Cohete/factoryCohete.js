@@ -19,8 +19,10 @@ const factoryCohete = {
 
         let posicionCentroCohete = new Posicion(x, y);
 
+        //el cohete sale de este cuadrante
+        const indexCuadrante=0;
 
-        return new CoheteLocal(posicionCentroCohete, jugador.id, submarino.id, 0);
+        return new CoheteLocal(posicionCentroCohete, jugador.id, submarino.id, indexCuadrante);
 
     }
 
