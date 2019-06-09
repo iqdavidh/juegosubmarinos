@@ -36,6 +36,7 @@ const gameController = {
         batalla: null
     },
     onRegistroSocket: function (token) {
+
         gameData.tokenRoom = token;
         gameData.jugadorLocal = factoryJugador.local();
 

@@ -10,18 +10,30 @@ const tipoMsgSocket = {
 
 
 const factoryMensajeSocket = {
-    JugadorIngresa: function (token :string, id_jugador :int ) {
+    JugadorIngresa: function (token :string, id_jugador :string ) {
         return {
             id_jugador,
             token,
             tipo: tipoMsgSocket.ingresa
         };
     },
-    JugadorConfirma: function (token :string, id_jugador : int) {
+    JugadorConfirma: function (token :string, id_jugador : string ) {
         return {
             id_jugador,
             token,
             tipo: tipoMsgSocket.confirma_posiciones
         }
+    },
+    LanzaCohete :function(  token :string , id_jugador : string,  indexCuadrante :number, r: number, c: number){
+
+        return {
+            id_jugador,
+            token,
+            tipo: tipoMsgSocket.lanza_cohete,
+            indexCuadrante : indexCuadrante ,
+            r:r,
+            c:c
+        }
+
     }
 };

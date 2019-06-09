@@ -3,7 +3,7 @@
 
 class ACohete {
 
-    constructor(posicionIni: Posicion, id_jugador: string) {
+    constructor(posicionIni: Posicion, id_jugador: string, indexCuadrante: number) {
         this.id = IDGenerator('c');
         this.posicionIni = posicionIni;
         this.posicionFinal = null;
@@ -22,6 +22,10 @@ class ACohete {
 
         this.id_jugador = id_jugador;
         this.callbackAlLanzar = null;
+        this.callbackAlExplotar = null;
+
+        this.indexCuadrante = indexCuadrante;
+        this.isLocal = null;
     }
 
     getEtapaExplosion(): number {
@@ -79,13 +83,33 @@ class ACohete {
         this.angulo = Math.round(this.angulo);
 
 
-        //TODO revisarlo cuando los disparos son haciua abajo
-        if (this.angulo < 0 && this.angulo > -180) {
-            //console.log(`angulo ${this.angulo}`);
-            this.angulo = 180 + this.angulo;
+        const indexCuadrante = this.indexCuadrante;
+
+        console.log(`angulo de cohete ${this.angulo}`);
+
+
+        //TRANSFORMACION DEL ANGULO - DEPENDE DEL CUADRANTE
+        console.log('indexCuadrante ' + indexCuadrante.toString());
+
+        if (indexCuadrante === 0) {
+            if (this.angulo < 0 && this.angulo > -180) {
+                this.angulo = 180 + this.angulo;
+            }
         }
 
-        //console.log(`angulo ${this.angulo}`);
+        if (indexCuadrante === 1) {
+
+            if (this.angulo < 90 && this.angulo > 0) {
+                this.angulo += 180;
+            } else if (this.angulo < 0 && this.angulo > -90) {
+                this.angulo += 360;
+            }
+
+        }
+
+
+        console.log(` angulo transformado  ${this.angulo}`);
+
 
         //----------------------------------------------------
 
@@ -101,6 +125,7 @@ class ACohete {
             //actualizar
             if (this.frameIniciaExplosion === 0) {
                 this.frameIniciaExplosion = contadorFrames;
+                //mandar mensaje de explosion si es local
             }
             const duracionFrame = 10;
 
@@ -109,15 +134,19 @@ class ACohete {
 
             if (this.etapaExplosion >= 7) {
                 this.estado = 'explotado';
-                this.etapaExplosion=6;
+                this.etapaExplosion = 6;
 
                 //poner que ya se alcanzo el objetivo
                 const zona = gameData.listaZonasAtacadas
-                    .find( z=>{
+                    .find(z => {
                         return z.idCohete === this.id;
                     });
                 //esta propiedad es la que se usa para draw
-                zona.isObjetivoAlcanzado=true;
+                zona.isObjetivoAlcanzado = true;
+
+                if (this.callbackAlExplotar) {
+                    this.callbackAlExplotar(zona);
+                }
             }
 
 

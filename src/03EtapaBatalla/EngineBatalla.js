@@ -37,7 +37,27 @@ class EngineBatalla extends AEngine {
             drawBatallaContadores.exe(ctx);
             drawBatallaZonasAtacadas.exe(ctx);
 
-            drawBatallaCohetesLocal.exe(ctx, contadorFrames);
+
+            //Los cohete local
+            const listaCohetesLocal = gameData.jugadorLocal.getListaCohetes()
+                .filter(c => {
+                    return c.getIsEstadoLanzado();
+                });
+
+            drawBatallaCohetesLocal.exe(ctx, contadorFrames, listaCohetesLocal);
+
+
+            //Los cohetes dreotos
+            const listaCohetesRemoto = gameData.listaCohetes
+                .filter(c => {
+                    return c.getIsEstadoLanzado();
+                });
+
+            drawBatallaCohetesLocal.exe(ctx, contadorFrames, listaCohetesRemoto);
+
+
+
+
 
             idFrame = window.requestAnimationFrame(frames);
 
@@ -154,4 +174,22 @@ class EngineBatalla extends AEngine {
         return sub;
     }
 
+    onJugadorRemotoLanzaCohete( id_jugador: string, indexCuadrante : number, r:number, c:number){
+
+        let jugadorRemoto= gameData.listaJugadores
+            .find( j=>{
+                return j.id=== id_jugador;
+        });
+
+        if(jugadorRemoto=== undefined || jugadorRemoto === null){
+            console.log('no se eocntro el jugador ' + id_jugador);
+        }
+
+        //con el jugador encontrado atacar
+        jugadorRemoto.lanzaCohete( indexCuadrante, r,c);
+
+
+
+
+    }
 }

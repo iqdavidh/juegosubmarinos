@@ -3,7 +3,7 @@
 const proRecibirMsgSocket = {
     exe: function (msg) {
 
-        const jugador = this.getJugadorFromId(parseInt(msg.id_jugador));
+        const jugador = this.getJugadorFromId(msg.id_jugador);
 
         if (msg.tipo === tipoMsgSocket.ingresa) {
             this.jugador_ingresa(jugador);
@@ -11,6 +11,9 @@ const proRecibirMsgSocket = {
 
         } else if (msg.tipo === tipoMsgSocket.confirma_posiciones) {
             this.jugador_confirma_posicion(jugador)
+
+        } else if (msg.tipo === tipoMsgSocket.lanza_cohete) {
+            this.lanza_cohete(msg)
 
         } else {
             alert("no esperamos este tipo de mensaje " + msg.tipo)
@@ -22,6 +25,7 @@ const proRecibirMsgSocket = {
 
     },
     jugador_confirma_posicion: function (jugador: JugadorRemoto) {
+
         jugador.setPosicionConfirmada();
 
         //notificar al controller - si no esta en la etapa de espera
@@ -31,7 +35,18 @@ const proRecibirMsgSocket = {
         }
 
     },
-    getJugadorFromId: function (id_jugador: number): JugadorRemoto {
+    lanza_cohete: function (msg) {
+
+        //si es el mensaje del jugador local no hacemos nada
+        if(msg.id_jugador === gameData.jugadorLocal.id){
+            return ;
+        }
+
+        gameController.engine.batalla.onJugadorRemotoLanzaCohete(msg.id_jugador, msg.indexCuadrante, msg.r, msg.c);
+
+
+    },
+    getJugadorFromId: function (id_jugador: string): JugadorRemoto {
 
 
         return gameData.listaJugadores

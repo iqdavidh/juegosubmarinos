@@ -42,7 +42,7 @@ class JugadorLocal extends AJugador {
 
             //agreagamos la zona atacada
             
-            let zonaAtacada=factoryZonaAtacada.exe(posicionEnLaMira, cohete.id);
+            let zonaAtacada=factoryZonaAtacada.exe(posicionEnLaMira, cohete.id , gameData.jugadorLocal.id);
             gameData.listaZonasAtacadas.push(zonaAtacada);
 
         }
