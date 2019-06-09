@@ -17,7 +17,7 @@ class AJugador {
     }
 
 
-    getIndexCuatrante(){
+    getIndexCuadrante(){
         return this.indexCuadrante;
     }
 

@@ -22,9 +22,16 @@ class CoheteLocal extends ACohete {
 
             if (submarino) {
                 //console.log(`preparar submarino ${id_submarino}`);
+
                 submarino.setNewTiempoCoheteReady();
+
                 //console.log(`nuevo tiempo del submarino ${id_submarino} es ${submarino.tiempoCoheteReady}`);
             }
+
+        };
+
+        this.callbackAlExplotar = (zona: Object) => {
+            //TODO enviar mensaje de que atacamos a algien
 
 
         }

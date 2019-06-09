@@ -277,17 +277,33 @@ let EventoDummy = {
         let r = 1;
         let c = numAtaques + 1;
 
-        if(c>4){
-            c=numAtaques-3;
+        if (c > 4) {
+            c = numAtaques - 3;
             r++;
         }
 
         let id_jugador_recibe_ataque = gameData.jugadorLocal.id;
 
-        let msg = factoryMensajeSocket.LanzaCohete(id, id_jugador_recibe_ataque, r, c)
+        let msg = factoryMensajeSocket.LanzaCohete(id, id_jugador_recibe_ataque, r, c);
         gameController.onRecibirMensajeSocket(msg);
 
-    }
+    },
+    simularJ1RecibeAtaque: function (r, c, isSubmarino) {
+
+
+        let id = gameData.listaJugadores[0].id;
+
+        const jugador1 = gameData.listaJugadores
+            .find(j => {
+                return j.id === id;
+            });
+
+
+        let msg = factoryMensajeSocket.ResultadoAtaque(id, r, c, isSubmarino, false);
+        gameController.onRecibirMensajeSocket(msg);
+    },
+
+
 };
 // @flow
 
@@ -348,7 +364,7 @@ class AJugador {
     }
 
 
-    getIndexCuatrante(){
+    getIndexCuadrante(){
         return this.indexCuadrante;
     }
 
@@ -368,24 +384,27 @@ class AJugador {
 "use strict";
 
 const factoryZonaAtacada = {
-    exe: function (posicionRCC, idCohete, id_jugador) {
+    exe: function (posicionRCC, idCohete, id_jugador, isObjetivoAlcanzado = false
+)
+{
 
-        const isSubmarino = null;
-        const id = IDGenerator('zona');
-        const indexCuadrante = posicionRCC.getIndexCuadrante();
-        const isObjetivoAlcanzado = false;
+    let isSubmarino = null;
+    const id = IDGenerator('zona');
+    const indexCuadrante = posicionRCC.getIndexCuadrante();
 
-        return {
-            id,
-            idCohete,
-            isObjetivoAlcanzado,
-            indexCuadrante,
-            id_jugador,
-            posicionRCC,
-            isSubmarino
-        };
-    }
-};
+
+    return {
+        id,
+        idCohete,
+        isObjetivoAlcanzado,
+        indexCuadrante,
+        id_jugador,
+        posicionRCC,
+        isSubmarino
+    };
+}
+}
+;
 /* @flow */
 class JugadorLocal extends AJugador {
 
@@ -460,6 +479,10 @@ class JugadorRemoto extends AJugador {
 
         this.numSubmarinos = gameConfig.numSubmarinos;
 
+    }
+
+    onSubmarinoDestruido() {
+        this.numSubmarinos--;
     }
 
     getNumSubmarinos() {
@@ -2059,7 +2082,7 @@ class ACohete {
                 this.frameIniciaExplosion = contadorFrames;
                 //mandar mensaje de explosion si es local
             }
-            const duracionFrame = 10;
+            const duracionFrame = 7;
 
 
             this.etapaExplosion = Math.floor((contadorFrames - this.frameIniciaExplosion) / duracionFrame);
@@ -2131,9 +2154,16 @@ class CoheteLocal extends ACohete {
 
             if (submarino) {
                 //console.log(`preparar submarino ${id_submarino}`);
+
                 submarino.setNewTiempoCoheteReady();
+
                 //console.log(`nuevo tiempo del submarino ${id_submarino} es ${submarino.tiempoCoheteReady}`);
             }
+
+        };
+
+        this.callbackAlExplotar = (zona) => {
+            //TODO enviar mensaje de que atacamos a algien
 
 
         }
@@ -2299,7 +2329,7 @@ const factoryMensajeSocket = {
         }
 
     },
-    ResultadoAtaque: function (id_jugador, indexCuadrante, r, c, is_submarino, is_rendicion) {
+    ResultadoAtaque: function (id_jugador,  r, c, isSubmarino, isRendicion) {
 
         return {
             token: gameData.tokenRoom,
@@ -2307,8 +2337,8 @@ const factoryMensajeSocket = {
             tipo: tipoMsgSocket.resultado_ataque,
             r,
             c,
-            is_submarino,
-            is_rendicion
+            isSubmarino,
+            isRendicion
         }
 
     }
@@ -2318,7 +2348,14 @@ const factoryMensajeSocket = {
 const proRecibirMsgSocket = {
     exe: function (msg) {
 
+        //buscar al jugador qeu envia el ataque
         const jugador = this.getJugadorFromId(msg.id_jugador);
+
+        //si es del jugador local / nbosotros msimos no hacemos nada
+        if (msg.id_jugador === gameData.jugadorLocal.id) {
+            return;
+        }
+
 
         if (msg.tipo === tipoMsgSocket.ingresa) {
             this.jugador_ingresa(jugador);
@@ -2329,6 +2366,9 @@ const proRecibirMsgSocket = {
 
         } else if (msg.tipo === tipoMsgSocket.lanza_cohete) {
             this.lanza_cohete(msg)
+
+        } else if (msg.tipo === tipoMsgSocket.resultado_ataque) {
+            this.resultado_ataque( jugador, msg);
 
         } else {
             alert("no esperamos este tipo de mensaje " + msg.tipo)
@@ -2352,11 +2392,6 @@ const proRecibirMsgSocket = {
     },
     lanza_cohete: function (msg) {
 
-        //si es el mensaje del jugador local no hacemos nada
-        if (msg.id_jugador === gameData.jugadorLocal.id) {
-            return;
-        }
-
         let indexCuadranteAtacado = null;
 
         if (msg.id_jugador_recibe_ataque === gameData.jugadorLocal.id) {
@@ -2374,10 +2409,42 @@ const proRecibirMsgSocket = {
             }
         }
 
-        if (indexCuadranteAtacado!== null) {
+        if (indexCuadranteAtacado !== null) {
             gameController.engine.batalla.onJugadorRemotoLanzaCohete(msg.id_jugador, indexCuadranteAtacado, msg.r, msg.c);
         }
 
+
+    },
+    resultado_ataque: function (jugador, msg) {
+        //buscar la zona que se ataco y marcarla
+
+        let zona = gameData.listaZonasAtacadas
+            .find(z => {
+                    let rZona = z.posicionRCC.posicionRC.r;
+                    let cZona = z.posicionRCC.posicionRC.c;
+
+                    return z.id_jugador === jugador.id && msg.r === rZona && msg.c === cZona;
+                }
+            );
+
+
+
+        if (!zona) {
+            //crear la zona
+            const indexCuadrante=jugador.getIndexCuadrante();
+            const pos=new PosicionRCCuadrante(indexCuadrante, new PosicionRC( msg.r, msg.c));
+            zona=factoryZonaAtacada.exe(pos,null, jugador.id);
+            gameData.listaZonasAtacadas.push(zona);
+        }else{
+
+        }
+
+        zona.isObjetivoAlcanzado = true;
+        zona.isSubmarino=msg.isSubmarino;
+
+        if(zona.isSubmarino){
+            jugador.onSubmarinoDestruido();
+        }
 
     },
     getJugadorFromId: function (id_jugador) {
@@ -2563,6 +2630,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190609 09:34');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190609 10:56');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

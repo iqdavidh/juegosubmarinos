@@ -78,15 +78,31 @@ let EventoDummy = {
         let r = 1;
         let c = numAtaques + 1;
 
-        if(c>4){
-            c=numAtaques-3;
+        if (c > 4) {
+            c = numAtaques - 3;
             r++;
         }
 
         let id_jugador_recibe_ataque = gameData.jugadorLocal.id;
 
-        let msg = factoryMensajeSocket.LanzaCohete(id, id_jugador_recibe_ataque, r, c)
+        let msg = factoryMensajeSocket.LanzaCohete(id, id_jugador_recibe_ataque, r, c);
         gameController.onRecibirMensajeSocket(msg);
 
-    }
+    },
+    simularJ1RecibeAtaque: function (r, c, isSubmarino: false) {
+
+
+        let id = gameData.listaJugadores[0].id;
+
+        const jugador1 = gameData.listaJugadores
+            .find(j => {
+                return j.id === id;
+            });
+
+
+        let msg = factoryMensajeSocket.ResultadoAtaque(id, r, c, isSubmarino, false);
+        gameController.onRecibirMensajeSocket(msg);
+    },
+
+
 };
