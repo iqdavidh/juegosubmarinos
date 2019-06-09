@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <title>Test Websocket</title>
+</head>
+<body>
+
+<div id="app">
+
+
+    <p>Prueba del Websocket</p>
+
+    <div style="display: flex">
+        <div style="width: 400px; border-right: 2px solid red"></div>
+        <div style="padding: 5px">
+            <strong>Output:</strong>
+            <hr>
+            <div id="output"></div>
+            <hr>
+            <p style="color:#c3c3c3">Si se desconecta recargar la página</p>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script>
+    var output = document.getElementById("output");
+
+    function writeToScreen(message) {
+        var p = document.createElement("p");
+        p.style.wordWrap = "break-word";
+        p.innerHTML = message;
+        output.appendChild(p);
+    }
+
+
+    /********************************************************************************/
+    var ws = new WebSocket("wss://9ig8cfud1d.execute-api.us-west-2.amazonaws.com/Dev");
+
+    ws.onopen = function (evento) {
+        writeToScreen("Conectado");
+    };
+
+    ws.onclose = function (evento) {
+        writeToScreen("Desconectado");
+    };
+
+    ws.onmessage = function (evento) {
+        writeToScreen(JSON.stringify(evento));
+    };
+
+    ws.onerror = function (evento) {
+        writeToScreen(JSON.stringify(evento));
+    };
+
+
+    function sendDataWS(mov) {
+
+        /* verficiar que este conectado ws*/
+        var msg = {
+            type: "message",
+            movimiento: mov
+        };
+
+        ws.send(JSON.stringify(msg));
+
+    }
+
+
+    const app = new Vue({
+
+    });
+
+
+</script>
+
+</body>
+</html>

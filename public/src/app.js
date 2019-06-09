@@ -2898,6 +2898,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190609 17:51');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190609 17:53');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
