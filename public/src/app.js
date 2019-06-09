@@ -3,10 +3,10 @@
 const gameConfig = {
     size: 700,
     deltaSep: 20,
-    numSubmarinos: 4,
+    numSubmarinos: 1,
     numDivisiones: 4,
     wDivision: 2,
-    sPrepararCohete:6,
+    sPrepararCohete:0, /*<------------*/
     velocidadCohete:10,
     sizeCohete:50,
     resources: {
@@ -2057,6 +2057,10 @@ class ACohete {
 
         this.angulo = Math.atan(dy / dx);
 
+        const isDyNegativo = dy < 0;
+        const isDxNegativo = dx < 0;
+
+
         //conversion a grados
         this.angulo = this.angulo * (180 / Math.PI);
 
@@ -2064,18 +2068,60 @@ class ACohete {
         this.angulo = Math.round(this.angulo);
 
 
+        //este es de donde sale el cohete
         const indexCuadrante = this.indexCuadrante;
-
-        console.log(`angulo de cohete ${this.angulo}`);
 
 
         //TRANSFORMACION DEL ANGULO - DEPENDE DEL CUADRANTE
         console.log('indexCuadrante ' + indexCuadrante.toString());
 
+        const anguloOriginal = this.angulo;
+
         if (indexCuadrante === 0) {
-            if (this.angulo < 0 && this.angulo > -180) {
-                this.angulo = 180 + this.angulo;
+            // if (this.angulo < 0 && this.angulo > -180) {
+            //     this.angulo = 180 + this.angulo;
+            // }
+
+
+            if (isDxNegativo) {
+
+                if (this.angulo === 0) {
+                    this.angulo = 180;
+
+                } else if (this.angulo < 0) {
+
+                    if (isDyNegativo) {
+
+                        this.angulo -= 360;
+                    } else {
+                        this.angulo += 180;
+                    }
+                }else{
+
+
+                    if(isDyNegativo){
+                        this.angulo += 180;
+                    }
+                }
+
+
+            } else {
+
+                if (isDyNegativo) {
+
+                    if (this.angulo === 0) {
+
+                    } else if (this.angulo < 0) {
+
+                        this.angulo += 360;
+                    }
+
+
+                }
+
             }
+
+
         }
 
         if (indexCuadrante === 1) {
@@ -2089,7 +2135,7 @@ class ACohete {
         }
 
 
-        console.log(` angulo transformado  ${this.angulo}`);
+        console.log(`cuadrante :: angulo original -> angulo transformado   ${indexCuadrante}:: ${anguloOriginal} -> ${this.angulo} | ${isDxNegativo ? 'isDxNegativo' : ''} ${isDyNegativo ? 'isDyNegativo' : ''}`);
 
 
         //----------------------------------------------------
@@ -2683,6 +2729,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190609 12:43');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190609 13:24');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
