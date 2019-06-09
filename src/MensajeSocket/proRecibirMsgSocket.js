@@ -99,6 +99,21 @@ const proRecibirMsgSocket = {
 
         if(zona.isSubmarino){
             jugador.onSubmarinoDestruido();
+
+            //ver cuantos jugadores quedan
+
+            let numJugadores =gameData.listaJugadores
+                .filter(j=>{
+                    return j.getNumSubmarinos()>0;
+                })
+                .length
+            ;
+
+            if(numJugadores===0){
+                alert("ganaste");
+            }
+
+
         }
 
     },

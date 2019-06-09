@@ -1584,6 +1584,7 @@ const drawBatallaZonasAtacadas = {
             });
 
         //con cada zona hacer el dibujo
+
         lista.forEach(zona => {
 
             const posicion = zona.posicionRCC.getPosAbs();
@@ -1595,7 +1596,8 @@ const drawBatallaZonasAtacadas = {
 
 
             if (zona.isSubmarino === true) {
-                //TODO si hay un submarino dibujarlo
+                let imgSubmarino=  gameConfig.resources.imgTanqueDest;
+                ctx.drawImage(imgSubmarino, 0, 0, 100, 100, posicion.x , posicion.y, sizeCM, sizeCM);
             }
 
         });
@@ -2444,6 +2446,21 @@ const proRecibirMsgSocket = {
 
         if(zona.isSubmarino){
             jugador.onSubmarinoDestruido();
+
+            //ver cuantos jugadores quedan
+
+            let numJugadores =gameData.listaJugadores
+                .filter(j=>{
+                    return j.getNumSubmarinos()>0;
+                })
+                .length
+            ;
+
+            if(numJugadores===0){
+                alert("ganaste");
+            }
+
+
         }
 
     },
@@ -2630,6 +2647,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190609 10:56');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190609 11:14');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
