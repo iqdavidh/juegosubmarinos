@@ -1,6 +1,6 @@
 /* @flow */
 const tipoMsgSocket = {
-    ingresa: 'ingresa',
+    solicitar_ingresar_room: 'ingresa',
     sale: 'sale',
     confirma_posiciones: 'confirma_posiciones',
     inicia_batalla: 'inicia_batalla',
@@ -14,7 +14,7 @@ const factoryMensajeSocket = {
         return {
             token: gameData.tokenRoom,
             id_jugador,
-            tipo: tipoMsgSocket.ingresa
+            tipo: tipoMsgSocket.solicitar_ingresar_room
         };
     },
     JugadorConfirma: function (id_jugador: string) {

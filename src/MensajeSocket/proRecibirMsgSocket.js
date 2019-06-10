@@ -12,7 +12,7 @@ const proRecibirMsgSocket = {
         }
 
 
-        if (msg.tipo === tipoMsgSocket.ingresa) {
+        if (msg.tipo === tipoMsgSocket.solicitar_ingresar_room) {
             this.jugador_ingresa(jugador);
 
 
