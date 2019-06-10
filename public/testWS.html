@@ -43,55 +43,86 @@
         <p>Recordar usar dos ventanas para ver como se comunican los jugadores</p>
 
 
-        <div style="display: flex">
-            <div style="width: 400px; border-right: 2px solid red; padding: 5px">
+        <div class="row">
 
-                <h4>Datos para prueba</h4>
+            <div class="col-md-4">
 
-                <div class="form-group">
-                    <label>Id Jugador Atacado</label>
-                    <input type="text" class="form-control"
-                           v-model="dataMsg.id_jugador_atacado" title=""/>
+                <div style=" border-right: 2px solid red; padding: 5px">
+
+                    <h4>Datos para prueba</h4>
+
+                    <div class="form-group">
+                        <label>Token Room</label>
+                        <input type="text" class="form-control"
+                               v-model="dataMsg.tokenRoom" title=""/>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label>Id Jugador Atacado</label>
+                        <input type="text" class="form-control"
+                               v-model="dataMsg.id_jugador_recibe_ataque" title=""/>
+                    </div>
+
+                    <div class="form-group">
+                        <label>r</label>
+                        <input type="text" class="form-control" v-model="dataMsg.r" title=""/>
+                    </div>
+
+                    <div class="form-group">
+                        <label>c</label>
+                        <input type="text" class="form-control" v-model="dataMsg.c" title=""/>
+                    </div>
+
+                    <hr/>
+                    <h4>Mensajes</h4>
+
+
+                    <div v-for="item in listaComandos" v-bind:key="item.tipo" style="margin-bottom: 5px">
+
+                        <button @click="sendMessage(item)"
+                                class="btn btn-block">
+                            {{item.tipo}}
+                        </button>
+                    </div>
+
                 </div>
-
-                <div class="form-group">
-                    <label>r</label>
-                    <input type="text" class="form-control" v-model="dataMsg.r" title=""/>
-                </div>
-
-                <div class="form-group">
-                    <label>c</label>
-                    <input type="text" class="form-control" v-model="dataMsg.c" title=""/>
-                </div>
-
-                <hr/>
-                <h4>Mensajes</h4>
-
-
-                <div v-for="item in listaComandos" v-bind:key="item.tipo" style="margin-bottom: 5px">
-
-                    <button @click=""
-                            class="btn btn-block">
-                        {{item.tipo}}
-                    </button>
-                </div>
-
             </div>
-            <div style="padding: 5px">
-                <strong>Output:</strong>
-                <hr>
-                <div id="output"></div>
-                <ul>
-                    <li v-for="item in listaMsgRecibido" v-bind:key="item.id">
-                        <small>{{item.eventoTipo}}</small><br>
-                        {{item.texto}}
+            <div class="col-md-4">
 
-                    </li>
-                </ul>
-
+                <h4>Mensajes Recibido...</h4>
                 <hr>
-                <p style="color:#c3c3c3">Si se desconecta recargar la página</p>
+
+                <div style="padding: 5px">
+                    <ul>
+                        <li v-for="item in listaMsgRecibido" >
+                            <small>{{item.eventoTipo}}</small>
+                            <br>
+                            {{item.texto}}
+
+                        </li>
+                    </ul>
+                    <hr>
+                    <p style="color:#c3c3c3">Si se desconecta recargar la página</p>
+                </div>
             </div>
+            <div class="col-md-4">
+
+                <h4>Mensajes Enviados...</h4>
+                <hr>
+                <div style="padding: 5px">
+                    <ul>
+                        <li v-for="item in listaMsgEnviado" >
+                            {{item}}
+                        </li>
+                    </ul>
+
+                    <hr>
+                    <p style="color:#c3c3c3">Si se desconecta recargar la página</p>
+                </div>
+            </div>
+
+
         </div>
 
     </div>
@@ -118,11 +149,12 @@
         el: '#app',
         data: {
             idJugador: null,
-            identityContador:0,
+            identityContador: 0,
             listaMsgRecibido: [],
             listaMsgEnviado: [],
             dataMsg: {
-                id_jugador_atacado: 'x',
+                tokenRoom: '*token*',
+                id_jugador_recibe_ataque: 'x',
                 r: 1,
                 c: 1
             },
@@ -141,9 +173,9 @@
             getIdJugador() {
                 return 'player-' + Math.round(Math.random() * 10000000).toString();
             },
-            getNextIdentity(){
-              this.identityContador++;
-              return this.identityContador;
+            getNextIdentity() {
+                this.identityContador++;
+                return this.identityContador;
             },
             onEventoSocket(evento, tipo) {
                 this.listaMsgRecibido.push(
@@ -167,6 +199,37 @@
             recibirOnError(evento) {
                 return this.onEventoSocket(evento, 'recibirOnError');
             },
+            sendMessage(itemComando) {
+                /* verficiar que este conectado ws*/
+
+                let data = {
+                    token: this.dataMsg.tokenRoom,
+                    id_jugador: this.idJugador,
+                    tipo: itemComando.tipo
+                };
+
+
+                if (itemComando.tipo === 'lanza_cohete') {
+                    data.id_jugador_recibe_ataque = this.dataMsg.id_jugador_recibe_ataque;
+                    data.r = this.dataMsg.r;
+                    data.c = this.dataMsg.c;
+                }
+
+                if (itemComando.tipo === 'resultado_ataque') {
+                    data.r = this.dataMsg.r;
+                    data.c = this.dataMsg.c;
+                    data.isSubmarino = (Math.random() > 0.5);
+                }
+
+                var msg = {
+                    mov:data,
+                    type: "message"
+                };
+
+                this.listaMsgEnviado.push(data);
+
+                ws.send(JSON.stringify(msg));
+            }
         },
         computed: {},
         mounted() {
@@ -196,19 +259,6 @@
     ws.onerror = function (evento) {
         app.recibirOnError(evento);
     };
-
-
-    function sendDataWS(mov) {
-
-        /* verficiar que este conectado ws*/
-        var msg = {
-            type: "message",
-            movimiento: mov
-        };
-
-        ws.send(JSON.stringify(msg));
-
-    }
 
 
 </script>
