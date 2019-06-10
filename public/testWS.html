@@ -20,13 +20,14 @@
           integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
 
     <style>
-        .form-control{
+        .form-control {
             display: inline-block;
-            width:150px;
+            width: 150px;
         }
 
-        label{
-            width: 150px; text-align: right;
+        label {
+            width: 150px;
+            text-align: right;
         }
     </style>
 </head>
@@ -40,7 +41,6 @@
         <h3>Prueba del Websocket {{idJugador}}</h3>
 
         <p>Recordar usar dos ventanas para ver como se comunican los jugadores</p>
-
 
 
         <div style="display: flex">
@@ -81,6 +81,14 @@
                 <strong>Output:</strong>
                 <hr>
                 <div id="output"></div>
+                <ul>
+                    <li v-for="item in listaMsgRecibido" v-bind:key="item.id">
+                        <small>{{item.eventoTipo}}</small><br>
+                        {{item.texto}}
+
+                    </li>
+                </ul>
+
                 <hr>
                 <p style="color:#c3c3c3">Si se desconecta recargar la página</p>
             </div>
@@ -91,47 +99,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script>
-    var output = document.getElementById("output");
 
-    function writeToScreen(message) {
-        var p = document.createElement("p");
-        p.style.wordWrap = "break-word";
-        p.innerHTML = message;
-        output.appendChild(p);
-    }
-
-
-    /********************************************************************************/
-    var ws = new WebSocket("wss://9ig8cfud1d.execute-api.us-west-2.amazonaws.com/Dev");
-
-    ws.onopen = function (evento) {
-        writeToScreen("Conectado");
-    };
-
-    ws.onclose = function (evento) {
-        writeToScreen("Desconectado");
-    };
-
-    ws.onmessage = function (evento) {
-        writeToScreen(JSON.stringify(evento));
-    };
-
-    ws.onerror = function (evento) {
-        writeToScreen(JSON.stringify(evento));
-    };
-
-
-    function sendDataWS(mov) {
-
-        /* verficiar que este conectado ws*/
-        var msg = {
-            type: "message",
-            movimiento: mov
-        };
-
-        ws.send(JSON.stringify(msg));
-
-    }
 
     /*copia de factory msgSoket*/
     const tipoMsgSocket = {
@@ -150,10 +118,13 @@
         el: '#app',
         data: {
             idJugador: null,
-            dataMsg:{
-               id_jugador_atacado:'x',
-               r:1,
-               c:1
+            identityContador:0,
+            listaMsgRecibido: [],
+            listaMsgEnviado: [],
+            dataMsg: {
+                id_jugador_atacado: 'x',
+                r: 1,
+                c: 1
             },
             listaComandos: [
                 {tipo: 'solicitar_crear_room'},
@@ -163,13 +134,39 @@
                 {tipo: 'confirma_posiciones'},
                 {tipo: 'inicia_batalla'},
                 {tipo: 'lanza_cohete'},
-                {tipo: 'resultado_ataque'},
+                {tipo: 'resultado_ataque'}
             ]
         },
         methods: {
             getIdJugador() {
                 return 'player-' + Math.round(Math.random() * 10000000).toString();
-            }
+            },
+            getNextIdentity(){
+              this.identityContador++;
+              return this.identityContador;
+            },
+            onEventoSocket(evento, tipo) {
+                this.listaMsgRecibido.push(
+                    {
+                        id: this.getNextIdentity(),
+                        data: evento,
+                        eventoTipo: tipo,
+                        texto: JSON.stringify(evento)
+                    }
+                );
+            },
+            recibirOnOpen(evento) {
+                return this.onEventoSocket(evento, 'onRecibirMensaje');
+            },
+            recibirOnClose(evento) {
+                return this.onEventoSocket(evento, 'recibirOnClose');
+            },
+            recibirOnMesagge(evento) {
+                return this.onEventoSocket(evento, 'recibirOnMesagge');
+            },
+            recibirOnError(evento) {
+                return this.onEventoSocket(evento, 'recibirOnError');
+            },
         },
         computed: {},
         mounted() {
@@ -177,6 +174,41 @@
             console.log('vue ready');
         }
     });
+
+
+    /********************************************************************************/
+    /********************************************************************************/
+
+    var ws = new WebSocket("wss://9ig8cfud1d.execute-api.us-west-2.amazonaws.com/Dev");
+
+    ws.onopen = function (evento) {
+        app.recibirOnOpen(evento);
+    };
+
+    ws.onclose = function (evento) {
+        app.recibirOnClose(evento);
+    };
+
+    ws.onmessage = function (evento) {
+        app.recibirOnMesagge(evento);
+    };
+
+    ws.onerror = function (evento) {
+        app.recibirOnError(evento);
+    };
+
+
+    function sendDataWS(mov) {
+
+        /* verficiar que este conectado ws*/
+        var msg = {
+            type: "message",
+            movimiento: mov
+        };
+
+        ws.send(JSON.stringify(msg));
+
+    }
 
 
 </script>
