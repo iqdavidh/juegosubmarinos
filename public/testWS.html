@@ -88,37 +88,54 @@
 
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-8">
+                <div class="col-md-12">
 
-                <h4>Mensajes Recibido...</h4>
-                <hr>
+                    <div class="row">
+                        <div class="col-md-12">
 
-                <div style="padding: 5px">
-                    <ul>
-                        <li v-for="item in listaMsgRecibido" >
-                            <small>{{item.eventoTipo}}</small>
-                            <br>
-                            {{item.texto}}
+                            <h4>Último Mensaje Recibido</h4>
+                            <div style="color:green; padding: 5px; margin-bottom: 20px">
+                                {{listaMsgRecibido[0]}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
 
-                        </li>
-                    </ul>
-                    <hr>
-                    <p style="color:#c3c3c3">Si se desconecta recargar la página</p>
-                </div>
-            </div>
-            <div class="col-md-4">
+                            <h4>Mensajes Recibido</h4>
+                            <div style="padding: 5px; max-height: 600px; overflow-y: scroll">
+                                <ul>
+                                    <li v-for="item in listaMsgRecibido">
+                                        <small>{{item.eventoTipo}}</small>
+                                        <br>
+                                        {{item}}
 
-                <h4>Mensajes Enviados...</h4>
-                <hr>
-                <div style="padding: 5px">
-                    <ul>
-                        <li v-for="item in listaMsgEnviado" >
-                            {{item}}
-                        </li>
-                    </ul>
+                                    </li>
+                                </ul>
+                                <hr>
+                                <p style="color:#c3c3c3">Si se desconecta recargar la página</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
 
-                    <hr>
-                    <p style="color:#c3c3c3">Si se desconecta recargar la página</p>
+                            <h4>Mensajes Enviados...</h4>
+                            <hr>
+                            <div style="padding: 5px">
+                                <ul>
+                                    <li v-for="item in listaMsgEnviado">
+                                        {{item}}
+                                    </li>
+                                </ul>
+
+                                <hr>
+                                <p style="color:#c3c3c3">Si se desconecta recargar la página</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+
                 </div>
             </div>
 
@@ -139,7 +156,7 @@
 
         sale: 'sale',
         confirma_posiciones: 'confirma_posiciones',
-        inicia_batalla: 'inicia_batalla',
+
         lanza_cohete: 'lanza_cohete',
         resultado_ataque: 'resultado_ataque',
     };
@@ -150,6 +167,7 @@
         data: {
             idJugador: null,
             identityContador: 0,
+            lastMsgRecibido: "",
             listaMsgRecibido: [],
             listaMsgEnviado: [],
             dataMsg: {
@@ -178,12 +196,28 @@
                 return this.identityContador;
             },
             onEventoSocket(evento, tipo) {
-                this.listaMsgRecibido.push(
+
+                if (evento.data === undefined || null) {
+                    console.log('este es un evento que no data');
+                    return;
+                }
+
+                if (typeof evento.data !== "string") {
+                    console.log('este esperamos que el data sea string -json ');
+                    console.log(evento.data);
+                    return;
+                }
+
+                //ya es seguro tener el data
+
+                let data =JSON.parse(evento.data);
+
+
+                this.listaMsgRecibido.unshift(
                     {
                         id: this.getNextIdentity(),
-                        data: evento,
+                        data,
                         eventoTipo: tipo,
-                        texto: JSON.stringify(evento)
                     }
                 );
             },
@@ -203,6 +237,7 @@
                 /* verficiar que este conectado ws*/
 
                 let data = {
+                    modo: 'juego',
                     token: this.dataMsg.tokenRoom,
                     id_jugador: this.idJugador,
                     tipo: itemComando.tipo
@@ -222,7 +257,7 @@
                 }
 
                 var msg = {
-                    mov:data,
+                    data,
                     type: "message"
                 };
 

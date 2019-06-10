@@ -3,7 +3,7 @@ const tipoMsgSocket = {
     solicitar_ingresar_room: 'ingresa',
     sale: 'sale',
     confirma_posiciones: 'confirma_posiciones',
-    inicia_batalla: 'inicia_batalla',
+
     lanza_cohete: 'lanza_cohete',
     resultado_ataque: 'resultado_ataque',
 };

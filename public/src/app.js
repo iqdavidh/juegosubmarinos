@@ -2534,10 +2534,10 @@ const factoryCohete = {
 
 /* @flow */
 const tipoMsgSocket = {
-    ingresa: 'ingresa',
+    solicitar_ingresar_room: 'ingresa',
     sale: 'sale',
     confirma_posiciones: 'confirma_posiciones',
-    inicia_batalla: 'inicia_batalla',
+
     lanza_cohete: 'lanza_cohete',
     resultado_ataque: 'resultado_ataque',
 };
@@ -2548,7 +2548,7 @@ const factoryMensajeSocket = {
         return {
             token: gameData.tokenRoom,
             id_jugador,
-            tipo: tipoMsgSocket.ingresa
+            tipo: tipoMsgSocket.solicitar_ingresar_room
         };
     },
     JugadorConfirma: function (id_jugador) {
@@ -2598,7 +2598,7 @@ const proRecibirMsgSocket = {
         }
 
 
-        if (msg.tipo === tipoMsgSocket.ingresa) {
+        if (msg.tipo === tipoMsgSocket.solicitar_ingresar_room) {
             this.jugador_ingresa(jugador);
 
 
@@ -2898,6 +2898,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190609 17:53');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190610 14:45');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
