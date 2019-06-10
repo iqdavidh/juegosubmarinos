@@ -1,7 +1,7 @@
 /* @flow */
 
 const gameConfig = {
-    size: 700,
+    size: 900,
     deltaSep: 20,
     numSubmarinos: 4,
     numDivisiones: 4,

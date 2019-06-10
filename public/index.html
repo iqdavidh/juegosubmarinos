@@ -35,8 +35,9 @@
         }
 
         .panFondoBlack {
-            background-color: rgba(0,0,0,0.5);
-            border-radius: 5px; color:#fff;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 5px;
+            color: #fff;
             padding: 10px 10px;
             text-align: center
 
@@ -62,8 +63,13 @@
                     <h2>Junio 2019</h2>
                     <h2>@iqdavidh</h2>
 
-                    <div style="margin-top: 40px">
-                        <div class="btn btn-primary">Jugar</div>
+                    <div style="margin-top: 40px"
+
+                    >
+                        <div class="btn btn-primary"
+                             @click="onIniciarJuego"
+                        >Jugar
+                        </div>
                         <div class="btn btn-default"
                              @click="subEtapa='instrucciones'"
                         >Ver Instrucciones
@@ -76,39 +82,54 @@
 
                             <ol>
                                 <li>
-                                    Este juego esta basado en <a href="https://es.wikipedia.org/wiki/Batalla_naval_(juego)">Battleship</a> pero
-                                    con las siguientes diferencias:
+                                    Este juego esta basado en
+                                    <a href="https://es.wikipedia.org/wiki/Batalla_naval_(juego)" target="_blank">Battleship</a>
+                                    pero
+                                    las siguientes diferencias:
                                     <ul>
-                                        <li>No esta basado en turnos, cada jugador puede disparar libremente mientras tenga cohetes listos. Cada barco puede generar un cohete cada 4 segundos.</li>
-                                        <li>El juego no esta limitado a 2 jugadores, pueden jugar en una misma partida hasta 8 jugadores.</li>
+                                        <li>No esta basado en turnos, cada jugador puede disparar libremente mientras
+                                            tenga cohetes listos. Cada barco puede generar un cohete cada 4 segundos.
+                                        </li>
+                                        <li>Solo existe un tipo de barco : Battleship</li>
+                                        <li>El juego no esta limitado a 2 jugadores, pueden jugar en una misma partida
+                                            hasta 8 jugadores.
+                                        </li>
                                         <li>Cada jugador juega desde una posición relativa que es la region central</li>
                                     </ul>
                                 </li>
                                 <li>
                                     El juego ba
-                                    El objetivo es disaparar  a las posiciones de los demás jugadores
+                                    El objetivo es disaparar a las posiciones de los demás jugadores
                                 </li>
                                 <li>Iniciar el Juego
                                     <ul>
-                                        <li>El juego lo inicia un primer jugador indicando el código de partida y el número de jugadores que habrá. Este token lo compartirá con los demas jugadores</li>
+                                        <li>El juego lo inicia un primer jugador indicando el código de partida y el
+                                            número de jugadores que habrá. Este token lo compartirá con los demas
+                                            jugadores
+                                        </li>
                                         <li>Los demas jugadores usarán el código para ingresar a la partida</li>
                                     </ul>
                                 </li>
                                 <li>
                                     Confirmar Posicion
                                     <ul>
-                                        <li>Arrastra los barcos a la posición que quieras y para confirmar que has finalizado presiona enter</li>
+                                        <li>Arrastra los barcos a la posición que quieras y para confirmar que has
+                                            finalizado presiona enter
+                                        </li>
                                     </ul>
                                 </li>
                                 <li>
                                     Partida
-                                    <img src="img/inst.jpg" alt="" style="margin-top: 20px; margin-bottom: 20px" />
+                                    <div style=" margin-bottom: 20px">
+                                        <img src="img/inst.jpg" alt=""/>
+                                    </div>
+
                                     <ul>
-                                        <li>Tu posición en el juego siempre sera en el sector central</li>
+                                        <li>Tu posición en el juego siempre será en el sector central</li>
                                         <li>Haz click en una región del territorio enemigo para atacar</li>
                                         <li>Si has atacado y aparece un barco has dado en el blanco</li>
                                         <li>Si te quedas sin barcos pierdes</li>
-                                        <li>El último jugador que quede con barcos es el ganador</li>                                       
+                                        <li>El último jugador que quede con barcos es el ganador</li>
 
                                     </ul>
                                 </li>
@@ -117,12 +138,36 @@
                         </div>
 
                     </div>
+
                 </div>
 
             </div>
 
         </div>
 
+        <div v-show="etapa==='ingresar_room'" class="panFondoBlack" style="padding-top: 40px">
+
+
+            <div v-show="subEtapa==='iniciar'">
+                <div class="btn btn-success"
+                     style="width: 200px; margin-right: 10px"
+                     @click="onCrearPartida"
+                >Crear Partida
+                </div>
+                <div class="btn btn-warning"
+                     style="width: 200px;"
+                     @click="onUnirsePartida"
+                >Unirse a una partida
+                </div>
+            </div>
+
+            <div v-show="subEtapa==='crear'">
+                <p>Crear partida</p>
+
+
+            </div>
+
+        </div>
 
         <div style="margin: auto; text-align: center" v-show="etapa==='juego'">
             <div id="container" style="border:1px solid red"></div>

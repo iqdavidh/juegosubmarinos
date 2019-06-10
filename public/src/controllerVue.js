@@ -27,6 +27,16 @@ const app = new Vue({
         ]
     },
     methods: {
+        onIniciarJuego(){
+            this.etapa='ingresar_room';
+            this.subEtapa='iniciar';
+        },
+        onCrearPartida(){
+            this.subEtapa='crear'
+        },
+        onUnirsePartida(){
+
+        },
         getIdJugador() {
             return 'player-' + Math.round(Math.random() * 10000000).toString();
         },
