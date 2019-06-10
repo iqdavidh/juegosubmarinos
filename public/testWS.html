@@ -213,6 +213,7 @@
                 let data =JSON.parse(evento.data);
 
 
+
                 this.listaMsgRecibido.unshift(
                     {
                         id: this.getNextIdentity(),
@@ -256,14 +257,11 @@
                     data.isSubmarino = (Math.random() > 0.5);
                 }
 
-                var msg = {
-                    data,
-                    type: "message"
-                };
+                data.type="message";
 
                 this.listaMsgEnviado.push(data);
 
-                ws.send(JSON.stringify(msg));
+                ws.send(JSON.stringify(data));
             }
         },
         computed: {},
