@@ -1,12 +1,12 @@
 /*  */
 
 const gameConfig = {
-    size: 600,
+    size: 900,
     deltaSep: 20,
     numSubmarinos: 4,
-    numDivisiones: 4,
+    numDivisiones: 6,
     wDivision: 2,
-    sPrepararCohete:2, /*<------------*/
+    sPrepararCohete:6, /*<------------*/
     velocidadCohete:10,
     sizeCohete:50,
     isAudio:false,
@@ -91,27 +91,27 @@ function loadImage(url) {
 (function () {
 
     function loadMar() {
-        return loadImage('/img/mar1.png')
+        return loadImage('img/mar1.png')
     }
 
     function loadBullet() {
-        return loadImage('/img/Bullet.png');
+        return loadImage('img/Bullet.png');
     }
 
     function loadTanque() {
-        return loadImage('/img/tanque.png');
+        return loadImage('img/tanque.png');
     }
 
     function loadTanqueDestruido() {
-        return loadImage('/img/tanque_destruido.png');
+        return loadImage('img/tanque_destruido.png');
     }
 
     function loadRocket() {
-        return loadImage('/img/Rocket150.png');
+        return loadImage('img/Rocket150.png');
     }
 
     function loadExplosion() {
-        return loadImage('/img/explosion50.png');
+        return loadImage('img/explosion50.png');
     }
 
     Promise.all([
@@ -2904,6 +2904,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190611 15:08');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190611 15:45');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

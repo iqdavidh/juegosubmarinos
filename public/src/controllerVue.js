@@ -1,7 +1,7 @@
 const appController = new Vue({
         el: '#app',
         data: {
-            isDebug: true,
+            isDebug: false,
             estadoConexion: false,
             etapa: 'inicio',
             subEtapa: 0,

@@ -17,27 +17,27 @@ function loadImage(url) {
 (function () {
 
     function loadMar() {
-        return loadImage('/img/mar1.png')
+        return loadImage('img/mar1.png')
     }
 
     function loadBullet() {
-        return loadImage('/img/Bullet.png');
+        return loadImage('img/Bullet.png');
     }
 
     function loadTanque() {
-        return loadImage('/img/tanque.png');
+        return loadImage('img/tanque.png');
     }
 
     function loadTanqueDestruido() {
-        return loadImage('/img/tanque_destruido.png');
+        return loadImage('img/tanque_destruido.png');
     }
 
     function loadRocket() {
-        return loadImage('/img/Rocket150.png');
+        return loadImage('img/Rocket150.png');
     }
 
     function loadExplosion() {
-        return loadImage('/img/explosion50.png');
+        return loadImage('img/explosion50.png');
     }
 
     Promise.all([

@@ -1,12 +1,12 @@
 /* @flow */
 
 const gameConfig = {
-    size: 600,
+    size: 900,
     deltaSep: 20,
     numSubmarinos: 4,
-    numDivisiones: 4,
+    numDivisiones: 6,
     wDivision: 2,
-    sPrepararCohete:2, /*<------------*/
+    sPrepararCohete:6, /*<------------*/
     velocidadCohete:10,
     sizeCohete:50,
     isAudio:false,
