@@ -46,7 +46,7 @@
 </head>
 <body
         style="background-image: url('/img/fondo.jpg');
-    background-repeat: no-repeat; background-color: #000; background-size: cover"
+    background-repeat: no-repeat; background-color: #000; background-position: center 10%"
 >
 
 
@@ -84,8 +84,7 @@
                                 <li>
                                     Este juego esta basado en
                                     <a href="https://es.wikipedia.org/wiki/Batalla_naval_(juego)" target="_blank">Battleship</a>
-                                    pero
-                                    las siguientes diferencias:
+                                    con las siguientes diferencias:
                                     <ul>
                                         <li>No esta basado en turnos, cada jugador puede disparar libremente mientras
                                             tenga cohetes listos. Cada barco puede generar un cohete cada 4 segundos.
@@ -130,7 +129,6 @@
                                         <li>Si has atacado y aparece un barco has dado en el blanco</li>
                                         <li>Si te quedas sin barcos pierdes</li>
                                         <li>El último jugador que quede con barcos es el ganador</li>
-
                                     </ul>
                                 </li>
 
@@ -151,19 +149,78 @@
             <div v-show="subEtapa==='iniciar'">
                 <div class="btn btn-success"
                      style="width: 200px; margin-right: 10px"
-                     @click="onCrearPartida"
+                     @click="subEtapa='crear'"
                 >Crear Partida
                 </div>
                 <div class="btn btn-warning"
                      style="width: 200px;"
-                     @click="onUnirsePartida"
+                     @click="subEtapa='unirse'"
                 >Unirse a una partida
                 </div>
             </div>
 
             <div v-show="subEtapa==='crear'">
-                <p>Crear partida</p>
+                <h1>Crear Partida</h1>
 
+                <p>La partida comenzará hasta que todos los jugadores indicados se conecten</p>
+                <div class="row">
+                    <div class="col-md-3">
+                        <p style="text-align: center">Código de Partida</p>
+                        <h2>{{newRoom.codigo}}</h2>
+                    </div>
+                    <div class="col-md-6">
+                        <p>Seleccionar el número de jugadores</p>
+
+                        <span v-for="item in listaNumJugadores"
+                              style="font-size: 20px; cursor:pointer; margin-right: 5px"
+                              @click="newRoom.numJugadores=item"
+                              class="badge"
+                              :class="{'badge-danger':item===newRoom.numJugadores, 'badge-info':item!==newRoom.numJugadores}"
+                        >
+                            {{item}}
+                        </span>
+
+                    </div>
+                    <div class="col-md-3">
+
+                        <button class="btn btn-danger btn-block"
+                                v-show="newRoom.numJugadores"
+                                style="margin-top: 40px"
+                                @click="empezarPartidaNewRoom"
+                        >Comenzar
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <div v-show="subEtapa==='unirse'">
+                <h1>Unirse a Partida</h1>
+
+                <p>Ingresar el código de la partida. El juego comenzará hasta que todos los jugadores se conecten.</p>
+
+                <div class="row">
+                    <div class="col-md-4">
+                    </div>
+                    <div class="col-md-4">
+                        <label>Código de Partida</label>
+                        <input type="text" class="form-control"
+                               style="width: 100%"
+                               v-model="unirseRoom" />
+
+                        <button class="btn btn-danger btn-block"
+                                v-show="unirseRoom"
+                                style="margin-top: 20px"
+                                @click="empezarPartidaUnirse"
+                        >Unirse
+                        </button>
+
+                    </div>
+                    <div class="col-md-4">
+
+
+                    </div>
+                </div>
 
             </div>
 

@@ -24,7 +24,14 @@ const app = new Vue({
             {tipo: 'inicia_batalla'},
             {tipo: 'lanza_cohete'},
             {tipo: 'resultado_ataque'}
-        ]
+        ],
+        newRoom:{
+            codigo:null,
+            numJugadores:null
+        },
+        unirseRoom:null,
+        listaNumJugadores:[2,3,4,5,6,7,8],
+
     },
     methods: {
         onIniciarJuego(){
@@ -43,6 +50,17 @@ const app = new Vue({
         getNextIdentity() {
             this.identityContador++;
             return this.identityContador;
+        },
+
+        empezarPartidaNewRoom(){
+
+            //esto inicia el juego
+
+        },
+        empezarPartidaUnirse(){
+
+            //esto inicia el juego
+
         },
         onEventoSocket(evento, tipo) {
 
@@ -115,6 +133,7 @@ const app = new Vue({
     computed: {},
     mounted() {
         this.idJugador = this.getIdJugador();
+        this.newRoom.codigo =  (Math.random().toString(36).substring(2, 5) + Math.random().toString(36).substring(2, 5)).toUpperCase();;
         console.log('vue ready');
     }
 });
