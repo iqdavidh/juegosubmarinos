@@ -12,7 +12,8 @@ const gameData = {
     estado: null,
     listaZonasAtacadas:[],
     isResourcesLoaded: false,
-    isCanvasLoaded: false
+    isCanvasLoaded: false,
+    numJugadoresEsperados:null
 };
 
 //cargar canvas ************************************************

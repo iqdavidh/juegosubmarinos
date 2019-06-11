@@ -64,6 +64,7 @@ const appController = new Vue({
                 //esperamos el juego
                 //document.getElementById('container').style='block';
                 this.etapa = 'juego';
+                gameData.canvas.style.backgroundColor='darkslategray';
 
 
             },
