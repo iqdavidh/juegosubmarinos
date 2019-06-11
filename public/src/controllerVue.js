@@ -57,7 +57,7 @@ const appController = new Vue({
 
 
                 //Paso 2 mandar invitacion a jugadores y esperar ingreso
-                let msgInvitacion = {                  
+                let msgInvitacion = {
                     code: this.newRoom.codigo,
                     tipo: 'invitacion',
                     numJugadoresEsperados: this.newRoom.numJugadores,
@@ -65,7 +65,7 @@ const appController = new Vue({
                 };
 
                 this.enviarMensajeSocket(msgInvitacion);
-                
+
 
                 //esperamos el juego
                 //document.getElementById('container').style='block';
@@ -93,14 +93,14 @@ const appController = new Vue({
 
 
                 //Paso 3 - enviamos acepotacion para que el jugador que creo el juego nos agregue
-                let msgAceptacion = {                   
+                let msgAceptacion = {
                     token: invitacion.codigo,
                     tipo: 'invitacion_aceptada',
                     id_jugador: gameData.jugadorLocal.id
                 }
-                
-                this.enviarMensajeSocket(msgAceptacion);               
-               
+
+                this.enviarMensajeSocket(msgAceptacion);
+
 
                 //esperamos el juego
                 this.etapa = 'juego';
@@ -129,10 +129,16 @@ const appController = new Vue({
 
                 //Como filtro solo vamos a mostrar los mensajes que son de este gameToken
 
-                if (this.etapa === 'juego' && data.token !== gameData.tokenRoom) {
-                    console.log('se recibio un mensaje que no es de esta partida - no se agrega');
-                    return;
+                if (this.etapa === 'juego') {
+
+                    if(data.tipo==='invitacion' && data.idJugador=== gameData.jugadorLocal.id){
+                        console.log('se recibio invitacion del mismo jugador');
+                        return;
+                    }
+
+
                 }
+
 
 
                 this.listaMsgRecibido.unshift(
@@ -154,6 +160,7 @@ const appController = new Vue({
 
                     return;
                 }
+
 
 
                 if (data.tipo === 'invitacion_aceptada') {
@@ -207,12 +214,19 @@ const appController = new Vue({
                 ws.send(JSON.stringify(data));
 
                 this.listaMsgEnviado.push(data);
+            },
+            enviarMensajeAtaque(id_jugador_recibe_ataque, r, c) {
+
+                let msg=factoryMensajeSocket.LanzaCohete( gameData.jugadorLocal.id , id_jugador_recibe_ataque, r,c)
+
+                return this.enviarMensajeSocket(msg);
+
             }
         },
         computed: {},
         mounted() {
 
-            this.newRoom.codigo = (Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10)).toUpperCase();
+            this.newRoom.codigo = (Math.random().toString(36).substring(2, 5) + Math.random().toString(36).substring(2, 5)).toUpperCase();
             console.log('vue ready');
         }
     }

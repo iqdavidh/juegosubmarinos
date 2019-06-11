@@ -21,7 +21,7 @@ const proRecibirMsgSocket = {
             this.resultado_ataque(jugador, msg);
 
         } else {
-            alert("no esperamos este tipo de mensaje " + msg.tipo)
+            console.log("no esperamos este tipo de mensaje " , msg)
         }
 
 
