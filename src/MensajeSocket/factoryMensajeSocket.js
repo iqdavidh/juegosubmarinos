@@ -1,23 +1,16 @@
 /* @flow */
 const tipoMsgSocket = {
-    solicitar_ingresar_room: 'ingresa',
-    sale: 'sale',
-    confirma_posiciones: 'confirma_posiciones',
 
+    confirma_posiciones: 'confirma_posiciones',
     lanza_cohete: 'lanza_cohete',
     resultado_ataque: 'resultado_ataque',
 };
 
 
 const factoryMensajeSocket = {
-    JugadorIngresa: function (id_jugador: string) {
-        return {
-            token: gameData.tokenRoom,
-            id_jugador,
-            tipo: tipoMsgSocket.solicitar_ingresar_room
-        };
-    },
     JugadorConfirma: function (id_jugador: string) {
+
+
         return {
             token: gameData.tokenRoom,
             id_jugador,

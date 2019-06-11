@@ -9,15 +9,11 @@ const appController = new Vue({
             listaMsgRecibido: [],
             listaMsgEnviado: [],
             listaInvitacionAJuego: [],
-            listaComandos: [
-                {tipo: 'solicitar_crear_room'},
-                {tipo: 'solicitar_ingresar_room'},
-                {tipo: 'confirmar_ingresa'},
-                {tipo: 'sale'},
-                {tipo: 'confirma_posiciones'},
+            listaTipoMsg: [
+                {tipo: tipoMsgSocket.confirma_posiciones},
                 {tipo: 'inicia_batalla'},
-                {tipo: 'lanza_cohete'},
-                {tipo: 'resultado_ataque'}
+                {tipo: tipoMsgSocket.lanza_cohete},
+                {tipo: tipoMsgSocket.resultado_ataque}
             ],
             dataMsg: {},
             newRoom: {
@@ -26,9 +22,16 @@ const appController = new Vue({
             },
             unirseRoom: null,
             numJugadoresEsperados: null,
+            labelIdPlayer: null,
             listaNumJugadores: [2, 3, 4, 5, 6, 7, 8, 9]
         },
         methods: {
+            getLabelIdPlayer() {
+                return this.labelIdPlayer;
+            },
+            setLabelIdPlayer(valor) {
+                this.labelIdPlayer = valor;
+            },
             setConexionOK() {
                 this.estadoConexion = true;
             },
@@ -45,7 +48,9 @@ const appController = new Vue({
 
                 //Paso 1 creamos el juego (se crea el id de jugador)
                 gameController.onRegistroSocket(this.newRoom.codigo, this.newRoom.numJugadores);
-                gameData.numJugadoresEsperados=this.newRoom.numJugadores;
+                gameData.numJugadoresEsperados = this.newRoom.numJugadores;
+
+                this.setLabelIdPlayer(gameData.jugadorLocal.id);
 
                 this.listaInvitacionAJuego = [];
                 this.numJugadoresEsperados = this.newRoom.numJugadores;
@@ -66,7 +71,8 @@ const appController = new Vue({
                 //esperamos el juego
                 //document.getElementById('container').style='block';
                 this.etapa = 'juego';
-                gameData.canvas.style.backgroundColor='darkslategray';
+                document.getElementById('panCanvas').style.display='block';
+                gameData.canvas.style.backgroundColor = 'darkslategray';
 
 
             },
@@ -76,6 +82,7 @@ const appController = new Vue({
                 gameController.onRegistroSocket(invitacion.codigo, invitacion.numJugadoresEsperados);
 
                 this.numJugadoresEsperados = invitacion.numJugadores;
+                this.setLabelIdPlayer(gameData.jugadorLocal.id);
 
                 //registrar al jugador que creo la invitacion
                 let msg = {
@@ -86,8 +93,11 @@ const appController = new Vue({
                 let jugadorMaster = factoryJugadorRemoto.fromMsgJugadorIngresa(msg);
                 gameData.listaJugadores.push(jugadorMaster);
 
+
                 //esperamos el juego
                 this.etapa = 'juego';
+                gameData.canvas.style.backgroundColor = 'darkslategray';
+                document.getElementById('panCanvas').style.display='block';
             },
             onEventoSocket(evento, tipo) {
 
@@ -116,6 +126,12 @@ const appController = new Vue({
 
                 //Ya tenemos un evento del socket que es parte del juego
                 if (data.tipo === 'invitacion') {
+
+                    if(  this.etapa === 'juego'){
+                        //si estamos en juego no hacemos caso a las invitaciones
+                        return ;
+                    }
+
                     this.listaInvitacionAJuego.push({
                         codigo: data.code,
                         numJugadoresEsperados: data.numJugadoresEsperados,
@@ -145,12 +161,8 @@ const appController = new Vue({
             },
             enviarMensajeSocket(data) {
 
-                let msg = {
-                    data: data,
-                    type: "message"
-                };
-
-                ws.send(JSON.stringify(msg));
+                data.type = 'message';
+                ws.send(JSON.stringify(data));
 
                 this.listaMsgEnviado.push(data);
             }
@@ -186,7 +198,3 @@ ws.onerror = function (evento) {
     appController.recibirOnError(evento);
 };
 
-function enviarMensajeSocket(data) {
-
-
-}

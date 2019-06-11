@@ -134,7 +134,7 @@ const factoryPosicionRCCuadrante = {
         }
 
 
-        console.log("Ese cuadrante no esta soportado " + cuadrante.toString());
+        console.log("Ese cuadrante no esta soportado cuadrante" + cuadrante? cuadrante.toString(): ' unddefined');
         return null;
     }
 

@@ -46,6 +46,9 @@
     background-repeat: no-repeat; background-color: #000; background-position: center 10%"
 >
 
+<div style="">
+    <div id="panCanvas" style="display: none"></div>
+</div>
 
 <div class="container">
 
@@ -225,7 +228,7 @@
 
 
         <div v-show="isDebug" style="background-color: #fff; margin-top: 100px">
-            <h3>Prueba del Websocket </h3>
+            <h3>Prueba del Websocket  - Jugador {{labelIdPlayer}}</h3>
 
             <p>Recordar usar dos ventanas para ver como se comunican los jugadores</p>
 
@@ -259,7 +262,7 @@
                         <h4>Mensajes</h4>
 
 
-                        <div v-for="item in listaComandos" v-bind:key="item.tipo" style="margin-bottom: 5px">
+                        <div v-for="item in listaTipoMsg" v-bind:key="item.tipo" style="margin-bottom: 5px">
 
                             <button @click="sendMessage(item)"
                                     class="btn btn-block">
@@ -329,9 +332,6 @@
 </div>
 
 <!-- TODO vr porque textalign center mueve las coordenadas-->
-<div>
-    <div id="panCanvas"></div>
-</div>
 
 
 

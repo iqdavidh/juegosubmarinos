@@ -66,6 +66,11 @@ const gameController = {
         gameData.estado = gameEstado.ConfirmarPosicion;
 
         let fnOnConfirmar = () => {
+
+            //Enviar Confirmacion
+            let msg = factoryMensajeSocket.JugadorConfirma( gameData.jugadorLocal.id );
+            appController.enviarMensajeSocket(msg);
+
             gameController.runEsperarParticipantes();
 
             this.engine.selpos = null;

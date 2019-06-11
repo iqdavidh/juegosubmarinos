@@ -786,6 +786,11 @@ const gameController = {
         gameData.estado = gameEstado.ConfirmarPosicion;
 
         let fnOnConfirmar = () => {
+
+            //Enviar Confirmacion
+            let msg = factoryMensajeSocket.JugadorConfirma( gameData.jugadorLocal.id );
+            appController.enviarMensajeSocket(msg);
+
             gameController.runEsperarParticipantes();
 
             this.engine.selpos = null;
@@ -2517,24 +2522,17 @@ const factoryCohete = {
 
 /* @flow */
 const tipoMsgSocket = {
-    solicitar_ingresar_room: 'ingresa',
-    sale: 'sale',
-    confirma_posiciones: 'confirma_posiciones',
 
+    confirma_posiciones: 'confirma_posiciones',
     lanza_cohete: 'lanza_cohete',
     resultado_ataque: 'resultado_ataque',
 };
 
 
 const factoryMensajeSocket = {
-    JugadorIngresa: function (id_jugador) {
-        return {
-            token: gameData.tokenRoom,
-            id_jugador,
-            tipo: tipoMsgSocket.solicitar_ingresar_room
-        };
-    },
     JugadorConfirma: function (id_jugador) {
+
+
         return {
             token: gameData.tokenRoom,
             id_jugador,
@@ -2878,11 +2876,11 @@ const factoryPosicionRCCuadrante = {
         }
 
 
-        console.log("Ese cuadrante no esta soportado " + cuadrante.toString());
+        console.log("Ese cuadrante no esta soportado cuadrante" + cuadrante? cuadrante.toString(): ' unddefined');
         return null;
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190611 11:14');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190611 11:59');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
