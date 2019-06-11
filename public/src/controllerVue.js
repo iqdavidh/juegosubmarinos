@@ -44,7 +44,9 @@ const appController = new Vue({
 
 
                 //Paso 1 creamos el juego (se crea el id de jugador)
-                gameController.onRegistroSocket(this.newRoom.codigo);
+                gameController.onRegistroSocket(this.newRoom.codigo, this.newRoom.numJugadores);
+                gameData.numJugadoresEsperados=this.newRoom.numJugadores;
+
                 this.listaInvitacionAJuego = [];
                 this.numJugadoresEsperados = this.newRoom.numJugadores;
 
@@ -71,7 +73,8 @@ const appController = new Vue({
             empezarPartidaUnirse(invitacion) {
 
                 //Paso 1 creamos el juego (se crea el id de jugador)
-                gameController.onRegistroSocket(invitacion.codigo);
+                gameController.onRegistroSocket(invitacion.codigo, invitacion.numJugadores);
+
                 this.numJugadoresEsperados = invitacion.numJugadores;
 
                 //registrar al jugador que creo la invitacion

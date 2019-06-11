@@ -730,9 +730,10 @@ const gameData = {
     listaCohetes: [],
     listaMsgSocket: [],
     estado: null,
-    listaZonasAtacadas:[],
+    listaZonasAtacadas: [],
     isResourcesLoaded: false,
-    isCanvasLoaded: false
+    isCanvasLoaded: false,
+    numJugadoresEsperados: null
 };
 
 //cargar canvas ************************************************
@@ -756,13 +757,6 @@ const gameData = {
 })();
 
 
-
-
-
-
-
-
-
 const gameController = {
 
     engine: {
@@ -770,10 +764,11 @@ const gameController = {
         esperarParticipantes: null,
         batalla: null
     },
-    onRegistroSocket: function (token) {
+    onRegistroSocket: function (token, numJugadoresEsperados) {
 
         gameData.tokenRoom = token;
         gameData.jugadorLocal = factoryJugador.local();
+        gameData.numJugadoresEsperados = numJugadoresEsperados;
 
         this.start()
     },
@@ -781,8 +776,8 @@ const gameController = {
 
         if (gameConfig.isResourcesLoaded) {
             this.runConfirmarPosiciones();
-        }else{
-            console.log('isResourcesLoaded false - nos e pueden confirmar posiciones');
+        } else {
+            console.log('isResourcesLoaded false - no se pueden confirmar posiciones');
         }
     },
     runConfirmarPosiciones: function () {
@@ -1343,7 +1338,7 @@ class EngineEsperar extends AEngine {
 
     onJugadorRemotoConfirma() {
         const ctx = this.ctx;
-        let numJugadores = gameData.listaJugadores.length;
+
 
         let numConfirmados = gameData.listaJugadores
             .filter(j => {
@@ -1352,10 +1347,10 @@ class EngineEsperar extends AEngine {
 
         if (this.estado !== 'saliendo') {
             //poner el texto caundots jugadores estan confirmados
-            drawEsperar.actualizarTextoEspera(ctx, numJugadores, numConfirmados);
+            drawEsperar.actualizarTextoEspera(ctx, gameData.numJugadoresEsperados-1, numConfirmados);
         }
 
-        if (numJugadores === numConfirmados) {
+        if ((gameData.numJugadoresEsperados -1)=== numConfirmados) {
             this.estado = 'saliendo';
             setTimeout(this.fnOnContinuar, 2000);
         }
@@ -2888,6 +2883,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190611 10:48');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190611 11:14');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

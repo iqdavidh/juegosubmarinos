@@ -10,10 +10,10 @@ const gameData = {
     listaCohetes: [],
     listaMsgSocket: [],
     estado: null,
-    listaZonasAtacadas:[],
+    listaZonasAtacadas: [],
     isResourcesLoaded: false,
     isCanvasLoaded: false,
-    numJugadoresEsperados:null
+    numJugadoresEsperados: null
 };
 
 //cargar canvas ************************************************
@@ -37,13 +37,6 @@ const gameData = {
 })();
 
 
-
-
-
-
-
-
-
 const gameController = {
 
     engine: {
@@ -51,10 +44,11 @@ const gameController = {
         esperarParticipantes: null,
         batalla: null
     },
-    onRegistroSocket: function (token) {
+    onRegistroSocket: function (token, numJugadoresEsperados) {
 
         gameData.tokenRoom = token;
         gameData.jugadorLocal = factoryJugador.local();
+        gameData.numJugadoresEsperados = numJugadoresEsperados;
 
         this.start()
     },
@@ -62,8 +56,8 @@ const gameController = {
 
         if (gameConfig.isResourcesLoaded) {
             this.runConfirmarPosiciones();
-        }else{
-            console.log('isResourcesLoaded false - nos e pueden confirmar posiciones');
+        } else {
+            console.log('isResourcesLoaded false - no se pueden confirmar posiciones');
         }
     },
     runConfirmarPosiciones: function () {
