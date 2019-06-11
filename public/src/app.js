@@ -1355,7 +1355,7 @@ class EngineEsperar extends AEngine {
             drawEsperar.actualizarTextoEspera(ctx, gameData.numJugadoresEsperados-1, numConfirmados);
         }
 
-        if ((gameData.numJugadoresEsperados -1)=== numConfirmados) {
+        if ((gameData.numJugadoresEsperados -1)=== numConfirmados &&  gameData.jugadorLocal.isPosicionConfirmada) {
             this.estado = 'saliendo';
             setTimeout(this.fnOnContinuar, 2000);
         }
@@ -2038,129 +2038,6 @@ const factoryImgRocket = {
     },
 
 };
-const gameAudio = (function () {
-
-    let _instance = null;
-
-
-    function init() {
-
-        const sounds = {
-            "disparo": {
-                url: "sonido/disparo.mp3"
-            },
-            "explosion": {
-                url: "sonido/explosion.wav"
-            },
-            "main": {
-                url: "sonido/main.mp3",
-                duracion: 197,
-                volume:0.6
-            },
-        };
-
-        function loadSound(name) {
-            var sound = sounds[name];
-
-            var url = sound.url;
-            var buffer = sound.buffer;
-
-            var request = new XMLHttpRequest();
-            request.open('GET', url, true);
-            request.responseType = 'arraybuffer';
-
-            request.onload = function () {
-                soundContext.decodeAudioData(request.response, function (newBuffer) {
-                    sound.buffer = newBuffer;
-                });
-            };
-
-            request.send();
-        }
-
-        for (var key in sounds) {
-            loadSound(key);
-        }
-
-        var soundContext = new AudioContext();
-
-
-        function playSound(name) {
-            var sound = sounds[name];
-            var soundVolume = sounds[name].volume || 1;
-
-            var buffer = sound.buffer;
-            if (buffer) {
-                var source = soundContext.createBufferSource();
-                source.buffer = buffer;
-
-                var volume = soundContext.createGain();
-
-                volume.gain.value = soundVolume;
-
-                volume.connect(soundContext.destination);
-                source.connect(volume);
-                source.start(0);
-            }
-        }
-
-
-        let playBG = () => {
-            playSound('main', 0.6);
-        };
-
-        let idSoundBG = null;
-        return {
-            load:()=>{
-              return true;
-            },
-            startBG: () => {
-                if(!gameConfig.isAudio){
-                    return;
-                }
-
-                playSound('main');
-                idSoundBG = setInterval(playBG, sounds.main.duracion * 1000)
-            },
-            stopBG: () => {
-                if(!gameConfig.isAudio){
-                    return;
-                }
-
-                clearInterval(idSoundBG);
-            },
-            lanzamiento: () => {
-                if(!gameConfig.isAudio){
-                    return;
-                }
-
-                playSound('disparo');
-            },
-            explosion:()=>{
-                if(!gameConfig.isAudio){
-                    return;
-                }
-
-                playSound('explosion')
-            }
-        };
-    }
-
-    return {
-        getInstance: () => {
-            if (_instance === null) {
-                _instance = init();
-            }
-
-            return _instance;
-        }
-    }
-
-})();
-
-
-gameAudio.getInstance().load();
-
 //@flow
 "use strict";
 
@@ -2520,9 +2397,131 @@ const factoryCohete = {
 
 };
 
+const gameAudio = (function () {
+
+    let _instance = null;
+
+
+    function init() {
+
+        const sounds = {
+            "disparo": {
+                url: "sonido/disparo.mp3"
+            },
+            "explosion": {
+                url: "sonido/explosion.wav"
+            },
+            "main": {
+                url: "sonido/main.mp3",
+                duracion: 197,
+                volume:0.6
+            },
+        };
+
+        function loadSound(name) {
+            var sound = sounds[name];
+
+            var url = sound.url;
+            var buffer = sound.buffer;
+
+            var request = new XMLHttpRequest();
+            request.open('GET', url, true);
+            request.responseType = 'arraybuffer';
+
+            request.onload = function () {
+                soundContext.decodeAudioData(request.response, function (newBuffer) {
+                    sound.buffer = newBuffer;
+                });
+            };
+
+            request.send();
+        }
+
+        for (var key in sounds) {
+            loadSound(key);
+        }
+
+        var soundContext = new AudioContext();
+
+
+        function playSound(name) {
+            var sound = sounds[name];
+            var soundVolume = sounds[name].volume || 1;
+
+            var buffer = sound.buffer;
+            if (buffer) {
+                var source = soundContext.createBufferSource();
+                source.buffer = buffer;
+
+                var volume = soundContext.createGain();
+
+                volume.gain.value = soundVolume;
+
+                volume.connect(soundContext.destination);
+                source.connect(volume);
+                source.start(0);
+            }
+        }
+
+
+        let playBG = () => {
+            playSound('main', 0.6);
+        };
+
+        let idSoundBG = null;
+        return {
+            load:()=>{
+              return true;
+            },
+            startBG: () => {
+                if(!gameConfig.isAudio){
+                    return;
+                }
+
+                playSound('main');
+                idSoundBG = setInterval(playBG, sounds.main.duracion * 1000)
+            },
+            stopBG: () => {
+                if(!gameConfig.isAudio){
+                    return;
+                }
+
+                clearInterval(idSoundBG);
+            },
+            lanzamiento: () => {
+                if(!gameConfig.isAudio){
+                    return;
+                }
+
+                playSound('disparo');
+            },
+            explosion:()=>{
+                if(!gameConfig.isAudio){
+                    return;
+                }
+
+                playSound('explosion')
+            }
+        };
+    }
+
+    return {
+        getInstance: () => {
+            if (_instance === null) {
+                _instance = init();
+            }
+
+            return _instance;
+        }
+    }
+
+})();
+
+
+gameAudio.getInstance().load();
+
 /* @flow */
 const tipoMsgSocket = {
-
     confirma_posiciones: 'confirma_posiciones',
     lanza_cohete: 'lanza_cohete',
     resultado_ataque: 'resultado_ataque',
@@ -2578,13 +2577,8 @@ const proRecibirMsgSocket = {
             return;
         }
 
-
-        if (msg.tipo === tipoMsgSocket.solicitar_ingresar_room) {
-            this.jugador_ingresa(jugador);
-
-
-        } else if (msg.tipo === tipoMsgSocket.confirma_posiciones) {
-            this.jugador_confirma_posicion(jugador)
+        if (msg.tipo === tipoMsgSocket.confirma_posiciones) {
+            this.jugador_confirma_posiciones(jugador)
 
         } else if (msg.tipo === tipoMsgSocket.lanza_cohete) {
             this.lanza_cohete(msg)
@@ -2598,10 +2592,8 @@ const proRecibirMsgSocket = {
 
 
     },
-    jugador_ingresa: function (jugador) {
 
-    },
-    jugador_confirma_posicion: function (jugador) {
+    jugador_confirma_posiciones: function (jugador) {
 
         jugador.setPosicionConfirmada();
 
@@ -2669,11 +2661,9 @@ const proRecibirMsgSocket = {
         if (zona.isSubmarino !== true && msg.isSubmarino) {
             zona.isSubmarino = true;
             jugador.onSubmarinoDestruido();
-        }else{
+        } else {
             zona.isSubmarino = msg.isSubmarino;
         }
-
-
 
 
         //si destruyeon un submarino evaluar si ya ganamos
@@ -2881,6 +2871,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190611 11:59');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190611 12:33');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

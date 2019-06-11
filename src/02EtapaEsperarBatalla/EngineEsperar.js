@@ -43,7 +43,7 @@ class EngineEsperar extends AEngine {
             drawEsperar.actualizarTextoEspera(ctx, gameData.numJugadoresEsperados-1, numConfirmados);
         }
 
-        if ((gameData.numJugadoresEsperados -1)=== numConfirmados) {
+        if ((gameData.numJugadoresEsperados -1)=== numConfirmados &&  gameData.jugadorLocal.isPosicionConfirmada) {
             this.estado = 'saliendo';
             setTimeout(this.fnOnContinuar, 2000);
         }

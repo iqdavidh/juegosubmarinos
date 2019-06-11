@@ -1,6 +1,5 @@
 /* @flow */
 const tipoMsgSocket = {
-
     confirma_posiciones: 'confirma_posiciones',
     lanza_cohete: 'lanza_cohete',
     resultado_ataque: 'resultado_ataque',

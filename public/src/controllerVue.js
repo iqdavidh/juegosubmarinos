@@ -10,8 +10,8 @@ const appController = new Vue({
             listaMsgEnviado: [],
             listaInvitacionAJuego: [],
             listaTipoMsg: [
+                {tipo: 'invitacion_aceptada'},
                 {tipo: tipoMsgSocket.confirma_posiciones},
-                {tipo: 'inicia_batalla'},
                 {tipo: tipoMsgSocket.lanza_cohete},
                 {tipo: tipoMsgSocket.resultado_ataque}
             ],
@@ -57,21 +57,20 @@ const appController = new Vue({
 
 
                 //Paso 2 mandar invitacion a jugadores y esperar ingreso
-                let data = {
-                    type: 'message',
+                let msgInvitacion = {                  
                     code: this.newRoom.codigo,
                     tipo: 'invitacion',
                     numJugadoresEsperados: this.newRoom.numJugadores,
                     idJugador: gameData.jugadorLocal.id
                 };
 
-                this.listaMsgEnviado.push(data);
-                ws.send(JSON.stringify(data));
+                this.enviarMensajeSocket(msgInvitacion);
+                
 
                 //esperamos el juego
                 //document.getElementById('container').style='block';
                 this.etapa = 'juego';
-                document.getElementById('panCanvas').style.display='block';
+                document.getElementById('panCanvas').style.display = 'block';
                 gameData.canvas.style.backgroundColor = 'darkslategray';
 
 
@@ -81,25 +80,37 @@ const appController = new Vue({
                 //Paso 1 creamos el juego (se crea el id de jugador)
                 gameController.onRegistroSocket(invitacion.codigo, invitacion.numJugadoresEsperados);
 
-                this.numJugadoresEsperados = invitacion.numJugadores;
+                this.numJugadoresEsperados = invitacion.numJugadoresEsperados;
                 this.setLabelIdPlayer(gameData.jugadorLocal.id);
 
-                //registrar al jugador que creo la invitacion
-                let msg = {
+                //Paso 2registrar al jugador que creo la invitacion
+
+                let jugadorMaster = factoryJugadorRemoto.fromMsgJugadorIngresa({
                     id_jugador: invitacion.idJugadorCreador,
                     token: invitacion.codigo
-                };
-
-                let jugadorMaster = factoryJugadorRemoto.fromMsgJugadorIngresa(msg);
+                });
                 gameData.listaJugadores.push(jugadorMaster);
 
+
+                //Paso 3 - enviamos acepotacion para que el jugador que creo el juego nos agregue
+                let msgAceptacion = {                   
+                    token: invitacion.codigo,
+                    tipo: 'invitacion_aceptada',
+                    id_jugador: gameData.jugadorLocal.id
+                }
+                
+                this.enviarMensajeSocket(msgAceptacion);               
+               
 
                 //esperamos el juego
                 this.etapa = 'juego';
                 gameData.canvas.style.backgroundColor = 'darkslategray';
-                document.getElementById('panCanvas').style.display='block';
+                document.getElementById('panCanvas').style.display = 'block';
+
+
             },
             onEventoSocket(evento, tipo) {
+
 
                 if (evento.data === undefined || null) {
                     console.log('este es un evento que no data');
@@ -116,6 +127,14 @@ const appController = new Vue({
                 //ya es seguro tener el data
                 let data = JSON.parse(evento.data);
 
+                //Como filtro solo vamos a mostrar los mensajes que son de este gameToken
+
+                if (this.etapa === 'juego' && data.token !== gameData.tokenRoom) {
+                    console.log('se recibio un mensaje que no es de esta partida - no se agrega');
+                    return;
+                }
+
+
                 this.listaMsgRecibido.unshift(
                     {
                         id: this.getNextIdentity(),
@@ -125,19 +144,42 @@ const appController = new Vue({
                 );
 
                 //Ya tenemos un evento del socket que es parte del juego
-                if (data.tipo === 'invitacion') {
-
-                    if(  this.etapa === 'juego'){
-                        //si estamos en juego no hacemos caso a las invitaciones
-                        return ;
-                    }
+                if (data.tipo === 'invitacion' && this.etapa !== 'juego') {
 
                     this.listaInvitacionAJuego.push({
                         codigo: data.code,
                         numJugadoresEsperados: data.numJugadoresEsperados,
                         idJugadorCreador: data.idJugador
                     });
+
+                    return;
                 }
+
+
+                if (data.tipo === 'invitacion_aceptada') {
+
+                    if (this.etapa === 'juego' && data.token !== gameData.tokenRoom) {
+                        //si estamos en juego no hacemos caso a las invitaciones
+                        return;
+                    }
+
+                    //estamos en el caso cuando un jugador local invito a jugadores y aceptaron
+                    if (gameData.listaJugadores.length < this.numJugadoresEsperados - 1) {
+
+                        //si faltan jugadores los agrtegamos
+                        let jugadorMaster = factoryJugadorRemoto.fromMsgJugadorIngresa({
+                            id_jugador: data.id_jugador,
+                            token: data.code
+                        });
+                        gameData.listaJugadores.push(jugadorMaster);
+                    }
+
+                    return;
+                }
+
+
+                //estos eventos propios del juego
+                proRecibirMsgSocket.exe(data);
             },
             recibirOnOpen(evento) {
                 this.setConexionOK();
