@@ -471,10 +471,11 @@ const factoryZonaAtacada = {
 
 
     return {
+        isLocal: id_jugador === gameData.jugadorLocal.id,
         id,
         idCohete,
         isObjetivoAlcanzado,
-        indexCuadrante,
+        indexCuadrante : indexCuadrante,
         id_jugador,
         posicionRCC,
         isSubmarino
@@ -539,12 +540,13 @@ class JugadorLocal extends AJugador {
             } else {
                 console.log('diablos! no hay jugador atacado');
             }
+            /*--------------------------------------------- */
 
 
             cohete.lanzar(posicionAbs);
 
 
-            let zonaAtacada = factoryZonaAtacada.exe(posicionEnLaMira, cohete.id, gameData.jugadorLocal.id);
+            let zonaAtacada = factoryZonaAtacada.exe(posicionEnLaMira, cohete.id, jugadorAtacado.id);
             gameData.listaZonasAtacadas.push(zonaAtacada);
 
         }
@@ -2493,14 +2495,27 @@ class CoheteRemoto extends ACohete {
                 zona.isSubmarino = false;
             }
 
+
+
             let  numSubActivos= gameData.jugadorLocal.listaSubmarinos
                 .filter(s=>{
                     return s.getIsActivo();
                 }).length;
 
-            let isRendicion=numSubActivos>0;
 
-            let msg=factoryMensajeSocket.ResultadoAtaque( gameData.jugadorLocal.id,  rZona, cZona,   zona.isSubmarino, isRendicion);
+
+
+
+            /*Enviar mesnaje de resultado de ataque ****************** */
+
+            appController.enviarMensajeResultadoDeAtaque(  rZona, cZona,  zona.isSubmarino);
+
+            /*--------------------------------------------- */
+
+            if(numSubActivos===0){
+                alert('Perdiste');
+            }
+
         };
 
     }
@@ -2568,7 +2583,7 @@ const factoryMensajeSocket = {
         }
 
     },
-    ResultadoAtaque: function (id_jugador,  r, c, isSubmarino, isRendicion) {
+    ResultadoAtaque: function (id_jugador,  r, c, isSubmarino) {
 
         return {
             token: gameData.tokenRoom,
@@ -2576,8 +2591,8 @@ const factoryMensajeSocket = {
             tipo: tipoMsgSocket.resultado_ataque,
             r,
             c,
-            isSubmarino,
-            isRendicion
+            isSubmarino
+
         }
 
     }
@@ -2889,6 +2904,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190611 14:07');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190611 15:08');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

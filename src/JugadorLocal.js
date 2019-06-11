@@ -55,12 +55,13 @@ class JugadorLocal extends AJugador {
             } else {
                 console.log('diablos! no hay jugador atacado');
             }
+            /*--------------------------------------------- */
 
 
             cohete.lanzar(posicionAbs);
 
 
-            let zonaAtacada = factoryZonaAtacada.exe(posicionEnLaMira, cohete.id, gameData.jugadorLocal.id);
+            let zonaAtacada = factoryZonaAtacada.exe(posicionEnLaMira, cohete.id, jugadorAtacado.id);
             gameData.listaZonasAtacadas.push(zonaAtacada);
 
         }

@@ -131,14 +131,13 @@ const appController = new Vue({
 
                 if (this.etapa === 'juego') {
 
-                    if(data.tipo==='invitacion' && data.idJugador=== gameData.jugadorLocal.id){
+                    if (data.tipo === 'invitacion' && data.idJugador === gameData.jugadorLocal.id) {
                         console.log('se recibio invitacion del mismo jugador');
                         return;
                     }
 
 
                 }
-
 
 
                 this.listaMsgRecibido.unshift(
@@ -160,7 +159,6 @@ const appController = new Vue({
 
                     return;
                 }
-
 
 
                 if (data.tipo === 'invitacion_aceptada') {
@@ -217,7 +215,14 @@ const appController = new Vue({
             },
             enviarMensajeAtaque(id_jugador_recibe_ataque, r, c) {
 
-                let msg=factoryMensajeSocket.LanzaCohete( gameData.jugadorLocal.id , id_jugador_recibe_ataque, r,c)
+                let msg = factoryMensajeSocket.LanzaCohete(gameData.jugadorLocal.id, id_jugador_recibe_ataque, r, c)
+
+                return this.enviarMensajeSocket(msg);
+
+            },
+            enviarMensajeResultadoDeAtaque(rZona, cZona, isSubmarino) {
+
+                let msg = factoryMensajeSocket.ResultadoAtaque(gameData.jugadorLocal.id, rZona, cZona, isSubmarino);
 
                 return this.enviarMensajeSocket(msg);
 

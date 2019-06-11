@@ -28,7 +28,7 @@ const factoryMensajeSocket = {
         }
 
     },
-    ResultadoAtaque: function (id_jugador: string,  r: number, c: number, isSubmarino: boolean, isRendicion: boolean) {
+    ResultadoAtaque: function (id_jugador: string,  r: number, c: number, isSubmarino: boolean) {
 
         return {
             token: gameData.tokenRoom,
@@ -36,8 +36,8 @@ const factoryMensajeSocket = {
             tipo: tipoMsgSocket.resultado_ataque,
             r,
             c,
-            isSubmarino,
-            isRendicion
+            isSubmarino
+
         }
 
     }

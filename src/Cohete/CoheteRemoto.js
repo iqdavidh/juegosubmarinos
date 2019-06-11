@@ -73,14 +73,27 @@ class CoheteRemoto extends ACohete {
                 zona.isSubmarino = false;
             }
 
+
+
             let  numSubActivos= gameData.jugadorLocal.listaSubmarinos
                 .filter(s=>{
                     return s.getIsActivo();
                 }).length;
 
-            let isRendicion=numSubActivos>0;
 
-            let msg=factoryMensajeSocket.ResultadoAtaque( gameData.jugadorLocal.id,  rZona, cZona,   zona.isSubmarino, isRendicion);
+
+
+
+            /*Enviar mesnaje de resultado de ataque ****************** */
+
+            appController.enviarMensajeResultadoDeAtaque(  rZona, cZona,  zona.isSubmarino);
+
+            /*--------------------------------------------- */
+
+            if(numSubActivos===0){
+                alert('Perdiste');
+            }
+
         };
 
     }
