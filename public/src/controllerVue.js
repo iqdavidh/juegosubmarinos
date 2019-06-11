@@ -1,7 +1,7 @@
 const appController = new Vue({
         el: '#app',
         data: {
-            isDebug: true,
+            isDebug: false,
             estadoConexion: false,
             etapa: 'inicio',
             subEtapa: 0,
@@ -19,14 +19,14 @@ const appController = new Vue({
                 {tipo: 'lanza_cohete'},
                 {tipo: 'resultado_ataque'}
             ],
-            dataMsg:{},
+            dataMsg: {},
             newRoom: {
                 codigo: null,
                 numJugadores: null
             },
             unirseRoom: null,
             numJugadoresEsperados: null,
-            listaNumJugadores: [2, 3, 4, 5, 6, 7, 8]
+            listaNumJugadores: [2, 3, 4, 5, 6, 7, 8, 9]
         },
         methods: {
             setConexionOK() {
@@ -62,6 +62,8 @@ const appController = new Vue({
                 ws.send(JSON.stringify(data));
 
                 //esperamos el juego
+                //document.getElementById('container').style='block';
+                this.etapa = 'juego';
 
 
             },
@@ -80,6 +82,8 @@ const appController = new Vue({
                 let jugadorMaster = factoryJugadorRemoto.fromMsgJugadorIngresa(msg);
                 gameData.listaJugadores.push(jugadorMaster);
 
+                //esperamos el juego
+                this.etapa = 'juego';
             },
             onEventoSocket(evento, tipo) {
 

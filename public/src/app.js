@@ -1,12 +1,12 @@
 /*  */
 
 const gameConfig = {
-    size: 900,
+    size: 600,
     deltaSep: 20,
     numSubmarinos: 4,
     numDivisiones: 4,
     wDivision: 2,
-    sPrepararCohete:0, /*<------------*/
+    sPrepararCohete:2, /*<------------*/
     velocidadCohete:10,
     sizeCohete:50,
     isAudio:false,
@@ -68,16 +68,7 @@ function IDGenerator(token){
 
     consecutivo++;
     return token + consecutivo.toString();
-
-    //
-    // let _getRandomInt = function (min, max) {
-    //     return Math.floor(Math.random() * (max - min + 1)) + min;
-    // };
-    //
-    // return _getRandomInt(0, 100000) ;
-
 }
-
 
 
 
@@ -95,61 +86,54 @@ function loadImage(url) {
 
 
 
-function loadCanvasAndResources(callback){
+//cargar imagenes ************************************************
 
-    /* registrar canvas */
-    if(!gameData.isCanvasLoaded){
+(function () {
 
-        gameData.canvas = document.createElement('canvas');
-        gameData.canvas.width = gameConfig.size;
-        gameData.canvas.height = gameConfig.size;
-
-        let container = document.getElementById('container');
-        container.append(gameData.canvas);
-        gameData.ctx = gameData.canvas.getContext('2d');
-
-        gameData.isCanvasLoaded=true;
-    }
-
-    /* precargar archivos *************************** */
-
-
-    function loadMar(){
+    function loadMar() {
         return loadImage('/img/mar1.png')
     }
 
-    function loadBullet(){
-        return loadImage( '/img/Bullet.png');
+    function loadBullet() {
+        return loadImage('/img/Bullet.png');
     }
 
-    function loadTanque(){
-        return loadImage( '/img/tanque.png');
+    function loadTanque() {
+        return loadImage('/img/tanque.png');
     }
 
-    function loadTanqueDestruido(){
-        return loadImage( '/img/tanque_destruido.png');
+    function loadTanqueDestruido() {
+        return loadImage('/img/tanque_destruido.png');
     }
 
-    function loadRocket(){
-        return loadImage( '/img/Rocket150.png');
+    function loadRocket() {
+        return loadImage('/img/Rocket150.png');
     }
 
-    function loadExplosion(){
-        return loadImage( '/img/explosion50.png');
+    function loadExplosion() {
+        return loadImage('/img/explosion50.png');
     }
 
     Promise.all([
-            loadMar(),loadBullet(), loadTanque(),
-            loadTanqueDestruido(), loadRocket(),loadExplosion()
+            loadMar(), loadBullet(), loadTanque(),
+            loadTanqueDestruido(), loadRocket(), loadExplosion()
         ]
     ).then(([imgMar, imgBullet, imgTanque,
-                           imgTanqueDest, imgRocket, imgExplosion]) => {
-        callback(imgMar, imgBullet, imgTanque
-            , imgTanqueDest, imgRocket, imgExplosion);
-        gameConfig.isResourcesLoaded = true;
-    });
+                imgTanqueDest, imgRocket, imgExplosion]) => {
 
-}
+        gameConfig.resources.imgMar = imgMar;
+        gameConfig.resources.imgBullet = imgBullet;
+        gameConfig.resources.imgTanque = imgTanque;
+        gameConfig.resources.imgTanqueDest = imgTanqueDest;
+        gameConfig.resources.imgRocket = imgRocket;
+        gameConfig.resources.imgExplosion = imgExplosion;
+
+        gameConfig.isResourcesLoaded = true;
+        console.log('resources loaded');
+    });
+})();
+
+
 //@flow
 /* use strict */
 
@@ -275,7 +259,7 @@ let EventoDummy = {
         let fn = () => {
             gameController.engine.selpos.onKeyDow({code: "Enter"});
         };
-        setTimeout(fn, 1000);
+       // setTimeout(fn, 1000);
 
     },
     j1Ataca: function () {
@@ -751,17 +735,32 @@ const gameData = {
     isCanvasLoaded: false
 };
 
+//cargar canvas ************************************************
 
-loadCanvasAndResources((imgMar, imgBullet, imgTanque
-    , imgTanqueDest, imgRocket, imgExplosion
-) => {
-    gameConfig.resources.imgMar = imgMar;
-    gameConfig.resources.imgBullet = imgBullet;
-    gameConfig.resources.imgTanque = imgTanque;
-    gameConfig.resources.imgTanqueDest = imgTanqueDest;
-    gameConfig.resources.imgRocket = imgRocket;
-    gameConfig.resources.imgExplosion = imgExplosion;
-});
+(function () {
+
+    gameData.canvas = document.createElement('canvas');
+    gameData.canvas.width = gameConfig.size;
+    gameData.canvas.height = gameConfig.size;
+
+    // gameData.canvas.style.width = gameConfig.size;
+    // gameData.canvas.style.height = gameConfig.size;
+
+    let container = document.getElementById('panCanvas');
+    container.append(gameData.canvas);
+    gameData.ctx = gameData.canvas.getContext('2d');
+
+    gameData.isCanvasLoaded = true;
+    console.log('canvas loaded');
+
+})();
+
+
+
+
+
+
+
 
 
 const gameController = {
@@ -780,20 +779,10 @@ const gameController = {
     },
     start: function () {
 
-        if (gameData.isResourcesLoaded) {
+        if (gameConfig.isResourcesLoaded) {
             this.runConfirmarPosiciones();
-
-        } else {
-
-            //se verifica si estan cargadoir
-            loadCanvasAndResources((imgMar, imgBullet, imgTanque) => {
-                gameConfig.resources.imgMar = imgMar;
-                gameConfig.resources.imgBullet = imgBullet;
-                gameConfig.resources.imgTanque = imgTanque;
-                this.runConfirmarPosiciones();
-            });
-
-
+        }else{
+            console.log('isResourcesLoaded false - nos e pueden confirmar posiciones');
         }
     },
     runConfirmarPosiciones: function () {
@@ -2893,10 +2882,12 @@ const factoryPosicionRCCuadrante = {
             return new Posicion(sizeRegion * 2, sizeRegion * 2);
         }
 
-        throw new Error("Ese cuadrante no esta soportado " + cuadrante.toString());
+
+        console.log("Ese cuadrante no esta soportado " + cuadrante.toString());
+        return null;
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190611 08:11');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190611 10:48');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map

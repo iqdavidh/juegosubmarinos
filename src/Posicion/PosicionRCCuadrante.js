@@ -133,7 +133,9 @@ const factoryPosicionRCCuadrante = {
             return new Posicion(sizeRegion * 2, sizeRegion * 2);
         }
 
-        throw new Error("Ese cuadrante no esta soportado " + cuadrante.toString());
+
+        console.log("Ese cuadrante no esta soportado " + cuadrante.toString());
+        return null;
     }
 
 };

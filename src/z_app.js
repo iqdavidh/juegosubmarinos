@@ -15,17 +15,32 @@ const gameData = {
     isCanvasLoaded: false
 };
 
+//cargar canvas ************************************************
 
-loadCanvasAndResources((imgMar, imgBullet, imgTanque
-    , imgTanqueDest, imgRocket, imgExplosion
-) => {
-    gameConfig.resources.imgMar = imgMar;
-    gameConfig.resources.imgBullet = imgBullet;
-    gameConfig.resources.imgTanque = imgTanque;
-    gameConfig.resources.imgTanqueDest = imgTanqueDest;
-    gameConfig.resources.imgRocket = imgRocket;
-    gameConfig.resources.imgExplosion = imgExplosion;
-});
+(function () {
+
+    gameData.canvas = document.createElement('canvas');
+    gameData.canvas.width = gameConfig.size;
+    gameData.canvas.height = gameConfig.size;
+
+    // gameData.canvas.style.width = gameConfig.size;
+    // gameData.canvas.style.height = gameConfig.size;
+
+    let container = document.getElementById('panCanvas');
+    container.append(gameData.canvas);
+    gameData.ctx = gameData.canvas.getContext('2d');
+
+    gameData.isCanvasLoaded = true;
+    console.log('canvas loaded');
+
+})();
+
+
+
+
+
+
+
 
 
 const gameController = {
@@ -44,20 +59,10 @@ const gameController = {
     },
     start: function () {
 
-        if (gameData.isResourcesLoaded) {
+        if (gameConfig.isResourcesLoaded) {
             this.runConfirmarPosiciones();
-
-        } else {
-
-            //se verifica si estan cargadoir
-            loadCanvasAndResources((imgMar, imgBullet, imgTanque) => {
-                gameConfig.resources.imgMar = imgMar;
-                gameConfig.resources.imgBullet = imgBullet;
-                gameConfig.resources.imgTanque = imgTanque;
-                this.runConfirmarPosiciones();
-            });
-
-
+        }else{
+            console.log('isResourcesLoaded false - nos e pueden confirmar posiciones');
         }
     },
     runConfirmarPosiciones: function () {
