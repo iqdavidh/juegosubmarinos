@@ -1,7 +1,7 @@
 const appController = new Vue({
         el: '#app',
         data: {
-            isDebug: false,
+            isDebug: true,
             estadoConexion: false,
             etapa: 'inicio',
             subEtapa: 0,
@@ -73,7 +73,7 @@ const appController = new Vue({
             empezarPartidaUnirse(invitacion) {
 
                 //Paso 1 creamos el juego (se crea el id de jugador)
-                gameController.onRegistroSocket(invitacion.codigo, invitacion.numJugadores);
+                gameController.onRegistroSocket(invitacion.codigo, invitacion.numJugadoresEsperados);
 
                 this.numJugadoresEsperados = invitacion.numJugadores;
 
