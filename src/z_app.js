@@ -49,7 +49,6 @@ const gameController = {
 
         } else {
 
-
             //se verifica si estan cargadoir
             loadCanvasAndResources((imgMar, imgBullet, imgTanque) => {
                 gameConfig.resources.imgMar = imgMar;

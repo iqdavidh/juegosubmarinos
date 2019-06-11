@@ -785,7 +785,6 @@ const gameController = {
 
         } else {
 
-
             //se verifica si estan cargadoir
             loadCanvasAndResources((imgMar, imgBullet, imgTanque) => {
                 gameConfig.resources.imgMar = imgMar;
@@ -2898,6 +2897,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190610 17:30');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190611 08:11');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
