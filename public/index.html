@@ -39,6 +39,16 @@
             text-align: center
 
         }
+
+        ul.panco {
+            list-style: none;
+        }
+
+        ul.panco li {
+            display: inline-block;
+            padding: 0;
+            margin: 0
+        }
     </style>
 </head>
 <body
@@ -59,20 +69,24 @@
 
                 <div class="panFondoBlack">
                     <h1 style="margin-top: 10px; font-size: 50px">Gran Batalla Naval</h1>
+                    <p>Demostración de Tecnología Sockets Serverless usando Amazon Web Services</p>
 
+                    <p>@iqdavidh</p>
                     <h2>Junio 2019</h2>
-                    <h2>@iqdavidh</h2>
+
+
+
 
                     <div style="margin-top: 40px"
 
                     >
                         <div class="btn btn-primary"
-                             v-if="estadoConexion"
+                             v-show="estadoConexion"
                              @click="onIniciarJuego"
                         >Jugar
                         </div>
 
-                        <div v-if="!estadoConexion">No hay conexion a socket</div>
+                        <div v-show="!estadoConexion">No hay conexion a socket</div>
                         <div class="btn btn-default"
                              @click="subEtapa='instrucciones'"
                         >Ver Instrucciones
@@ -174,7 +188,7 @@
                 <div class="row">
                     <div class="col-md-3">
                         <p style="text-align: center">Código de Partida</p>
-                        <h2>{{newRoom.codigo}}</h2>
+                        <h2>{{newRoom.token}}</h2>
                     </div>
                     <div class="col-md-6">
                         <p>Seleccionar el número de jugadores</p>
@@ -214,7 +228,7 @@
                                 style="margin-top: 20px"
                                 @click="empezarPartidaUnirse(item)"
                                 v-for="item in listaInvitacionAJuego"
-                        >Unirse al Juego {{item.codigo}} - {{item.numJugadoresEsperados}} Jugadores
+                        >Unirse al Juego {{item.token}} - {{item.numJugadoresEsperados}} Jugadores
                         </button>
                     </div>
                     <div class="col-md-4">
@@ -226,9 +240,8 @@
         </div>
 
 
-
         <div v-show="isDebug" style="background-color: #fff; margin-top: 100px">
-            <h3>Prueba del Websocket  - Jugador {{labelIdPlayer}}</h3>
+            <h3>Prueba del Websocket - Jugador {{labelIdPlayer}}</h3>
 
             <p>Recordar usar dos ventanas para ver como se comunican los jugadores</p>
 
@@ -332,13 +345,6 @@
 </div>
 
 <!-- TODO vr porque textalign center mueve las coordenadas-->
-
-
-
-
-
-
-
 
 
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>

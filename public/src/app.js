@@ -1,7 +1,7 @@
 /*  */
 
 const gameConfig = {
-    size: 900,
+    size: 600,
     deltaSep: 20,
     numSubmarinos: 4,
     numDivisiones: 6,
@@ -435,7 +435,7 @@ class AJugador {
             return indexCuadrante === 0;
         };
 
-        this.listaAtaquesRecibidos = [];
+
         this.listaCohetes = [];
 
     }
@@ -2904,6 +2904,6 @@ const factoryPosicionRCCuadrante = {
     }
 
 };
-/*FBUILD*/ console.log( 'FBUILD-20190611 15:45');  /*FBUILD*/
+/*FBUILD*/ console.log( 'FBUILD-20190612 09:02');  /*FBUILD*/
 
 //# sourceMappingURL=app.js.map
