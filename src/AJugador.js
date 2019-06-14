@@ -16,7 +16,7 @@ class AJugador {
             return indexCuadrante === 0;
         };
 
-        this.listaAtaquesRecibidos = [];
+
         this.listaCohetes = [];
 
     }

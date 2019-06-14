@@ -1,23 +1,15 @@
 /* @flow */
 const tipoMsgSocket = {
-    ingresa: 'ingresa',
-    sale: 'sale',
     confirma_posiciones: 'confirma_posiciones',
-    inicia_batalla: 'inicia_batalla',
     lanza_cohete: 'lanza_cohete',
     resultado_ataque: 'resultado_ataque',
 };
 
 
 const factoryMensajeSocket = {
-    JugadorIngresa: function (id_jugador: string) {
-        return {
-            token: gameData.tokenRoom,
-            id_jugador,
-            tipo: tipoMsgSocket.ingresa
-        };
-    },
     JugadorConfirma: function (id_jugador: string) {
+
+
         return {
             token: gameData.tokenRoom,
             id_jugador,
@@ -36,7 +28,7 @@ const factoryMensajeSocket = {
         }
 
     },
-    ResultadoAtaque: function (id_jugador: string,  r: number, c: number, isSubmarino: boolean, isRendicion: boolean) {
+    ResultadoAtaque: function (id_jugador: string,  r: number, c: number, isSubmarino: boolean) {
 
         return {
             token: gameData.tokenRoom,
@@ -44,8 +36,8 @@ const factoryMensajeSocket = {
             tipo: tipoMsgSocket.resultado_ataque,
             r,
             c,
-            isSubmarino,
-            isRendicion
+            isSubmarino
+
         }
 
     }

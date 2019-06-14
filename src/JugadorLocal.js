@@ -38,11 +38,30 @@ class JugadorLocal extends AJugador {
         if (cohete) {
             let posicionAbs = posicionEnLaMira.getPosAbs();
 
+
+            /*Enviar mesnaje de ataque ****************** */
+
+            let indexCuadrante = posicionEnLaMira.getIndexCuadrante();
+
+            let jugadorAtacado = gameData.listaJugadores
+                .find(j => {
+                        return j.indexCuadrante === indexCuadrante;
+                    }
+                )
+            ;
+
+            if (jugadorAtacado) {
+                appController.enviarMensajeAtaque(jugadorAtacado.id, posicionEnLaMira.getR(),posicionEnLaMira.getC());
+            } else {
+                console.log('diablos! no hay jugador atacado');
+            }
+            /*--------------------------------------------- */
+
+
             cohete.lanzar(posicionAbs);
 
-            //agreagamos la zona atacada
-            
-            let zonaAtacada=factoryZonaAtacada.exe(posicionEnLaMira, cohete.id , gameData.jugadorLocal.id);
+
+            let zonaAtacada = factoryZonaAtacada.exe(posicionEnLaMira, cohete.id, jugadorAtacado.id);
             gameData.listaZonasAtacadas.push(zonaAtacada);
 
         }

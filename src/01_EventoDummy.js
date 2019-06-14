@@ -75,7 +75,7 @@ let EventoDummy = {
         let fn = () => {
             gameController.engine.selpos.onKeyDow({code: "Enter"});
         };
-        setTimeout(fn, 1000);
+       // setTimeout(fn, 1000);
 
     },
     j1Ataca: function () {

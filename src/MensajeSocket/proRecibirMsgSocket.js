@@ -11,13 +11,8 @@ const proRecibirMsgSocket = {
             return;
         }
 
-
-        if (msg.tipo === tipoMsgSocket.ingresa) {
-            this.jugador_ingresa(jugador);
-
-
-        } else if (msg.tipo === tipoMsgSocket.confirma_posiciones) {
-            this.jugador_confirma_posicion(jugador)
+        if (msg.tipo === tipoMsgSocket.confirma_posiciones) {
+            this.jugador_confirma_posiciones(jugador)
 
         } else if (msg.tipo === tipoMsgSocket.lanza_cohete) {
             this.lanza_cohete(msg)
@@ -26,15 +21,13 @@ const proRecibirMsgSocket = {
             this.resultado_ataque(jugador, msg);
 
         } else {
-            alert("no esperamos este tipo de mensaje " + msg.tipo)
+            console.log("no esperamos este tipo de mensaje " , msg)
         }
 
 
     },
-    jugador_ingresa: function (jugador: JugadorRemoto) {
 
-    },
-    jugador_confirma_posicion: function (jugador: JugadorRemoto) {
+    jugador_confirma_posiciones: function (jugador: JugadorRemoto) {
 
         jugador.setPosicionConfirmada();
 
@@ -102,11 +95,9 @@ const proRecibirMsgSocket = {
         if (zona.isSubmarino !== true && msg.isSubmarino) {
             zona.isSubmarino = true;
             jugador.onSubmarinoDestruido();
-        }else{
+        } else {
             zona.isSubmarino = msg.isSubmarino;
         }
-
-
 
 
         //si destruyeon un submarino evaluar si ya ganamos

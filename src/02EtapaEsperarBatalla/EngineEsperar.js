@@ -31,7 +31,7 @@ class EngineEsperar extends AEngine {
 
     onJugadorRemotoConfirma() {
         const ctx = this.ctx;
-        let numJugadores = gameData.listaJugadores.length;
+
 
         let numConfirmados = gameData.listaJugadores
             .filter(j => {
@@ -40,10 +40,10 @@ class EngineEsperar extends AEngine {
 
         if (this.estado !== 'saliendo') {
             //poner el texto caundots jugadores estan confirmados
-            drawEsperar.actualizarTextoEspera(ctx, numJugadores, numConfirmados);
+            drawEsperar.actualizarTextoEspera(ctx, gameData.numJugadoresEsperados-1, numConfirmados);
         }
 
-        if (numJugadores === numConfirmados) {
+        if ((gameData.numJugadoresEsperados -1)=== numConfirmados &&  gameData.jugadorLocal.isPosicionConfirmada) {
             this.estado = 'saliendo';
             setTimeout(this.fnOnContinuar, 2000);
         }

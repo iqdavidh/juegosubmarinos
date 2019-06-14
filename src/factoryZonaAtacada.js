@@ -12,10 +12,11 @@ const factoryZonaAtacada = {
 
 
     return {
+        isLocal: id_jugador === gameData.jugadorLocal.id,
         id,
         idCohete,
         isObjetivoAlcanzado,
-        indexCuadrante,
+        indexCuadrante : indexCuadrante,
         id_jugador,
         posicionRCC,
         isSubmarino

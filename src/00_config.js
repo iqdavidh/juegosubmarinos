@@ -1,15 +1,15 @@
 /* @flow */
 
 const gameConfig = {
-    size: 700,
+    size: 600,
     deltaSep: 20,
     numSubmarinos: 4,
-    numDivisiones: 4,
+    numDivisiones: 5,
     wDivision: 2,
-    sPrepararCohete:0, /*<------------*/
+    sPrepararCohete:7, /*<------------*/
     velocidadCohete:10,
     sizeCohete:50,
-    isAudio:false,
+    isAudio:true,
     resources: {
         imgMar: null,
         imgBullet:null ,
@@ -68,14 +68,6 @@ function IDGenerator(token) :string{
 
     consecutivo++;
     return token + consecutivo.toString();
-
-    //
-    // let _getRandomInt = function (min, max) {
-    //     return Math.floor(Math.random() * (max - min + 1)) + min;
-    // };
-    //
-    // return _getRandomInt(0, 100000) ;
-
 }
 
 
